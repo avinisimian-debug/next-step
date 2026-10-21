@@ -9,5 +9,5 @@ export default defineConfig({
       "server-only": path.resolve(__dirname, "test/server-only-stub.ts"),
     },
   },
-  test: { include: ["src/**/*.test.ts"], environment: "node" },
+  test: { include: ["src/**/*.test.ts", "supabase/tests/**/*.test.ts"], environment: "node" },
 });

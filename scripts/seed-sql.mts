@@ -4,9 +4,9 @@ import { institutions } from "../src/data/institutions.ts";
 const q = (s: string) => `'${s.replace(/'/g, "''")}'`;
 const rows = institutions.map(
   (i) =>
-    `(${q(i.id)}, ${q(i.slug)}, ${i.published}, ${q(i.verificationStatus)}, ${q(i.lastVerified)}, ${q(JSON.stringify(i))}::jsonb)`,
+    `(${q(i.id)}, ${q(i.slug)}, ${q(i.pathway)}, ${i.published}, ${q(i.verificationStatus)}, ${q(i.lastVerified)}, ${q(JSON.stringify(i))}::jsonb)`,
 );
-console.log(`insert into public.institutions (id, slug, published, verification_status, last_verified, data) values
+console.log(`insert into next_step.institutions (id, slug, pathway, published, verification_status, last_verified, data) values
 ${rows.join(",\n")}
-on conflict (id) do update set slug = excluded.slug, published = excluded.published,
+on conflict (id) do update set slug = excluded.slug, pathway = excluded.pathway, published = excluded.published,
   verification_status = excluded.verification_status, last_verified = excluded.last_verified, data = excluded.data;`);
