@@ -195,6 +195,32 @@ test("admin area is not exposed when no admin credentials are configured", async
   expect((await request.get("/admin")).status()).toBe(404);
 });
 
+test("search finds institutions by text and filters, keeps state in the URL, and shows an empty state", async ({ page }) => {
+  await page.goto("/institutions");
+  await page.getByLabel("חיפוש לפי שם, מקום או תיאור").fill("הכותל");
+  await page.getByRole("button", { name: "חיפוש" }).click();
+  await expect(page).toHaveURL(/q=/);
+  // Name matches rank first; Birkat Moshe also matches because its founders came from HaKotel.
+  await expect(page.locator("main ul li h2").first()).toHaveText("ישיבת הכותל");
+
+  await page.goto("/institutions?pathway=hesder&region=south");
+  await expect(page.getByLabel("מסלול", { exact: true })).toHaveValue("hesder");
+  const cards = page.locator("main ul li h2");
+  await expect(cards.filter({ hasText: "שדרות" })).toHaveCount(1);
+  await expect(cards.filter({ hasText: "הכותל" })).toHaveCount(0);
+
+  await page.goto("/institutions?q=" + encodeURIComponent("אין כזה מקום בכלל"));
+  await expect(page.getByRole("status")).toHaveText("לא נמצאו מסגרות");
+  await page.getByRole("link", { name: "להצגת כל המסגרות" }).click();
+  await expect(page).toHaveURL(/\/institutions$/);
+});
+
+test("search ignores invalid filter values", async ({ page }) => {
+  const res = await page.goto("/institutions?pathway=army&region=mars");
+  expect(res?.status()).toBe(200);
+  await expect(page.getByLabel("מסלול", { exact: true })).toHaveValue("");
+});
+
 test("unverified records are not reachable", async ({ request }) => {
   expect((await request.get("/institutions/nachshon")).status()).toBe(404);
 });
