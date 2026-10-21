@@ -47,7 +47,24 @@ export interface Exclusion {
   reason: string;
 }
 
+/** How well a whole pathway fits, derived from the best eligible options within it. */
+export interface PathwayFit {
+  pathway: Pathway;
+  /** Best compatibility score in this pathway, or null if every option was excluded. */
+  score: number | null;
+  /** Options in this pathway at or above the recommendation threshold. */
+  qualifying: number;
+  /** Eligible options considered in this pathway. */
+  considered: number;
+  /** Strongest specific reason from the best option, if any. */
+  reason?: string;
+  /** Set when options exist but all were excluded by a hard constraint. */
+  excludedNote?: string;
+}
+
 export interface MatchResult {
+  /** All four pathways, best first. */
+  pathways: PathwayFit[];
   recommendations: Recommendation[];
   /** All scored options, best first — useful for tests and "see more". */
   ranked: Recommendation[];
@@ -554,5 +571,25 @@ export function match(catalog: Institution[], a: Answers, config: EngineConfig =
     limitation = `מצאנו ${chosen.length === 1 ? "אפשרות אחת" : "שתי אפשרויות"} שמתאימות מספיק. לא נציג התאמות חלשות רק כדי למלא שלושה מקומות.`;
   }
 
-  return { recommendations: chosen, ranked, excluded, lowConfidence, needsGuidance, limitation };
+  const pathways = rankPathways(ranked, excluded, config);
+  return { pathways, recommendations: chosen, ranked, excluded, lowConfidence, needsGuidance, limitation };
+}
+
+const ALL_PATHWAYS: Pathway[] = ["idf", "mechina", "hesder", "yeshiva"];
+
+export function rankPathways(ranked: Recommendation[], excluded: Exclusion[], config: EngineConfig = DEFAULT_CONFIG): PathwayFit[] {
+  return ALL_PATHWAYS.map((pathway): PathwayFit => {
+    const inPath = ranked.filter((r) => r.institution.pathway === pathway);
+    const best = inPath[0];
+    const excludedHere = excluded.filter((e) => e.institution.pathway === pathway).length;
+    return {
+      pathway,
+      score: best ? best.score : null,
+      qualifying: inPath.filter((r) => r.score >= config.minScore).length,
+      considered: inPath.length,
+      reason: best?.reasons[0],
+      excludedNote:
+        !best && excludedHere > 0 ? "המסגרות שבמאגר במסלול הזה מיועדות לקהל אחר מזה שציינת." : undefined,
+    };
+  }).sort((x, y) => (y.score ?? -1) - (x.score ?? -1) || ALL_PATHWAYS.indexOf(x.pathway) - ALL_PATHWAYS.indexOf(y.pathway));
 }

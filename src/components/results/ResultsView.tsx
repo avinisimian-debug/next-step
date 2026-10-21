@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Info, Pencil, RotateCcw, Scale, Sparkles, UserRound } from "lucide-react";
+import { ArrowLeft, ClipboardList, Info, Pencil, RotateCcw, Scale, Sparkles, UserRound } from "lucide-react";
 import type { Institution } from "@/lib/domain/types";
 import { match } from "@/lib/matching/engine";
 import type { Answers } from "@/lib/questionnaire/questions";
 import { KEYS, clearAllStored, useStored } from "@/lib/client/store";
 import { RecommendationCard } from "./RecommendationCard";
+import { PathwayOverview } from "./PathwayOverview";
+import { Loading } from "@/components/site/Loading";
 
 export function ResultsView({ catalog }: { catalog: Institution[] }) {
   const router = useRouter();
@@ -18,7 +20,7 @@ export function ResultsView({ catalog }: { catalog: Institution[] }) {
   const result = useMemo(() => match(catalog, answers), [catalog, answers]);
   const [ai, setAi] = useState<Record<string, string> | null>(null);
 
-  if (!hydrated) return <div className="min-h-[70vh]" aria-busy="true" />;
+  if (!hydrated) return <Loading label="מחשבים את ההמלצות…" />;
 
   if (Object.keys(answers).length === 0) {
     return (
@@ -64,6 +66,13 @@ export function ResultsView({ catalog }: { catalog: Institution[] }) {
             </button>
           )}
           <Link
+            href="/plan"
+            className="inline-flex items-center gap-2 rounded-full border border-teal-600 px-5 py-2.5 text-sm font-semibold text-teal-700 hover:bg-teal-100"
+          >
+            <ClipboardList className="size-4" aria-hidden="true" />
+            תוכנית הפעולה שלי
+          </Link>
+          <Link
             href="/questionnaire?edit=1"
             onClick={() => setProgress({ index: 0, phase: "summary" })}
             className="inline-flex items-center gap-2 rounded-full border border-sand-300 px-5 py-2.5 text-sm font-medium text-navy-900 hover:bg-sand-100"
@@ -97,6 +106,12 @@ export function ResultsView({ catalog }: { catalog: Institution[] }) {
           </Notice>
         )}
       </div>
+
+      <PathwayOverview pathways={result.pathways} />
+
+      {recs.length > 0 && (
+        <h2 className="mt-12 font-display text-2xl font-bold text-navy-950">המסגרות שכדאי להכיר</h2>
+      )}
 
       {recs.length > 0 && <AiPanel answers={answers} ids={recs.map((r) => r.institution.id)} onResult={setAi} />}
 

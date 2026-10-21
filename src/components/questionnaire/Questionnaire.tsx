@@ -16,6 +16,7 @@ import {
 } from "@/lib/questionnaire/questions";
 import { KEYS, clearAllStored, useStored } from "@/lib/client/store";
 import { ICONS } from "./icons";
+import { Loading } from "@/components/site/Loading";
 
 interface Progress {
   index: number;
@@ -61,7 +62,7 @@ export function Questionnaire() {
   }, [index, progress.phase, resume]);
 
   if (!hydrated || resume === "pending") {
-    return <div className="mx-auto min-h-[60vh] max-w-2xl px-4" aria-busy="true" />;
+    return <Loading label="טוען את השאלון…" />;
   }
 
   const setAnswer = (id: string, value: string | string[] | undefined) => {

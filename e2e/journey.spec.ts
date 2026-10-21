@@ -77,6 +77,12 @@ test("full journey: conditional questions, summary, results, profile and compare
   await expect(page).toHaveURL(/\/results/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("מצאנו את שלושת הכיוונים שכדאי לך להכיר.");
 
+  // Pathway-level view comes before specific institutions, with all four pathways.
+  const overview = page.locator("section[aria-labelledby='h-pathways']");
+  await expect(overview.getByRole("heading", { name: "איך כל מסלול מתאים לך" })).toBeVisible();
+  await expect(overview.locator("li[data-pathway]")).toHaveCount(4);
+  await expect(overview.locator("li[data-pathway]").first()).toHaveAttribute("data-pathway", "hesder");
+
   const cards = page.locator("article");
   await expect(cards).toHaveCount(3);
   for (let i = 0; i < 3; i++) {
@@ -105,6 +111,25 @@ test("full journey: conditional questions, summary, results, profile and compare
   await expect(page.getByText("ההשוואה משקפת את המידע המאומת")).toBeVisible();
   const visibleTitles = page.locator("a[id^='d-'], a[id^='m-']").filter({ visible: true });
   await expect(visibleTitles).toHaveCount(3);
+
+  // Action plan: one section per recommendation; check-offs persist across reloads.
+  await page.getByRole("link", { name: "לתוכנית הפעולה שלי" }).click();
+  await expect(page).toHaveURL(/\/plan/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("תוכנית הפעולה שלי");
+  await expect(page.locator("section[aria-labelledby^='plan-']")).toHaveCount(4);
+  const first = page.locator("li[data-step='talk-home'] input[type=checkbox]");
+  await first.check();
+  await expect(page.getByText(/הושלמו 1 מתוך/)).toBeVisible();
+  await page.reload();
+  await expect(page.locator("li[data-step='talk-home'] input[type=checkbox]")).toBeChecked();
+  const stored = await page.evaluate(() => localStorage.getItem("nextstep.plan.v1"));
+  expect(JSON.parse(stored ?? "[]")).toContain("talk-home");
+});
+
+test("action plan without answers shows an empty state", async ({ page }) => {
+  await page.goto("/plan");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("תוכנית הפעולה נבנית מההמלצות שלך");
+  await expect(page.getByRole("link", { name: "למעבר לשאלון" })).toBeVisible();
 });
 
 test("back navigation keeps answers, and progress survives a reload", async ({ page }) => {
@@ -186,7 +211,7 @@ test("external official links are labelled and open safely", async ({ page }) =>
   await expect(page.getByText("האתר הרשמי טרם אומת").first()).toBeVisible();
 });
 
-for (const path of ["/", "/questionnaire", "/institutions", "/institutions/hakotel", "/about", "/privacy", "/compare"]) {
+for (const path of ["/", "/questionnaire", "/institutions", "/institutions/hakotel", "/about", "/privacy", "/compare", "/plan"]) {
   test(`no horizontal overflow on ${path}`, async ({ page }) => {
     await page.goto(path);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

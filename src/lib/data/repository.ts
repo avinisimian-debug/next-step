@@ -27,7 +27,7 @@ function validate(records: unknown[]): Institution[] {
   });
 }
 
-class SeedRepository implements InstitutionRepository {
+export class SeedRepository implements InstitutionRepository {
   private readonly records = validate(seed);
   async listPublic() {
     return this.records.filter(isPublic);
@@ -47,7 +47,7 @@ class SeedRepository implements InstitutionRepository {
  * Supabase (PostgREST) implementation without extra dependencies.
  * Table layout: see supabase/schema.sql. The full record lives in the `data` jsonb column.
  */
-class SupabaseRepository implements InstitutionRepository {
+export class SupabaseRepository implements InstitutionRepository {
   constructor(
     private readonly url: string,
     private readonly readKey: string,

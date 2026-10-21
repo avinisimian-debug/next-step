@@ -9,6 +9,7 @@ import type { Answers } from "@/lib/questionnaire/questions";
 import { KEYS, useStored } from "@/lib/client/store";
 import { DURATION_LABELS, INTENSITY_LABELS, MILITARY_MODEL_LABELS, PATHWAY_INFO } from "@/lib/domain/pathways";
 import { OfficialLink, VerificationBadge, formatDate } from "@/components/institution/bits";
+import { Loading } from "@/components/site/Loading";
 
 const NV = "המידע עדיין לא אומת";
 
@@ -54,7 +55,7 @@ export function CompareView({ catalog }: { catalog: Institution[] }) {
     [selected, answers, hasAnswers],
   );
 
-  if (!hydrated) return <div className="min-h-[60vh]" aria-busy="true" />;
+  if (!hydrated) return <Loading label="טוען את ההשוואה…" />;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -128,6 +129,12 @@ export function CompareView({ catalog }: { catalog: Institution[] }) {
               </tbody>
             </table>
           </div>
+          {hasAnswers && (
+            <Link href="/plan" className="mt-6 inline-flex items-center gap-2 rounded-full bg-navy-900 px-5 py-2.5 text-sm font-semibold text-paper hover:bg-navy-800">
+              לתוכנית הפעולה שלי
+              <ArrowLeft className="size-4" aria-hidden="true" />
+            </Link>
+          )}
         </>
       )}
 

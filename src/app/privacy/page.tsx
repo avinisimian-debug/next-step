@@ -18,7 +18,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="font-display text-2xl font-bold text-navy-950">מה נשמר ואיפה</h2>
           <ul className="mt-3 list-disc space-y-2 ps-6">
-            <li>התשובות לשאלון, המיקום שלך בשאלון, המועדפים והבחירות להשוואה — נשמרים רק באחסון המקומי של הדפדפן (localStorage) במכשיר הזה.</li>
+            <li>התשובות לשאלון, המיקום שלך בשאלון, המועדפים, הבחירות להשוואה והצעדים שסימנת בתוכנית הפעולה — נשמרים רק באחסון המקומי של הדפדפן (localStorage) במכשיר הזה.</li>
             <li>חישוב ההתאמה נעשה בדפדפן שלך. התשובות לא נשלחות לשרת שלנו לצורך החישוב.</li>
             <li>אנחנו לא מבקשים שם, טלפון, מספר זהות, פרטים רפואיים או פרופיל צבאי, ולא צריך להירשם.</li>
             <li>אין באתר כלי אנליטיקה או מעקב כברירת מחדל.</li>
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
 
         <section className="rounded-3xl border border-sand-200 bg-paper p-6">
           <h2 className="font-display text-2xl font-bold text-navy-950">מחיקת המידע</h2>
-          <p className="mt-2">הכפתור מוחק מהדפדפן הזה את כל מה ש־NEXT STEP שמר: תשובות, מועדפים, השוואות והסכמות.</p>
+          <p className="mt-2">הכפתור מוחק מהדפדפן הזה את כל מה ש־NEXT STEP שמר: תשובות, מועדפים, השוואות, סימונים בתוכנית הפעולה והסכמות.</p>
           <div className="mt-4">
             <ClearDataButton />
           </div>

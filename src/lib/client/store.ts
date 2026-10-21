@@ -13,6 +13,7 @@ export const KEYS = {
   favorites: "nextstep.favorites.v1",
   compare: "nextstep.compare.v1",
   aiConsent: "nextstep.aiConsent.v1",
+  plan: "nextstep.plan.v1",
 } as const;
 
 const listeners = new Set<() => void>();
