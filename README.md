@@ -2,7 +2,7 @@
 
 A Hebrew-first, RTL web app that helps Jewish Israeli students in grades 11–12 (and recent graduates) explore four post-high-school pathways — **IDF service, pre-military academies (mechinot), hesder yeshivot and higher yeshivot** — and get up to three explainable recommendations from a catalog of verified institutions.
 
-Core flow: landing page → adaptive questionnaire → summary → matching → top 3 recommendations → institution profiles → side-by-side comparison → official links and contact details.
+Core flow: landing page → adaptive questionnaire → review answers → pathway-level fit → up to 3 institution recommendations → institution profiles → side-by-side comparison → personal action plan (with official links and contact details).
 
 ## Stack
 
@@ -65,11 +65,12 @@ src/
   lib/data/          repository.ts — Seed and Supabase implementations of InstitutionRepository
   lib/questionnaire/ questions.ts — questions, options, conditional visibility, pruning
   lib/matching/      config.ts (weights, thresholds), engine.ts (scoring, constraints, explanations)
+  lib/plan/          actionPlan.ts — deterministic personal action plan
   lib/ai/            explain.ts — optional grounded summaries with structured output + fallback
   lib/client/        store.ts — localStorage-backed state (answers, progress, favorites, compare)
   components/        site, questionnaire, results, institution, compare, admin, art
   app/               routes: / /questionnaire /results /institutions /institutions/[slug]
-                     /compare /about /privacy /admin /api/explain /api/admin/institutions
+                     /compare /plan /about /privacy /admin /api/explain /api/admin/institutions
 ```
 
 The catalog is separate from the engine: pages load records through the repository and pass plain objects into `match()`. Matching runs **in the browser**, so questionnaire answers never reach the server unless the user opts into the AI summary.
@@ -138,8 +139,64 @@ The matching attributes (e.g. Torah intensity, environment styles) are an editor
 
 ## Tests
 
-- `npm test` — 26 Vitest tests: schema validity and uniqueness of the catalog, distinct profiles (Torah + service, combat, intensive Torah, mixed mechina, technology) getting distinct and sensible results, determinism, neutral handling of missing answers, audience constraints, no padding, variety, explanation presence, low-confidence flag, conditional questions and answer pruning.
-- `npm run test:e2e` — 17 Playwright tests × desktop and mobile (34 runs): Hebrew/RTL, full journey with conditional questions, summary editing, results, details panel, profile, compare; back navigation; resume after reload and restart; required-question gating and exclusive options; keyboard-only answering and focus management; empty states; AI endpoint without a key; admin hidden without credentials; unverified record unreachable; official links labelled and opening safely; no horizontal overflow on key pages.
+- `npm test` — 48 Vitest tests. Engine (26): schema validity and uniqueness of the catalog, distinct profiles (Torah + service, combat, intensive Torah, mixed mechina, technology) getting distinct and sensible results, determinism, neutral handling of missing answers, audience constraints, no padding, variety, explanation presence, low-confidence flag, conditional questions and answer pruning. Plus pathway ranking and the action plan (10), Seed and Supabase repositories with mocked `fetch` (8) and the admin middleware (4).
+- `npm run test:e2e` — 19 Playwright tests × desktop and mobile (38 runs), including pathway overview and action plan persistence: Hebrew/RTL, full journey with conditional questions, summary editing, results, details panel, profile, compare; back navigation; resume after reload and restart; required-question gating and exclusive options; keyboard-only answering and focus management; empty states; AI endpoint without a key; admin hidden without credentials; unverified record unreachable; official links labelled and opening safely; no horizontal overflow on key pages.
+
+## Implementation status
+
+This section is the single source of truth for what works. Last updated 21 October 2026.
+
+### Implemented and tested
+
+| Area | Evidence |
+| --- | --- |
+| Homepage, adaptive questionnaire (conditional follow-ups, back, skip, summary editing, resume after reload) | Playwright `e2e/journey.spec.ts`, desktop + mobile |
+| Matching engine: weights, neutral missing answers, audience-only hard constraint, no padding, variety, explanations | Vitest `src/lib/matching/engine.test.ts` (26 tests) |
+| Pathway-level recommendations (all four pathways ranked before institutions) | Vitest `src/lib/plan/actionPlan.test.ts`; Playwright full journey |
+| Institution profiles, comparison (mobile cards, desktop table) | Playwright full journey, overflow checks |
+| Personal action plan (`/plan`): steps from recommendations and answers, sourced deadlines only, check-offs saved in the browser, print | Vitest `actionPlan.test.ts`; Playwright journey (check, reload, still checked) and empty state |
+| Persistence: answers, progress, favorites, compare picks, plan check-offs in `localStorage`; one-click delete on `/privacy` | Playwright resume/restart tests |
+| Data integrity: schema validation, unique ids/slugs, unpublished and `unverified` records never shown | Vitest catalog tests, `src/lib/data/repository.test.ts`; Playwright 404 for unverified slug |
+| Admin authorization (Basic auth; 404 when not configured, 401 on wrong credentials, pass on correct) | Vitest `src/middleware.test.ts`; Playwright (not configured → 404) |
+| AI endpoint without a key returns `available: false`, UI hides the panel | Playwright |
+| Accessibility basics: Hebrew/RTL, skip link, keyboard answering, focus moves to each question, labelled external links, loading text with `role="status"` | Playwright |
+| Production build, typecheck, lint | `npm run build`, `npm run typecheck`, `npm run lint` |
+
+### Implemented but not fully verified
+
+- **Supabase repository**: request shape, filtering, validation and service-key rules are unit-tested with a mocked `fetch`; never run against a live Supabase project.
+- **AI summaries**: consent gate, grounding, schema validation and fallback are implemented; never called with a real API key, so output quality is unverified.
+- **Admin editing with credentials end to end**: middleware is unit-tested; the editor UI and save route have not been exercised in a browser with credentials set.
+- **Route error boundary** (`src/app/error.tsx`): added, not triggered in a test.
+- **Hosted preview on Vercel**: deployed from this code without environment variables (seed catalog, no AI, no admin). A deployment is not production verification.
+
+### Blocked by an external dependency
+
+- AI summaries need `ANTHROPIC_API_KEY`.
+- Live database needs a Supabase project and keys.
+- The 9 `partial` records need their official sites, which could not be opened from the build environment.
+- A GitHub repository needs the owner's go-ahead.
+
+### Not implemented
+
+- User accounts, server-side saving of answers or plans, sharing a plan by link.
+- Analytics (deliberately none).
+- Form-based admin editor and an audit log of verification changes.
+- Gender-neutral or user-selectable Hebrew microcopy.
+- Shared (multi-instance) rate limiting for the AI endpoint.
+
+### Data categories
+
+| Category | Where | Shown to users? |
+| --- | --- | --- |
+| Verified | Records with `verificationStatus: "verified"` (13), facts read on official or government sites | Yes |
+| Partial | `verificationStatus: "partial"` (9), existence and basics from an encyclopedic source; no website shown | Yes, with a badge |
+| Unverified | `verificationStatus: "unverified"` (1, Nachshon), also `published: false` | Never |
+| Missing | Empty profile fields (costs, admissions, schedules) | Shown as "המידע עדיין לא אומת" |
+| User-generated | Answers, favorites, compare picks, plan check-offs | Only in the user's own browser |
+| Development-only sample data | None in the catalog | — |
+
+This is not production-ready: the AI and database paths and admin editing have not been verified end to end, and the catalog still has partial records.
 
 ## Known limitations and next steps
 
