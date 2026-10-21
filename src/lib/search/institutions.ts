@@ -22,7 +22,7 @@ const FINAL_LETTERS: Record<string, string> = { ך: "כ", ם: "מ", ן: "נ", ף
 export function normalize(text: string): string {
   return text
     .normalize("NFKD")
-    .replace(/[\u05BE\-\u2013\u2014_/.,:;()]/g, " ") // maqaf and dashes; before the niqqud range, which includes the maqaf
+    .replace(/[\u05BE\-\u2013\u2014_/.,:;()?!\u2026]/g, " ") // maqaf, dashes and punctuation; before the niqqud range, which includes the maqaf
     .replace(/[\u0591-\u05C7]/g, "")
     .replace(/[\u05F3\u05F4"'`]/g, "")
     .replace(/[ךםןףץ]/g, (c) => FINAL_LETTERS[c])

@@ -1,10 +1,18 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { refreshSession } from "@/lib/supabase/middleware";
+
+const isAdminPath = (path: string) => /^\/(api\/)?admin(\/|$)/.test(path);
 
 /**
- * Protects the admin area with HTTP Basic auth.
+ * Protects the admin area with HTTP Basic auth, and refreshes the Supabase session elsewhere.
  * If ADMIN_USER / ADMIN_PASSWORD are not configured, the admin area does not exist (404).
  */
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
+  if (!isAdminPath(req.nextUrl.pathname)) return refreshSession(req);
+  return adminGate(req);
+}
+
+function adminGate(req: NextRequest) {
   const user = process.env.ADMIN_USER;
   const pass = process.env.ADMIN_PASSWORD;
   if (!user || !pass) return new NextResponse("Not found", { status: 404 });
@@ -28,4 +36,6 @@ function safeEqual(a: string, b: string) {
   return diff === 0;
 }
 
-export const config = { matcher: ["/admin/:path*", "/api/admin/:path*"] };
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$).*)"],
+};

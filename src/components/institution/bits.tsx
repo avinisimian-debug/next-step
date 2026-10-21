@@ -2,7 +2,9 @@
 
 import { BadgeCheck, CircleDashed, ExternalLink, Heart, Mail, MapPin, Phone, Scale } from "lucide-react";
 import type { Institution } from "@/lib/domain/types";
+import { useEffect, useState, useTransition } from "react";
 import { KEYS, useStored } from "@/lib/client/store";
+import { getSaveState, setSaved, type SaveState } from "@/app/actions/saved";
 import { AUDIENCE_LABELS } from "@/lib/domain/pathways";
 
 export const formatDate = (iso: string) =>
@@ -130,20 +132,66 @@ export function OfficialLink({ inst, variant = "button" }: { inst: Institution; 
   );
 }
 
+/**
+ * Saves an institution. Signed-in visitors save to their account; everyone else saves on
+ * this device only, and the button says so. The account state is loaded after mount so
+ * pages stay cacheable.
+ */
 export function FavoriteButton({ id, name }: { id: string; name: string }) {
   const [favs, setFavs] = useStored<string[]>(KEYS.favorites, []);
-  const on = favs.includes(id);
+  const [state, setState] = useState<SaveState | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    let live = true;
+    getSaveState(id)
+      .then((s) => live && setState(s))
+      .catch(() => live && setState({ mode: "local", canSignIn: false }));
+    return () => {
+      live = false;
+    };
+  }, [id]);
+
+  const account = state?.mode === "account";
+  const on = account ? state.saved : favs.includes(id);
+
+  const toggle = () => {
+    setMessage(null);
+    if (!account) {
+      setFavs((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+      return;
+    }
+    startTransition(async () => {
+      const res = await setSaved(id, !on).catch(() => ({ ok: false as const, message: "לא הצלחנו לשמור. אפשר לנסות שוב." }));
+      if (res.ok) setState({ mode: "account", saved: res.saved });
+      else setMessage(res.message);
+    });
+  };
+
   return (
-    <button
-      type="button"
-      aria-pressed={on}
-      onClick={() => setFavs((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))}
-      className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${on ? "bg-rose-50 text-rose-700" : "text-navy-800 hover:bg-sand-100"}`}
-      aria-label={on ? `הסרה מהמועדפים: ${name}` : `שמירה למועדפים: ${name}`}
-    >
-      <Heart className={`size-4 ${on ? "fill-current" : ""}`} aria-hidden="true" />
-      {on ? "נשמר" : "שמור למועדפים"}
-    </button>
+    <span className="inline-flex flex-col items-start">
+      <button
+        type="button"
+        aria-pressed={on}
+        disabled={pending || state === null}
+        onClick={toggle}
+        className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition disabled:opacity-60 ${on ? "bg-rose-50 text-rose-700" : "text-navy-800 hover:bg-sand-100"}`}
+        aria-label={on ? `הסרה מהשמורים: ${name}` : `שמירה: ${name}`}
+      >
+        <Heart className={`size-4 ${on ? "fill-current" : ""}`} aria-hidden="true" />
+        {on ? (account ? "נשמר בחשבון" : "נשמר במכשיר") : "שמירה"}
+      </button>
+      <span aria-live="polite" className="px-4 text-xs text-stone-600">
+        {message ? (
+          <span className="text-rose-700">{message}</span>
+        ) : on && state?.mode === "local" && state.canSignIn ? (
+          <a href={`/login?next=${encodeURIComponent("/saved")}`} className="underline">
+            להתחבר כדי לשמור בחשבון
+          </a>
+        ) : null}
+      </span>
+    </span>
   );
 }
 

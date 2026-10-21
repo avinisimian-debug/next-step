@@ -221,6 +221,28 @@ test("search ignores invalid filter values", async ({ page }) => {
   await expect(page.getByLabel("מסלול", { exact: true })).toHaveValue("");
 });
 
+test("account features say they are unavailable instead of pretending to work when no database is configured", async ({ page }) => {
+  for (const path of ["/community", "/my-path", "/account", "/login", "/community/ask"]) {
+    await page.goto(path);
+    await expect(page.getByText(/עדיין לא זמין באתר הזה/)).toBeVisible();
+  }
+  // Saving still works on the device, and says so.
+  await page.goto("/institutions/hakotel");
+  await page.getByRole("button", { name: "שמירה: ישיבת הכותל" }).click();
+  await expect(page.getByRole("button", { name: /הסרה מהשמורים/ })).toContainText("נשמר במכשיר");
+  await page.goto("/saved");
+  await expect(page.getByRole("heading", { name: "שמורים במכשיר הזה" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "ישיבת הכותל" })).toBeVisible();
+  // No sign-in link when sign-in is not possible.
+  await expect(page.getByRole("link", { name: "התחברות" })).toHaveCount(0);
+});
+
+test("the assistant is clearly unavailable without an AI key", async ({ page, request }) => {
+  await page.goto("/assistant");
+  await expect(page.getByText("העוזר לא זמין באתר הזה כרגע")).toBeVisible();
+  expect((await request.post("/api/assistant", { data: { question: "מה זה הסדר?" } })).status()).toBe(503);
+});
+
 test("unverified records are not reachable", async ({ request }) => {
   expect((await request.get("/institutions/nachshon")).status()).toBe(404);
 });
@@ -237,7 +259,7 @@ test("external official links are labelled and open safely", async ({ page }) =>
   await expect(page.getByText("האתר הרשמי טרם אומת").first()).toBeVisible();
 });
 
-for (const path of ["/", "/questionnaire", "/institutions", "/institutions/hakotel", "/about", "/privacy", "/compare", "/plan"]) {
+for (const path of ["/", "/questionnaire", "/institutions", "/institutions/hakotel", "/about", "/privacy", "/compare", "/plan", "/community", "/assistant", "/saved", "/login"]) {
   test(`no horizontal overflow on ${path}`, async ({ page }) => {
     await page.goto(path);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

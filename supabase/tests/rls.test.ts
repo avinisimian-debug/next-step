@@ -52,7 +52,7 @@ suite("database security rules", () => {
     await client.connect();
     await client.query("drop schema if exists next_step cascade");
     await client.query(read("tests/supabase-stub.sql"));
-    for (const f of ["migrations/20261021210000_next_step_core.sql", "migrations/20261021213000_next_step_fk_indexes.sql"]) await client.query(read(f));
+    for (const f of ["migrations/20261021210000_next_step_core.sql", "migrations/20261021213000_next_step_fk_indexes.sql", "migrations/20261021220000_next_step_touch_steps.sql"]) await client.query(read(f));
     await client.query(
       `insert into auth.users (id) values ($1), ($2), ($3), ($4) on conflict do nothing`,
       [ALICE, BOB, MOD, REP],
@@ -117,6 +117,17 @@ suite("database security rules", () => {
       );
       await as(ALICE);
       expect((await q("select * from next_step.saved_institutions")).rowCount).toBe(1);
+    });
+  });
+
+  it("maintains step timestamps itself and does not let users write them", async () => {
+    await tx(async (as, q) => {
+      await as(ALICE);
+      const { rows: [step] } = await q("insert into next_step.pathway_steps (title) values ('צעד') returning id, updated_at");
+      await fails(() => q("update next_step.pathway_steps set updated_at = now() - interval '1 day'"), /permission denied/);
+      await q("select pg_sleep(0.01)");
+      const { rows: [after] } = await q("update next_step.pathway_steps set status = 'done' where id = $1 returning updated_at", [step.id]);
+      expect(after.updated_at.getTime()).toBeGreaterThanOrEqual(step.updated_at.getTime());
     });
   });
 

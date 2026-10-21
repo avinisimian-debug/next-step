@@ -1,6 +1,7 @@
 import "server-only";
 import { institutions as seed } from "@/data/institutions";
 import { institutionSchema, type Institution } from "@/lib/domain/types";
+import { DB_SCHEMA, getSupabaseConfig } from "@/lib/supabase/config";
 
 /**
  * Data access for the institution catalog. The matching engine never imports this —
@@ -45,7 +46,7 @@ export class SeedRepository implements InstitutionRepository {
 
 /**
  * Supabase (PostgREST) implementation without extra dependencies.
- * Table layout: see supabase/schema.sql. The full record lives in the `data` jsonb column.
+ * Table layout: next_step.institutions (supabase/migrations). The full record lives in the `data` jsonb column.
  */
 export class SupabaseRepository implements InstitutionRepository {
   constructor(
@@ -56,7 +57,7 @@ export class SupabaseRepository implements InstitutionRepository {
 
   private async query(params: string, key = this.readKey): Promise<Institution[]> {
     const res = await fetch(`${this.url}/rest/v1/institutions?select=data&${params}`, {
-      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      headers: { apikey: key, Authorization: `Bearer ${key}`, "Accept-Profile": DB_SCHEMA },
       next: { revalidate: 300 },
     });
     if (!res.ok) throw new Error(`Supabase request failed: ${res.status}`);
@@ -84,11 +85,13 @@ export class SupabaseRepository implements InstitutionRepository {
         apikey: this.serviceKey,
         Authorization: `Bearer ${this.serviceKey}`,
         "Content-Type": "application/json",
+        "Content-Profile": DB_SCHEMA,
         Prefer: "resolution=merge-duplicates",
       },
       body: JSON.stringify({
         id: valid.id,
         slug: valid.slug,
+        pathway: valid.pathway,
         published: valid.published,
         verification_status: valid.verificationStatus,
         last_verified: valid.lastVerified,
@@ -101,12 +104,19 @@ export class SupabaseRepository implements InstitutionRepository {
 
 let cached: InstitutionRepository | null = null;
 
+/**
+ * The catalog is read from Supabase only when CATALOG_SOURCE=supabase. Otherwise the
+ * bundled, verified seed is used, so a database outage or misconfiguration can't take
+ * the catalog down with it.
+ */
 export function getRepository(): InstitutionRepository {
   if (cached) return cached;
-  const url = process.env.SUPABASE_URL;
-  const anon = process.env.SUPABASE_ANON_KEY;
-  cached = url && anon ? new SupabaseRepository(url, anon, process.env.SUPABASE_SERVICE_ROLE_KEY) : new SeedRepository();
+  const config = getSupabaseConfig();
+  cached =
+    config && process.env.CATALOG_SOURCE === "supabase"
+      ? new SupabaseRepository(config.url, config.key, process.env.SUPABASE_SERVICE_ROLE_KEY)
+      : new SeedRepository();
   return cached;
 }
 
-export const dataSourceLabel = () => (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY ? "Supabase" : "seed");
+export const dataSourceLabel = () => (getSupabaseConfig() && process.env.CATALOG_SOURCE === "supabase" ? "Supabase" : "seed");

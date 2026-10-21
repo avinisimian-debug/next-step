@@ -36,6 +36,7 @@ describe("SupabaseRepository", () => {
     expect(url).toContain("published=eq.true");
     expect(url).toContain("verification_status=neq.unverified");
     expect((init.headers as Record<string, string>).apikey).toBe("anon");
+    expect((init.headers as Record<string, string>)["Accept-Profile"]).toBe("next_step");
   });
 
   it("rejects rows that fail schema validation", async () => {

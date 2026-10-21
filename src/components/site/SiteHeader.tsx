@@ -5,12 +5,14 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
+import { AccountLink } from "./AccountLink";
 
 const NAV = [
   { href: "/#pathways", label: "המסלולים" },
-  { href: "/#how", label: "איך זה עובד" },
+  { href: "/institutions", label: "חיפוש מסגרות" },
+  { href: "/community", label: "קהילה" },
+  { href: "/assistant", label: "שאלו את העוזר" },
   { href: "/compare", label: "השוואה" },
-  { href: "/about", label: "אודות" },
 ];
 
 export function SiteHeader() {
@@ -26,7 +28,7 @@ export function SiteHeader() {
         </Link>
 
         {!inFlow && (
-          <nav aria-label="ניווט ראשי" className="hidden md:block">
+          <nav aria-label="ניווט ראשי" className="hidden lg:block">
             <ul className="flex items-center gap-1 text-[15px] text-navy-800">
               {NAV.map((n) => (
                 <li key={n.href}>
@@ -41,6 +43,11 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           {!inFlow && (
+            <span className="hidden lg:inline-flex">
+              <AccountLink />
+            </span>
+          )}
+          {!inFlow && (
             <Link
               href="/questionnaire"
               className="hidden rounded-full bg-navy-900 px-4 py-2 text-sm font-medium text-paper transition hover:bg-navy-800 sm:inline-flex"
@@ -51,7 +58,7 @@ export function SiteHeader() {
           {!inFlow && (
             <button
               type="button"
-              className="inline-flex size-10 items-center justify-center rounded-lg text-navy-900 hover:bg-sand-100 md:hidden"
+              className="inline-flex size-10 items-center justify-center rounded-lg text-navy-900 hover:bg-sand-100 lg:hidden"
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? "סגירת תפריט" : "פתיחת תפריט"}
@@ -64,7 +71,7 @@ export function SiteHeader() {
       </div>
 
       {open && !inFlow && (
-        <nav id="mobile-nav" aria-label="ניווט ראשי" className="border-t border-sand-200 bg-paper md:hidden">
+        <nav id="mobile-nav" aria-label="ניווט ראשי" className="border-t border-sand-200 bg-paper lg:hidden">
           <ul className="mx-auto flex max-w-6xl flex-col px-4 py-2">
             {NAV.map((n) => (
               <li key={n.href}>
@@ -73,6 +80,9 @@ export function SiteHeader() {
                 </Link>
               </li>
             ))}
+            <li>
+              <AccountLink block onNavigate={() => setOpen(false)} />
+            </li>
             <li className="py-2">
               <Link
                 href="/questionnaire"

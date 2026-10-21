@@ -19,6 +19,9 @@ export function SiteFooter() {
             <li><Link className="hover:text-paper" href="/results">ההמלצות שלי</Link></li>
             <li><Link className="hover:text-paper" href="/compare">השוואה</Link></li>
             <li><Link className="hover:text-paper" href="/institutions">חיפוש מסגרות</Link></li>
+            <li><Link className="hover:text-paper" href="/community">קהילה</Link></li>
+            <li><Link className="hover:text-paper" href="/assistant">שאלו את העוזר</Link></li>
+            <li><Link className="hover:text-paper" href="/my-path">מפת הדרך שלי</Link></li>
           </ul>
         </nav>
         <nav aria-label="מידע">
