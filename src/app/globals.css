@@ -1,26 +1,74 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --font-sans: "Heebo Variable", "Heebo", system-ui, sans-serif;
+  --font-display: "Frank Ruhl Libre", "Heebo Variable", serif;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-navy-950: #0a1726;
+  --color-navy-900: #0f2236;
+  --color-navy-800: #17324d;
+  --color-navy-700: #234567;
+  --color-navy-600: #345a80;
+  --color-mist-500: #6f8aa3;
+  --color-mist-300: #a9bccd;
+  --color-mist-100: #e3eaf1;
+  --color-paper: #faf7f2;
+  --color-sand-100: #f3eee5;
+  --color-sand-200: #e8e0d2;
+  --color-sand-300: #d8ccb8;
+  --color-stone-600: #6b6357;
+  --color-ink: #14202d;
+  --color-olive-600: #5f6f3f;
+  --color-olive-100: #eaeddc;
+  --color-teal-700: #245c58;
+  --color-teal-600: #2f6f6a;
+  --color-teal-100: #dcebe8;
+  --color-amber-700: #8a5a12;
+  --color-amber-100: #f6ead2;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --shadow-card: 0 1px 2px rgb(15 34 54 / 0.04), 0 8px 24px -12px rgb(15 34 54 / 0.14);
+  --shadow-lift: 0 2px 4px rgb(15 34 54 / 0.05), 0 18px 40px -18px rgb(15 34 54 / 0.28);
+
+  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
   }
 }
 
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "kern";
+  text-rendering: optimizeLegibility;
+}
+
+/* Latin strings (emails, URLs, phone numbers) inside RTL text */
+.ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-teal-600);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
