@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import type { BrowserContext } from "@playwright/test";
-import { APP_PORT, JWT_SECRET, USERS } from "./env.mjs";
+import { JWT_SECRET, USERS } from "./env.mjs";
 
 const b64 = (v: unknown) => Buffer.from(typeof v === "string" ? v : JSON.stringify(v)).toString("base64url");
 

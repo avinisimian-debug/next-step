@@ -1,0 +1,25 @@
+{
+ "references": [
+  {
+   "category": "mechina",
+   "label": "מועצת המכינות הקדם־צבאיות — ספר טלפונים של המכינות",
+   "source_url": "https://mechinot.org.il/phonebook",
+   "status": "not_loaded",
+   "reason": "The site could not be fetched from the build environment on 2026-10-21. Load it when access is available."
+  },
+  {
+   "category": "yeshiva",
+   "label": "אין רשימה רשמית אחת של ישיבות גבוהות שמצאנו",
+   "source_url": null,
+   "status": "no_reference",
+   "reason": "No single authoritative public list of higher yeshivot (non-hesder) was found. Coverage for this category cannot be measured yet."
+  },
+  {
+   "category": "idf",
+   "label": "מסלולי שירות בצה״ל",
+   "source_url": "https://www.idf.il/השירות-שלי/סוגי-השירות-בצה-ל/",
+   "status": "not_applicable",
+   "reason": "IDF entries are service directions, not institutions; coverage against a list of units is out of scope."
+  }
+ ]
+}

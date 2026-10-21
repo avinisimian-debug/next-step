@@ -155,6 +155,21 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
             </div>
           </div>
 
+          <div className="rounded-3xl border border-sand-200 bg-paper p-6">
+            <h2 className="text-sm font-semibold text-navy-950">שאלות בקהילה</h2>
+            <p className="mt-2 text-sm leading-6 text-stone-600">
+              תשובות בקהילה הן ניסיון אישי של משתמשים, אלא אם מסומנות כתשובה רשמית של נציג מאומת.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium">
+              <Link href={`/community?institution=${encodeURIComponent(inst.id)}`} className="text-teal-700 underline-offset-4 hover:underline">
+                שאלות על {inst.name}
+              </Link>
+              <Link href={`/community/ask?institution=${encodeURIComponent(inst.id)}`} className="text-teal-700 underline-offset-4 hover:underline">
+                לשאול שאלה
+              </Link>
+            </div>
+          </div>
+
           <div className="rounded-3xl border border-sand-200 bg-sand-100/50 p-6">
             <h2 className="text-sm font-semibold text-navy-950">מקורות ואימות</h2>
             <p className="mt-2 text-sm leading-6 text-stone-600">{inst.verificationNotes}</p>

@@ -10,5 +10,6 @@ export const USERS = {
   bob: { id: "00000000-0000-4000-8000-0000000000b2", email: "bob@example.test", name: "בוב (בדיקה)", role: "member" },
   mod: { id: "00000000-0000-4000-8000-0000000000c3", email: "mod@example.test", name: "מנהלת (בדיקה)", role: "moderator" },
   rep: { id: "00000000-0000-4000-8000-0000000000d4", email: "rep@example.test", name: "נציג הכותל (בדיקה)", role: "representative", institution: "hesder-hakotel" },
+  admin: { id: "00000000-0000-4000-8000-0000000000f6", email: "admin@example.test", name: "מנהל מערכת (בדיקה)", role: "admin" },
   fresh: { id: "00000000-0000-4000-8000-0000000000e5", email: "fresh@example.test" },
 };

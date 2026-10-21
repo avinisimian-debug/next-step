@@ -21,6 +21,7 @@ await db.query(`do $$ begin
 end $$; grant anon, authenticated to authenticator;`);
 for (const f of ["20261021210000_next_step_core.sql", "20261021213000_next_step_fk_indexes.sql", "20261021220000_next_step_touch_steps.sql"]) await db.query(read(`supabase/migrations/${f}`));
 await db.query(read("supabase/seed.sql"));
+await db.query(read("supabase/registry-entries.sql"));
 
 for (const u of Object.values(USERS)) await db.query("insert into auth.users (id, email) values ($1, $2)", [u.id, u.email]);
 for (const u of Object.values(USERS)) {

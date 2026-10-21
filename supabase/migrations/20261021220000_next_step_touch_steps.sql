@@ -8,6 +8,5 @@ end;
 $$;
 revoke all on function next_step.touch_updated_at() from public;
 
-drop trigger if exists pathway_steps_touch on next_step.pathway_steps;
-create trigger pathway_steps_touch before update on next_step.pathway_steps
+create or replace trigger pathway_steps_touch before update on next_step.pathway_steps
   for each row execute function next_step.touch_updated_at();

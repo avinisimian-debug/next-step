@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "seed:sql": "node --experimental-strip-types scripts/seed-sql.mts"
+    "seed:sql": "node --experimental-strip-types scripts/seed-sql.mts",
+    "registry:report": "vite-node --config vitest.config.ts scripts/registry-report.ts",
+    "test:e2e:db": "playwright test -c playwright.supabase.config.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.0.0",

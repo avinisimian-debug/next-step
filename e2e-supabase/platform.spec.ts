@@ -250,3 +250,23 @@ test("the assistant says clearly that it is unavailable without an AI key", asyn
   const res = await page.request.post("/api/assistant", { data: { question: "מה זה הסדר?" } });
   expect(res.status()).toBe(503);
 });
+
+test("registry entries that need review are resolved by admins only", async ({ page, context, browser }) => {
+  const mod = await browser.newContext();
+  await signInAs(mod, "mod");
+  expect((await (await mod.newPage()).goto("/registry-review"))?.status()).toBe(404);
+  await mod.close();
+
+  await signInAs(context, "admin");
+  await page.goto("/registry-review");
+  await expect(page.getByRole("link", { name: "דורש בדיקה (8)" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "הותאם (6)" })).toBeVisible();
+  const item = page.locator("li").filter({ hasText: 'ישיבת הסדר "לב לדעת" שדרות' });
+  await expect(item.getByLabel("רשומה במאגר")).toHaveValue("hesder-sderot");
+  await item.getByLabel("הערה").fill("אומת מול אתר הישיבה");
+  await item.getByRole("button", { name: "שמירת החלטה" }).click();
+  await expect(page.getByRole("link", { name: "דורש בדיקה (7)" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "הותאם (7)" })).toBeVisible();
+  const [row] = await sql("select status, matched_institution_id, notes from next_step.registry_entries where external_name like '%לב לדעת%'");
+  expect(row).toEqual({ status: "matched", matched_institution_id: "hesder-sderot", notes: "אומת מול אתר הישיבה" });
+});
