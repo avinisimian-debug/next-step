@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, Scale, ShieldCheck, Sparkles, Eye } from "lucide-react";
 import { PhotoCredit, PhotoFrame } from "@/components/art/PhotoFrame";
-import { HERO_PHOTO, PATHWAY_PHOTOS } from "@/lib/photos";
+import { PATHWAY_PHOTOS } from "@/lib/photos";
 import { PATHWAY_INFO, PATHWAY_ORDER } from "@/lib/domain/pathways";
 import { HomeJourney } from "@/components/journey/HomeJourney";
 import { ResumeLink } from "@/components/journey/ResumeLink";
@@ -58,10 +58,23 @@ export default function Home() {
           </div>
 
           <div className="relative animate-rise [animation-delay:120ms]">
-            <div className="relative aspect-[4/3.4] overflow-hidden rounded-[28px] shadow-lift ring-1 ring-navy-900/5">
-              <PhotoFrame photo={HERO_PHOTO} priority sizes="(min-width: 768px) 560px, 100vw" />
-            </div>
-            <div className="absolute -bottom-6 start-6 hidden max-w-[260px] rounded-2xl border border-sand-200 bg-paper/95 p-4 shadow-card backdrop-blur sm:block">
+            <ul className="grid aspect-[4/3.4] grid-cols-2 grid-rows-2 gap-2 overflow-hidden rounded-[28px] shadow-lift ring-1 ring-navy-900/5">
+              {PATHWAY_ORDER.map((id) => (
+                <li key={id} className="relative overflow-hidden">
+                  <PhotoFrame
+                    photo={PATHWAY_PHOTOS[id]}
+                    priority
+                    sizes="(min-width: 768px) 280px, 50vw"
+                    credit={false}
+                  />
+                  <PhotoCredit photo={PATHWAY_PHOTOS[id]} className="top-1.5 start-1.5" />
+                  <span className="absolute bottom-2 end-2 rounded-full bg-paper/95 px-3 py-1 text-xs font-bold text-navy-950 shadow-card">
+                    {PATHWAY_INFO[id].name}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 hidden rounded-2xl border border-sand-200 bg-paper p-4 shadow-card sm:block">
               <p className="text-xs font-medium text-mist-500">איך זה עובד</p>
               <p className="mt-1 text-sm leading-6 text-navy-900">
                 כ־5 דקות של שאלות, ושלושה כיוונים עם הסבר שקוף למה הם מתאימים לך.

@@ -1,6 +1,5 @@
 import type { StaticImageData } from "next/image";
 import type { Pathway } from "@/lib/domain/types";
-import hero from "@/assets/photos/hero.webp";
 import idf from "@/assets/photos/idf.webp";
 import mechina from "@/assets/photos/mechina.webp";
 import hesder from "@/assets/photos/hesder.webp";
@@ -19,15 +18,6 @@ export type Photo = {
   license: string;
   licenseUrl?: string;
   source: string;
-};
-
-export const HERO_PHOTO: Photo = {
-  src: hero,
-  alt: "קבוצת צעירים במסע רגלי במדבר",
-  author: "Judith89",
-  license: "CC BY-SA 3.0",
-  licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0",
-  source: "https://commons.wikimedia.org/wiki/File:Youth_hiking.JPG",
 };
 
 export const PATHWAY_PHOTOS: Record<Pathway, Photo> = {
@@ -65,4 +55,4 @@ export const PATHWAY_PHOTOS: Record<Pathway, Photo> = {
   },
 };
 
-export const ALL_PHOTOS: Photo[] = [HERO_PHOTO, ...Object.values(PATHWAY_PHOTOS)];
+export const ALL_PHOTOS: Photo[] = Object.values(PATHWAY_PHOTOS);
