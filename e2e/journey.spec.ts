@@ -206,7 +206,9 @@ test("search finds institutions by text and filters, keeps state in the URL, and
   await page.goto("/institutions?pathway=hesder&region=south");
   await expect(page.getByLabel("מסלול", { exact: true })).toHaveValue("hesder");
   const cards = page.locator("main ul li h2");
-  await expect(cards.filter({ hasText: "שדרות" })).toHaveCount(1);
+  // two separate hesder yeshivot in Sderot are listed by the hesder association
+  await expect(cards.filter({ hasText: "ישיבת ההסדר שדרות" })).toHaveCount(1);
+  await expect(cards.filter({ hasText: "לב לדעת" })).toHaveCount(1);
   await expect(cards.filter({ hasText: "הכותל" })).toHaveCount(0);
 
   await page.goto("/institutions?q=" + encodeURIComponent("אין כזה מקום בכלל"));

@@ -45,6 +45,10 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
     { id: "admissions", title: "תהליך קבלה", body: p.admissions },
     { id: "financial", title: "עלויות וסיוע כלכלי", body: p.financial },
   ];
+  // Sections with nothing verified are listed together instead of repeating "not verified" under each heading.
+  const isUnverified = (body?: string) => !body || body.replace(/[\s.—-]|מיקום/g, "") === NOT_VERIFIED.replace(/\s/g, "");
+  const known = sections.filter((s) => !isUnverified(s.body));
+  const unknown = sections.filter((s) => isUnverified(s.body));
 
   return (
     <article>
@@ -88,18 +92,39 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
             </ul>
           )}
 
-          {sections.map((s) => (
+          {known.map((s) => (
             <section key={s.id} aria-labelledby={`h-${s.id}`}>
               <h2 id={`h-${s.id}`} className="font-display text-2xl font-bold text-navy-950">
                 {s.title}
               </h2>
-              {s.body ? (
-                <p className="mt-3 leading-8 text-navy-800">{s.body}</p>
-              ) : (
-                <p className="mt-3 text-mist-500">{NOT_VERIFIED}</p>
-              )}
+              <p className="mt-3 leading-8 text-navy-800">{s.body}</p>
             </section>
           ))}
+
+          {unknown.length > 0 && (
+            <section aria-labelledby="h-unknown" className="rounded-3xl border border-dashed border-sand-300 bg-sand-50 p-6">
+              <h2 id="h-unknown" className="font-display text-xl font-bold text-navy-950">
+                מה עוד לא אומת
+              </h2>
+              <p className="mt-2 leading-7 text-stone-600">
+                על הנושאים האלה עדיין אין לנו מידע ממקור שבדקנו, ולכן לא כתבנו עליהם כלום. כדאי לשאול את המוסד ישירות, או מי שכבר
+                היה שם.
+              </p>
+              <ul className="mt-4 flex flex-wrap gap-2" aria-label="נושאים שלא אומתו">
+                {unknown.map((s) => (
+                  <li key={s.id} className="rounded-full border border-sand-300 bg-paper px-3 py-1.5 text-sm text-navy-800">
+                    {s.title}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href={`/community/ask?institution=${encodeURIComponent(inst.id)}`}
+                className="mt-4 inline-flex text-sm font-medium text-teal-700 underline underline-offset-4"
+              >
+                לשאול בקהילה על {inst.name}
+              </Link>
+            </section>
+          )}
 
           {inst.limitations.length > 0 && (
             <section aria-labelledby="h-limits">
