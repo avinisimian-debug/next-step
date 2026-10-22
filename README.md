@@ -84,7 +84,7 @@ Notes for a shared project: auth users are shared, so the other app's `on_auth_u
 ```
 src/
   lib/domain/        types.ts (Zod schema for institutions), pathways.ts (neutral pathway copy + labels)
-  data/              institutions.ts — the curated, sourced seed catalog
+  data/              institutions.ts — the curated, sourced seed catalog; directory.ts — listed institutions not yet researched
   lib/data/          repository.ts — Seed and Supabase implementations of InstitutionRepository
   lib/questionnaire/ questions.ts — questions, options, conditional visibility, pruning
   lib/matching/      config.ts (weights, thresholds), engine.ts (scoring, constraints, explanations)
@@ -232,9 +232,10 @@ This section is the single source of truth for what works. Last updated 22 Octob
 | Category | Where | Shown to users? |
 | --- | --- | --- |
 | Verified | `verificationStatus: "verified"` (13), facts from official or government sites | Yes |
-| Partial | `verificationStatus: "partial"` (9) | Yes, with a badge |
-| Unverified | 1 record (Nachshon), `published: false` | Never |
-| Registry entries | 62 hesder entries in `next_step.registry_entries`, not shown publicly; 6 matched, 8 for review, 48 not yet in the catalog | Admins only |
+| Partial | `verificationStatus: "partial"` (9 researched records) | Yes, with a badge |
+| Directory | `src/data/directory.ts` — 176 records (57 mechinot, 64 hesder yeshivot, 54 higher yeshivot, 1 IDF track) whose name, type and (where stated) location come from a cited list; everything else shown as "המידע עדיין לא אומת". Status `partial`, thin matching attributes so they rank below researched records | Yes, with a badge |
+| Unverified | none at the moment (`published: false` records never reach users) | Never |
+| Registry entries | 62 hesder (hesder.org.il) + 62 mechinot (state list for תשפ״ז) in `next_step.registry_entries`, not shown publicly; see `docs/coverage-report.md` for matched / review counts | Admins only |
 | Missing | Empty profile fields (costs, admissions, schedules) | Shown as "המידע עדיין לא אומת" |
 | User-generated | Device: answers, favorites, compare, plan. Account: saved items, steps, posts | Owner only, except community posts (public) |
 | Test data | Users and posts in the e2e database only, flagged `is_test` | Never in the live project |
@@ -243,8 +244,9 @@ National coverage is **not complete** — see `docs/coverage-report.md` for scop
 
 ## Known limitations and next steps
 
-- Add the 48 hesder yeshivot that are on the association's list but not in the catalog, each verified from its own source; the association lists 62 while the Ministry of Defense cites 77.
-- Load a mechina registry when the Council of Mechinot directory can be reached; there is no authoritative list for higher yeshivot.
+- Research the 176 directory records (program, admissions, costs, official site) and move each to `institutions.ts` as it is verified. The hesder association lists 62 and the Ministry of Defense cites 77; the catalog now has 74 hesder records.
+- Confirm whether hesder.org.il's "אפיקי דעת" is the catalog's Sderot record, and whether its "בית אל" hesder entry is the same as the higher-yeshiva record.
+- Higher yeshivot have no official list; the catalog covers the Religious-Zionist ones named by Arutz 7's 2025 survey. Haredi yeshivot are out of scope.
 - Costs, admissions and daily schedules are mostly unverified and should be collected directly from institutions.
 - Hebrew microcopy uses the masculine second person; a gender-neutral or user-selectable form is worth adding.
 - Real photography (licensed) can replace the SVG landscapes.

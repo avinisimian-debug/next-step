@@ -1,4 +1,5 @@
 import type { Institution } from "@/lib/domain/types";
+import { directoryInstitutions } from "./directory";
 
 /**
  * Seed catalog.
@@ -57,7 +58,7 @@ const HESDER_GENERAL_SOURCE = {
 const HESDER_MILITARY =
   "לפי משרד הביטחון, ישיבות ההסדר משלבות לימודים תורניים לצד שירות צבאי מקוצר במסגרת דתית. במסלול ההסדר הקלאסי מדובר ב־44 חודשי שירות (כולל תקופות של״ת), מתוכם כ־17 חודשי שירות פעיל. קיימים גם מסלולים נוספים (כמו ״שש־הסדר״ ו״שילובים״) — יש לברר באיזה מסלול פועלת הישיבה.";
 
-export const institutions: Institution[] = [
+const researched: Institution[] = [
   // ───────────────────────── צה״ל ─────────────────────────
   {
     id: "idf-combat",
@@ -505,42 +506,6 @@ export const institutions: Institution[] = [
     verificationNotes: "התיאור ופרטי הקשר נלקחו מהאתר הרשמי. משך התוכנית, עלויות ותנאי קבלה לא אומתו.",
     published: true,
   },
-  {
-    id: "mechina-nachshon",
-    slug: "nachshon",
-    name: "מכינת נחשון",
-    pathway: "mechina",
-    typeLabel: "מכינה קדם־צבאית כללית",
-    kind: "institution",
-    regions: ["judea_samaria"],
-    locationLabel: "ניל״י",
-    shortDescription: "המכינה הכללית הראשונה, שנוסדה ב־1997. הרשומה ממתינה לאימות מול מקור רשמי.",
-    highlights: [],
-    limitations: [],
-    attributes: {
-      torahIntensity: 1,
-      militaryEmphasis: 2,
-      militaryModel: "pre_military",
-      torahServiceBalance: null,
-      religiousEnvironments: ["general", "mixed_backgrounds"],
-      development: ["leadership", "social"],
-      serviceInterests: ["leadership_command"],
-      environmentStyles: ["teamwork"],
-      learningStyles: ["discussion"],
-      strengths: ["leadership"],
-      residential: "residential",
-      duration: "one_year",
-      communitySize: "unknown",
-      audience: "unknown",
-    },
-    profile: { overview: "טיוטה — ממתינה לאימות.", faq: [] },
-    sources: [{ label: "Wikipedia — Mechina", url: "https://en.wikipedia.org/wiki/Mechina", kind: "encyclopedia" }],
-    lastVerified: VERIFIED_ON,
-    verificationStatus: "unverified",
-    verificationNotes: "נמצא רק אזכור במקור משני. לא נמצא אתר רשמי. לא מוצג למשתמשים עד לאימות.",
-    published: false,
-  },
-
   // ───────────────────────── ישיבות הסדר ─────────────────────────
   {
     id: "hesder-har-etzion",
@@ -1158,3 +1123,6 @@ export const institutions: Institution[] = [
     published: true,
   },
 ];
+
+/** Researched records first, then directory records (identity confirmed, details not yet verified). */
+export const institutions: Institution[] = [...researched, ...directoryInstitutions];

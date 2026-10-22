@@ -1,5 +1,5 @@
 // Prints SQL that loads the seed catalog into Supabase: `npm run seed:sql > supabase/seed.sql`
-import { institutions } from "../src/data/institutions.ts";
+import { institutions } from "@/data/institutions";
 
 const q = (s: string) => `'${s.replace(/'/g, "''")}'`;
 const rows = institutions.map(

@@ -243,8 +243,9 @@ test("the assistant is clearly unavailable without an AI key", async ({ page, re
   expect((await request.post("/api/assistant", { data: { question: "מה זה הסדר?" } })).status()).toBe(503);
 });
 
-test("unverified records are not reachable", async ({ request }) => {
-  expect((await request.get("/institutions/nachshon")).status()).toBe(404);
+test("unknown or unpublished records are not reachable", async ({ request }) => {
+  // The seed catalog has no draft records right now; unit tests cover the published/verified filter.
+  expect((await request.get("/institutions/no-such-record")).status()).toBe(404);
 });
 
 test("external official links are labelled and open safely", async ({ page }) => {

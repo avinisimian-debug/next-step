@@ -195,9 +195,15 @@ describe("matching engine — fairness and missing data", () => {
 
 describe("matching engine — reliability", () => {
   it("never returns unpublished or unverified records", () => {
+    const base = catalog.find((i) => i.id === "mechina-ein-prat")!;
+    const drafts: Institution[] = [
+      { ...base, id: "draft-unpublished", slug: "draft-unpublished", published: false },
+      { ...base, id: "draft-unverified", slug: "draft-unverified", verificationStatus: "unverified" },
+    ];
     for (const p of Object.values(PROFILES)) {
-      const res = match(catalog, { ...p, paths: ["mechina"] });
-      expect(res.ranked.map((r) => r.institution.id)).not.toContain("mechina-nachshon");
+      const res = match([...catalog, ...drafts], { ...p, paths: ["mechina"] });
+      expect(res.ranked.map((r) => r.institution.id)).not.toContain("draft-unpublished");
+      expect(res.ranked.map((r) => r.institution.id)).not.toContain("draft-unverified");
     }
   });
 

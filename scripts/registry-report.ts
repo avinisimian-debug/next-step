@@ -12,7 +12,10 @@ const readJson = <T>(p: string) => JSON.parse(readFileSync(path.join(root, p), "
 
 const catalog = institutions.map((i) => institutionSchema.parse(i));
 const published = catalog.filter((i) => i.published);
-const registries = [readJson<RegistryFile>("data/registry/hesder-association.json")];
+const registries = [
+  readJson<RegistryFile>("data/registry/hesder-association.json"),
+  readJson<RegistryFile>("data/registry/mechinot-gov.json"),
+];
 const { references } = readJson<{
   references: { category: string; label: string; source_url: string | null; status: string; reason: string }[];
 }>("data/registry/references.json");

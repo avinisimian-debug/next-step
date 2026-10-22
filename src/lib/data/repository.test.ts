@@ -3,7 +3,8 @@ import { institutions } from "@/data/institutions";
 import { SeedRepository, SupabaseRepository } from "./repository";
 
 const verified = institutions.find((i) => i.verificationStatus === "verified")!;
-const hidden = institutions.find((i) => !i.published)!;
+// A draft record: the seed catalog currently has none, so the fixture is built here.
+const hidden = { ...verified, id: "draft-record", slug: "draft-record", published: false, verificationStatus: "unverified" as const };
 
 function mockFetch(body: unknown, status = 200) {
   const fn = vi.fn(async () => new Response(JSON.stringify(body), { status }));

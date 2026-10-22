@@ -1,0 +1,259 @@
+{
+ "registry": "mechinot-gov-5787",
+ "label": "משרד ההתיישבות והמשימות הלאומיות — מיקומי מכינות ושלוחות בשנת תשפ״ז",
+ "category": "mechina",
+ "source_url": "https://www.gov.il/BlobFolder/unit/mchiont/he/mchinot_mechinot010926.pdf",
+ "retrieved_on": "2026-10-22",
+ "method": "The PDF could not be downloaded directly from the build environment (network policy). Names were extracted with a page-reading tool and cross-checked against the ministry's earlier list of recognized mechinot (https://www.gov.il/BlobFolder/unit/mchiont/he/files_mechinot-h.pdf), which has the same names plus locations.",
+ "scope_note": "Mechinot and branches recognized by the state for the 2026/27 (תשפ״ז) year. Names only; the list does not say whether a mechina is Torani, general or mixed.",
+ "entries": [
+  {
+   "name": "מכינת אבנר",
+   "region": ""
+  },
+  {
+   "name": "מכינת אדרת",
+   "region": ""
+  },
+  {
+   "name": "מכינת אופקים למדע",
+   "region": ""
+  },
+  {
+   "name": "מכינת אורות",
+   "region": ""
+  },
+  {
+   "name": "מכינת אחד משלנו",
+   "region": ""
+  },
+  {
+   "name": "מכינת איתן",
+   "region": ""
+  },
+  {
+   "name": "מכינת אלישע",
+   "region": ""
+  },
+  {
+   "name": "מכינת ארזי הלבנון",
+   "region": ""
+  },
+  {
+   "name": "מכינת באר אורה",
+   "region": ""
+  },
+  {
+   "name": "מכינת בארי",
+   "region": ""
+  },
+  {
+   "name": "מכינת בית ישראל",
+   "region": ""
+  },
+  {
+   "name": "מכינת בית יתיר",
+   "region": ""
+  },
+  {
+   "name": "מכינת בני דוד",
+   "region": ""
+  },
+  {
+   "name": "מכינת גל",
+   "region": ""
+  },
+  {
+   "name": "מכינת גליל עליון",
+   "region": ""
+  },
+  {
+   "name": "מכינת דרור",
+   "region": ""
+  },
+  {
+   "name": "מכינת דרך ארץ",
+   "region": ""
+  },
+  {
+   "name": "מכינת הדר",
+   "region": ""
+  },
+  {
+   "name": "מכינת הירושלמית",
+   "region": ""
+  },
+  {
+   "name": "מכינת הנגב",
+   "region": ""
+  },
+  {
+   "name": "מכינת העמ\"ק",
+   "region": ""
+  },
+  {
+   "name": "מכינת השומר החדש",
+   "region": ""
+  },
+  {
+   "name": "מכינת חביבה רייק",
+   "region": ""
+  },
+  {
+   "name": "מכינת חברותא",
+   "region": ""
+  },
+  {
+   "name": "מכינת חוסן",
+   "region": ""
+  },
+  {
+   "name": "מכינת חמדת",
+   "region": ""
+  },
+  {
+   "name": "מכינת חמש אצבעות",
+   "region": ""
+  },
+  {
+   "name": "מכינת חנתון",
+   "region": ""
+  },
+  {
+   "name": "מכינת ידידיה",
+   "region": ""
+  },
+  {
+   "name": "מכינת יונתן",
+   "region": ""
+  },
+  {
+   "name": "מכינת ימין אורד",
+   "region": ""
+  },
+  {
+   "name": "מכינת יסודות",
+   "region": ""
+  },
+  {
+   "name": "מכינת יפתח דרור",
+   "region": ""
+  },
+  {
+   "name": "מכינת כרם אל",
+   "region": ""
+  },
+  {
+   "name": "מכינת לפידות",
+   "region": ""
+  },
+  {
+   "name": "מכינת מגדלור",
+   "region": ""
+  },
+  {
+   "name": "מכינת מגן שאול",
+   "region": ""
+  },
+  {
+   "name": "מכינת מדרשת השילוב",
+   "region": ""
+  },
+  {
+   "name": "מכינת מיצר",
+   "region": ""
+  },
+  {
+   "name": "מכינת מיתרים לכיש",
+   "region": ""
+  },
+  {
+   "name": "מכינת מלח הארץ",
+   "region": ""
+  },
+  {
+   "name": "מכינת ממעמקים",
+   "region": ""
+  },
+  {
+   "name": "מכינת מנשרים",
+   "region": ""
+  },
+  {
+   "name": "מכינת מעוז לוד",
+   "region": ""
+  },
+  {
+   "name": "מכינת משכיות",
+   "region": ""
+  },
+  {
+   "name": "מכינת נחשון",
+   "region": ""
+  },
+  {
+   "name": "מכינת עז שלמה",
+   "region": ""
+  },
+  {
+   "name": "מכינת עטרת ירושלים",
+   "region": ""
+  },
+  {
+   "name": "מכינת עין פרת",
+   "region": ""
+  },
+  {
+   "name": "מכינת עמיחי",
+   "region": ""
+  },
+  {
+   "name": "מכינת עצם",
+   "region": ""
+  },
+  {
+   "name": "מכינת ערבה",
+   "region": ""
+  },
+  {
+   "name": "מכינת צהלי",
+   "region": ""
+  },
+  {
+   "name": "מכינת קשת יהודה",
+   "region": ""
+  },
+  {
+   "name": "מכינת רבין",
+   "region": ""
+  },
+  {
+   "name": "מכינת רוח השדה",
+   "region": ""
+  },
+  {
+   "name": "מכינת רוח נכון",
+   "region": ""
+  },
+  {
+   "name": "מכינת רקיע",
+   "region": ""
+  },
+  {
+   "name": "מכינת שובו אחים",
+   "region": ""
+  },
+  {
+   "name": "מכינת תבור",
+   "region": ""
+  },
+  {
+   "name": "מכינת תל\"ם",
+   "region": ""
+  },
+  {
+   "name": "מכינת תמיר",
+   "region": ""
+  }
+ ]
+}

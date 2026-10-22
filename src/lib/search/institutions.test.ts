@@ -52,8 +52,16 @@ describe("searchInstitutions", () => {
     expect(searchInstitutions(catalog, { ...base, verifiedOnly: true }).every((i) => i.verificationStatus === "verified")).toBe(true);
   });
 
-  it("never returns unpublished records it was not given", () => {
-    expect(ids({ q: "נחשון" })).toEqual([]);
+  it("never returns unpublished records", () => {
+    const draft = { ...catalog[0], id: "draft-record", slug: "draft-record", name: "טיוטה נסתרת", published: false };
+    const published = [...catalog, draft].filter((i) => i.published);
+    expect(searchInstitutions(published, { ...base, q: "טיוטה נסתרת" })).toEqual([]);
+  });
+
+  it("finds directory records by name and by place", () => {
+    expect(ids({ q: "נחשון" })).toContain("mechina-nachshon");
+    expect(ids({ q: "ישיבת ההסדר צפת" })[0]).toBe("hesder-tzfat");
+    expect(ids({ q: "קצרין" })).toEqual(expect.arrayContaining(["mechina-tamir", "yeshiva-mor-dror-katzrin"]));
   });
 });
 

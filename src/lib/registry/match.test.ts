@@ -25,14 +25,18 @@ describe("matching the hesder association list", () => {
   it("matches catalog yeshivot when the identifying name is the same", () => {
     expect(matchEntry(byName('"הכותל"'), catalog)).toMatchObject({ status: "matched", candidates: ["hesder-hakotel"] });
     expect(matchEntry(byName('"שעלבים"'), catalog)).toMatchObject({ status: "matched", candidates: ["hesder-shaalvim"] });
+    expect(matchEntry(byName("לב לדעת"), catalog, "hesder")).toMatchObject({ status: "matched", candidates: ["hesder-lev-ladaat-sderot"] });
+    expect(matchEntry(byName('"הגולן"'), catalog, "hesder")).toMatchObject({ status: "matched", candidates: ["hesder-hagolan"] });
     expect(matchEntry(byName('"ברכת משה"'), catalog)).toMatchObject({ status: "matched", candidates: ["hesder-birkat-moshe"] });
   });
 
   it("never auto-matches on a shared place name alone", () => {
     // Plausibly the same places as our records, but the names differ: a person decides.
-    expect(matchEntry(byName("לב לדעת"), catalog, "hesder")).toMatchObject({ status: "ambiguous", candidates: ["hesder-sderot"] });
-    expect(matchEntry(byName("עתניאל"), catalog, "hesder")).toMatchObject({ status: "ambiguous", candidates: ["hesder-otniel"] });
-    expect(matchEntry(byName('"הגולן"'), catalog, "hesder").status).toBe("unresolved");
+    const otniel = matchEntry(byName("עתניאל"), catalog, "hesder");
+    expect(otniel.status).toBe("ambiguous");
+    expect(otniel.candidates).toContain("hesder-otniel");
+    // ״אפיקי דעת״ is probably our Sderot record, but nothing in the names says so.
+    expect(matchEntry(byName("אפיקי דעת"), catalog, "hesder").status).toBe("unresolved");
     // Our catalog files Beit El as a higher yeshiva; the hesder list includes it. Same place, different
     // classification: flagged for review instead of silently merged.
     expect(matchEntry(byName('"בית אל"'), catalog, "hesder")).toMatchObject({ status: "ambiguous", candidates: ["yeshiva-beit-el"] });

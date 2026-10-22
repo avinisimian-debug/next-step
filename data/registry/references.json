@@ -4,15 +4,15 @@
    "category": "mechina",
    "label": "מועצת המכינות הקדם־צבאיות — ספר טלפונים של המכינות",
    "source_url": "https://mechinot.org.il/phonebook",
-   "status": "not_loaded",
-   "reason": "The site could not be fetched from the build environment on 2026-10-21. Load it when access is available."
+   "status": "superseded",
+   "reason": "Replaced by the state's list in data/registry/mechinot-gov.json (2026-10-22). The council's phonebook is still not reachable from the build environment."
   },
   {
    "category": "yeshiva",
-   "label": "אין רשימה רשמית אחת של ישיבות גבוהות שמצאנו",
-   "source_url": null,
-   "status": "no_reference",
-   "reason": "No single authoritative public list of higher yeshivot (non-hesder) was found. Coverage for this category cannot be measured yet."
+   "label": "ערוץ 7 — עולם התורה הציוני (24.08.2025)",
+   "source_url": "https://www.inn.co.il/news/677167",
+   "status": "partial_reference",
+   "reason": "No official list of higher yeshivot exists. The catalog lists the Religious-Zionist higher yeshivot named in Arutz 7's 2025 enrollment survey and its June 2025 report on new yeshivot. Haredi yeshivot are out of scope."
   },
   {
    "category": "idf",
