@@ -64,7 +64,7 @@ All tables live in the `next_step` schema (the deployed project shares a Supabas
 1. Apply the files in `supabase/migrations/` in order. They create the tables, row-level security, column grants, rate-limit and counter triggers, and RPCs (`ensure_profile`, `search_questions`, moderation helpers).
 2. Load `supabase/seed.sql` (catalog) and, optionally, `supabase/registry-entries.sql` (registry imports; re-running keeps reviewers' decisions).
 3. In the Supabase dashboard:
-   - **API → Exposed schemas**: add `next_step`.
+   - **API → Exposed schemas**: add `next_step`. (On the deployed project this was done in SQL on 22 October 2026: `alter role authenticator set pgrst.db_schemas = 'public, graphql_public, next_step'`; revert with `reset pgrst.db_schemas`. If someone later edits the list in the dashboard, check `next_step` is still there.)
    - **Authentication → URL configuration → Redirect URLs**: add `https://<your-site>/**`. Do not change the Site URL if the project serves another app.
 4. Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Add `CATALOG_SOURCE=supabase` only after step 3 is done.
 
@@ -174,16 +174,16 @@ The matching attributes (e.g. Torah intensity, environment styles) are an editor
 
 ## Tests
 
-Latest run, 21 October 2026:
+Latest run, 22 October 2026 (journey milestone):
 
-- `npm test` with `TEST_DATABASE_URL` — **95 passed** (Vitest): matching engine, catalog integrity, questionnaire, action plan, repositories, middleware, Hebrew search normalization, error mapping, safe redirects, community schemas, assistant retrieval and citation checks, registry matching, and 12 RLS tests run against real Postgres 16 with the migrations applied. Without `TEST_DATABASE_URL` the 12 RLS tests are skipped.
-- `npm run test:e2e` — **54 passed** (Playwright, desktop + mobile, no database): journeys, search, RTL, keyboard, empty states, unconfigured account/assistant states, admin hidden, no horizontal overflow.
-- `npm run test:e2e:db` — **13 passed** (Playwright against Postgres + PostgREST): sign-in link and callback, profile creation, saving and privacy between users, device → account import, pathway map, community ask/answer/labels/helpful/notifications, reports and moderation, database rate limit, assistant unavailable without key, admin-only registry review.
+- `npm test` with `TEST_DATABASE_URL` — **104 passed** (Vitest): matching engine, catalog integrity, questionnaire, action plan, repositories, middleware, Hebrew search normalization, error mapping, safe redirects, community schemas, assistant retrieval and citation checks, registry matching, and 13 RLS tests run against real Postgres 16 with the migrations applied. Without `TEST_DATABASE_URL` the 13 RLS tests are skipped.
+- `npm run test:e2e` — **60 passed** (Playwright, desktop + mobile, no database): journeys, search, RTL, keyboard, empty states, unconfigured account/assistant states, admin hidden, no horizontal overflow.
+- `npm run test:e2e:db` — **13 passed** (last run 21 October; not re-run for the journey milestone) (Playwright against Postgres + PostgREST): sign-in link and callback, profile creation, saving and privacy between users, device → account import, pathway map, community ask/answer/labels/helpful/notifications, reports and moderation, database rate limit, assistant unavailable without key, admin-only registry review.
 - `npm run typecheck`, `npm run lint`, `npm run build` — clean.
 
 ## Implementation status
 
-This section is the single source of truth for what works. Last updated 21 October 2026.
+This section is the single source of truth for what works. Last updated 22 October 2026.
 
 ### Implemented and tested
 
@@ -194,6 +194,8 @@ This section is the single source of truth for what works. Last updated 21 Octob
 | Email-link sign-in, callback, sign-out, profile and display name | `e2e-supabase/platform.spec.ts` |
 | Saving to the account, notes, device → account import; private per user | `e2e-supabase`; RLS tests |
 | Personal pathway map (add, status, order, delete, import from plan) | `e2e-supabase`; RLS tests |
+| `/journey`: route from questionnaire to placement (6 milestones from the user's own data), per-place stage tracker (interested → chosen, IDF tracks use call-up/screening/assignment), next action per place from catalog data only; on the device without an account, in `saved_institutions.stage` with one | Vitest `src/lib/journey`; Playwright `e2e/journey.spec.ts` (device mode); RLS test for the stage column. Account mode not yet exercised in `e2e-supabase` |
+| App-style navigation (bottom tab bar on phones, "המסע שלי" in the header) and a home page that shows the real journey state | Playwright overflow + home tests |
 | Community: questions, answers, labels (official / personal experience / AI / test), helpful marks, similar-question suggestions, notifications | `e2e-supabase` |
 | Moderation: reports, hide/restore, moderator-only pages, database rate limits | `e2e-supabase`; RLS tests |
 | Assistant: retrieval, citation enforcement, clear "unavailable" state without a key | Vitest `src/lib/ai/retrieval.test.ts`; Playwright both suites |
@@ -203,7 +205,7 @@ This section is the single source of truth for what works. Last updated 21 Octob
 
 ### Implemented but not fully verified
 
-- **Live Supabase from the deployed site**: migrations, seed and registry entries are in the project, but this build environment cannot reach supabase.co over HTTP, so sign-in and community have not been exercised against the live project. Requires the two dashboard steps in "Database setup".
+- **Live Supabase from the deployed site**: the community page loads from the live database (checked 22 October), and the sign-in redirect URL was added by the owner. A full sign-in by email on the live site has not been confirmed yet.
 - **Real email delivery** of sign-in links (the e2e gateway simulates it).
 - **Assistant and AI summaries with a real key**: never called with `ANTHROPIC_API_KEY`, so answer quality is unverified.
 - **Legacy `/admin` JSON editor with credentials** in a browser.
