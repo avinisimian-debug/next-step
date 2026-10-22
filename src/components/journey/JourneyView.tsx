@@ -119,12 +119,24 @@ export function JourneyView({ catalog, account, canSignIn, accountError }: Props
   return (
     <div>
       {/* Header band with the route */}
-      <section className="bg-navy-950 text-paper">
-        <div className="mx-auto max-w-6xl px-4 pb-10 pt-10 sm:px-6 sm:pt-14">
+      <section className="relative overflow-hidden bg-navy-950 text-paper">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <div className="absolute -start-24 -top-24 size-72 rounded-full bg-violet-500/25 blur-3xl" />
+          <div className="absolute end-0 top-10 size-64 rounded-full bg-rose-500/20 blur-3xl" />
+          <div className="absolute -bottom-28 start-1/3 size-80 rounded-full bg-amber-400/15 blur-3xl" />
+          <div className="absolute -bottom-20 -end-16 size-72 rounded-full bg-emerald-400/15 blur-3xl" />
+        </div>
+        <div className="relative mx-auto max-w-6xl px-4 pb-10 pt-10 sm:px-6 sm:pt-14">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div className="max-w-2xl animate-rise">
-              <p className="text-sm font-semibold text-teal-100">המסע שלי</p>
-              <h1 className="mt-2 font-display text-[2.1rem] font-bold leading-tight sm:text-5xl">מהשאלון ועד השיבוץ</h1>
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-paper">
+                <span className="size-2 animate-pulse rounded-full bg-emerald-400" aria-hidden="true" />
+                המסע שלי
+              </p>
+              <h1 className="mt-3 font-display text-[2.1rem] font-bold leading-tight sm:text-5xl">
+                מהשאלון{" "}
+                <span className="bg-gradient-to-l from-violet-300 via-rose-300 to-amber-200 bg-clip-text text-transparent">ועד השיבוץ</span>
+              </h1>
               <p className="mt-3 leading-7 text-mist-300">
                 כאן רואים איפה אתה עומד, מה הצעד הבא, ואיפה נמצא כל מקום שאתה בודק.{" "}
                 {account ? "הכול שמור בחשבון שלך ופרטי לך בלבד." : "בלי חשבון, הכול נשמר רק בדפדפן הזה."}
@@ -132,7 +144,7 @@ export function JourneyView({ catalog, account, canSignIn, accountError }: Props
             </div>
             <ProgressRing percent={percent} size={84} tone="dark" />
           </div>
-          <div className="mt-10">
+          <div className="mt-10 rounded-[28px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm sm:p-7">
             <JourneyMap milestones={milestones} tone="dark" />
           </div>
         </div>
@@ -145,8 +157,8 @@ export function JourneyView({ catalog, account, canSignIn, accountError }: Props
         {/* Next step */}
         {current && (
           <section aria-labelledby="h-next" className="grid gap-4 md:grid-cols-[1.2fr_1fr]">
-            <div className="rounded-[28px] border border-sand-200 bg-paper p-6 shadow-card sm:p-8">
-              <p className="inline-flex items-center gap-2 text-sm font-semibold text-teal-700">
+            <div className="rounded-[28px] border border-violet-200 bg-gradient-to-br from-violet-50 via-paper to-rose-50 p-6 shadow-card sm:p-8">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-violet-700">
                 <Footprints className="size-4" aria-hidden="true" />
                 הצעד הבא שלך
               </p>
@@ -156,7 +168,7 @@ export function JourneyView({ catalog, account, canSignIn, accountError }: Props
               <p className="mt-2 leading-7 text-stone-600">{nextStepText(current.id, answered, active.length)}</p>
               <Link
                 href={current.action.href}
-                className="group mt-5 inline-flex items-center gap-2 rounded-full bg-navy-900 px-5 py-3 text-sm font-semibold text-paper hover:bg-navy-800"
+                className="group mt-5 inline-flex items-center gap-2 rounded-full bg-gradient-to-l from-violet-600 to-rose-500 px-5 py-3 text-sm font-semibold text-paper shadow-md transition hover:shadow-lg"
               >
                 {current.action.label}
                 <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
@@ -313,6 +325,8 @@ function nextStepText(id: string, answered: number, listed: number) {
   }
 }
 
+const STAGE_BAR = ["bg-violet-500", "bg-rose-500", "bg-amber-500", "bg-sky-500", "bg-teal-600", "bg-emerald-500", "bg-emerald-500"];
+
 function PlaceCard({ place, onStage, onRemove }: { place: Place; onStage: (s: Stage) => void; onRemove: () => void }) {
   const { inst, stage } = place;
   const stages = stagesFor(inst.kind);
@@ -320,7 +334,10 @@ function PlaceCard({ place, onStage, onRemove }: { place: Place; onStage: (s: St
   const action = nextActionFor(inst, stage);
   const chosen = stage === "chosen";
   return (
-    <li className={`rounded-[28px] border bg-paper p-6 shadow-card ${chosen ? "border-teal-600 ring-2 ring-teal-600/20" : "border-sand-200"}`} data-place={inst.id}>
+    <li
+      className={`rounded-[28px] border bg-paper p-6 shadow-card transition hover:shadow-lift ${chosen ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-paper ring-2 ring-emerald-500/25" : "border-sand-200"}`}
+      data-place={inst.id}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-medium text-teal-700">{inst.typeLabel}</p>
@@ -331,14 +348,14 @@ function PlaceCard({ place, onStage, onRemove }: { place: Place; onStage: (s: St
           </h3>
           <p className="mt-0.5 text-sm text-stone-600">{inst.locationLabel}</p>
         </div>
-        {chosen && <span className="shrink-0 rounded-full bg-teal-600 px-3 py-1 text-xs font-semibold text-paper">הבחירה שלי</span>}
+        {chosen && <span className="shrink-0 rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-paper shadow">הבחירה שלי</span>}
       </div>
 
       <fieldset className="mt-5">
         <legend className="text-sm font-medium text-navy-900">איפה אני עם המקום הזה?</legend>
         <div className="mt-3 flex gap-1" aria-hidden="true">
           {stages.map((s, i) => (
-            <span key={s} className={`h-1.5 flex-1 rounded-full ${i <= idx ? "bg-teal-600" : "bg-sand-200"}`} />
+            <span key={s} className={`h-2 flex-1 rounded-full transition-colors duration-500 ${i <= idx ? STAGE_BAR[i % STAGE_BAR.length] : "bg-sand-200"}`} />
           ))}
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -349,7 +366,9 @@ function PlaceCard({ place, onStage, onRemove }: { place: Place; onStage: (s: St
               aria-pressed={s === stage}
               onClick={() => onStage(s)}
               className={`rounded-full px-3 py-1.5 text-sm transition ${
-                s === stage ? "bg-navy-900 font-medium text-paper" : "border border-sand-300 text-navy-800 hover:bg-sand-100"
+                s === stage
+                  ? "bg-gradient-to-l from-violet-600 to-rose-500 font-medium text-paper shadow-md"
+                  : "border border-sand-300 text-navy-800 hover:-translate-y-0.5 hover:border-violet-300 hover:bg-violet-50"
               }`}
             >
               {stageLabel(s, inst.kind)}

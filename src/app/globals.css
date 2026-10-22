@@ -34,6 +34,15 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: none; }
   }
+  --animate-bob: bob 2.4s ease-in-out infinite;
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bob, .animate-pulse { animation: none; }
 }
 
 :root {

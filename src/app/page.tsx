@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, Scale, ShieldCheck, Sparkles, Eye } from "lucide-react";
-import { Landscape } from "@/components/art/Landscape";
+import { PhotoCredit, PhotoFrame } from "@/components/art/PhotoFrame";
+import { HERO_PHOTO, PATHWAY_PHOTOS } from "@/lib/photos";
 import { PATHWAY_INFO, PATHWAY_ORDER } from "@/lib/domain/pathways";
 import { HomeJourney } from "@/components/journey/HomeJourney";
 import { ResumeLink } from "@/components/journey/ResumeLink";
@@ -57,8 +58,8 @@ export default function Home() {
           </div>
 
           <div className="relative animate-rise [animation-delay:120ms]">
-            <div className="aspect-[4/3.4] overflow-hidden rounded-[28px] shadow-lift ring-1 ring-navy-900/5">
-              <Landscape variant="hero" className="size-full" />
+            <div className="relative aspect-[4/3.4] overflow-hidden rounded-[28px] shadow-lift ring-1 ring-navy-900/5">
+              <PhotoFrame photo={HERO_PHOTO} priority sizes="(min-width: 768px) 560px, 100vw" />
             </div>
             <div className="absolute -bottom-6 start-6 hidden max-w-[260px] rounded-2xl border border-sand-200 bg-paper/95 p-4 shadow-card backdrop-blur sm:block">
               <p className="text-xs font-medium text-mist-500">איך זה עובד</p>
@@ -84,13 +85,19 @@ export default function Home() {
             {PATHWAY_ORDER.map((id) => {
               const p = PATHWAY_INFO[id];
               return (
-                <li key={id}>
+                <li key={id} className="relative">
                   <Link
                     href={`/institutions?pathway=${id}`}
                     className="group flex h-full flex-col overflow-hidden rounded-3xl border border-sand-200 bg-paper shadow-card transition hover:-translate-y-0.5 hover:shadow-lift"
                   >
-                    <div className="h-32 overflow-hidden">
-                      <Landscape variant={id} className="size-full transition-transform duration-500 group-hover:scale-[1.03]" />
+                    <div className="relative h-44 overflow-hidden">
+                      <PhotoFrame
+                        photo={PATHWAY_PHOTOS[id]}
+                        credit={false}
+                        sizes="(min-width: 1024px) 280px, (min-width: 640px) 50vw, 100vw"
+                        className="transition-transform duration-500 group-hover:scale-[1.04]"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-navy-950/35 to-transparent" aria-hidden="true" />
                     </div>
                     <div className="flex flex-1 flex-col p-6">
                       <p className="text-xs font-medium text-mist-500">{p.short}</p>
@@ -102,6 +109,7 @@ export default function Home() {
                       </span>
                     </div>
                   </Link>
+                  <PhotoCredit photo={PATHWAY_PHOTOS[id]} className="end-2 top-[9.4rem]" />
                 </li>
               );
             })}
@@ -142,7 +150,8 @@ export default function Home() {
       {/* Closing CTA */}
       <section className="px-4 pt-20 sm:px-6">
         <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-navy-950">
-          <Landscape variant="closing" className="absolute inset-0 size-full opacity-90" />
+          <PhotoFrame photo={PATHWAY_PHOTOS.mechina} credit={false} sizes="(min-width: 1152px) 1152px, 100vw" className="opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/70 to-navy-950/40" aria-hidden="true" />
           <div className="relative px-6 py-16 text-center sm:py-20">
             <h2 className="font-display text-3xl font-bold text-paper sm:text-5xl">לא צריך לדעת הכול מראש.</h2>
             <p className="mx-auto mt-4 max-w-lg text-lg leading-8 text-mist-100">
@@ -156,6 +165,7 @@ export default function Home() {
               <ArrowLeft className="size-5" aria-hidden="true" />
             </Link>
           </div>
+          <PhotoCredit photo={PATHWAY_PHOTOS.mechina} className="bottom-2 end-3" />
         </div>
       </section>
     </>

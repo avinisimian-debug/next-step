@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { getRepository } from "@/lib/data/repository";
-import { Landscape } from "@/components/art/Landscape";
 import {
   AudienceChip,
   CompareButton,
@@ -15,6 +14,7 @@ import {
 } from "@/components/institution/bits";
 import { PersonalFit } from "@/components/institution/PersonalFit";
 import { DURATION_LABELS, INTENSITY_LABELS, MILITARY_MODEL_LABELS, PATHWAY_INFO } from "@/lib/domain/pathways";
+import type { Pathway } from "@/lib/domain/types";
 
 export const revalidate = 300;
 
@@ -29,6 +29,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!inst) return { title: "לא נמצא" };
   return { title: inst.name, description: inst.shortDescription };
 }
+
+// A tint per pathway instead of a photo: a stock photo here would read as a picture of this specific place.
+const HEADER_TINT: Record<Pathway, string> = {
+  idf: "from-[#e4e8d6] via-sand-100",
+  mechina: "from-[#f3e2c9] via-sand-100",
+  hesder: "from-[#dbe7e2] via-sand-100",
+  yeshiva: "from-[#dfe6f0] via-sand-100",
+};
 
 export default async function InstitutionPage({ params }: { params: Promise<{ slug: string }> }) {
   const inst = await getRepository().getPublicBySlug((await params).slug);
@@ -53,8 +61,7 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
   return (
     <article>
       <header className="relative overflow-hidden border-b border-sand-200">
-        <Landscape variant={inst.pathway} className="absolute inset-0 size-full opacity-35" />
-        <div className="absolute inset-0 bg-gradient-to-t from-paper via-paper/85 to-paper/40" aria-hidden="true" />
+        <div className={`absolute inset-0 bg-gradient-to-bl ${HEADER_TINT[inst.pathway]} to-paper`} aria-hidden="true" />
         <div className="relative mx-auto max-w-5xl px-4 pb-10 pt-8 sm:px-6 sm:pt-12">
           <Link href="/results" className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-800 hover:underline">
             <ArrowRight className="size-4" aria-hidden="true" />
