@@ -44,14 +44,35 @@ export function AccessibilityMenu() {
   useEffect(() => {
     if (!open) return;
     panel.current?.querySelector<HTMLElement>("button")?.focus();
+    const close = () => {
+      setOpen(false);
+      trigger.current?.focus();
+    };
+    // Modal: Tab and Shift+Tab cycle inside the panel, Esc or a click outside closes it.
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        trigger.current?.focus();
+      if (e.key === "Escape") return close();
+      if (e.key !== "Tab" || !panel.current) return;
+      const items = [...panel.current.querySelectorAll<HTMLElement>("button:not([disabled]), a[href]")];
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !panel.current.contains(document.activeElement))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !panel.current.contains(document.activeElement))) {
+        e.preventDefault();
+        first.focus();
       }
     };
+    const onPointer = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (!panel.current?.contains(t) && !trigger.current?.contains(t)) close();
+    };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointer);
+    };
   }, [open]);
 
   const update = (next: Prefs) => {
@@ -91,6 +112,7 @@ export function AccessibilityMenu() {
           ref={panel}
           id="a11y-panel"
           role="dialog"
+          aria-modal="true"
           aria-label="תפריט נגישות"
           className="fixed bottom-[calc(8.5rem+env(safe-area-inset-bottom))] end-3 z-50 w-[min(20rem,calc(100vw-1.5rem))] rounded-3xl border border-sand-200 bg-paper p-5 text-navy-950 shadow-lift lg:bottom-20 lg:end-6"
         >

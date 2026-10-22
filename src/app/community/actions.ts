@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getViewer, isModerator } from "@/lib/auth/viewer";
 import { getRepository } from "@/lib/data/repository";
-import { answerSchema, firstIssue, questionSchema, reportSchema } from "@/lib/community/schemas";
+import { answerSchema, firstIssue, issueField, questionSchema, reportSchema } from "@/lib/community/schemas";
 import { similarQuestions } from "@/lib/community/queries";
 import { userErrorMessage, USER_ERROR_MESSAGES } from "@/lib/supabase/errors";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -22,7 +22,7 @@ export type AskState = FormState & { values?: Record<string, string> };
 export async function askQuestion(_prev: AskState, form: FormData): Promise<AskState> {
   const values = Object.fromEntries(["title", "body", "institution_id", "pathway"].map((k) => [k, field(form, k) ?? ""]));
   const parsed = questionSchema.safeParse(values);
-  if (!parsed.success) return { status: "error", message: firstIssue(parsed.error), values };
+  if (!parsed.success) return { status: "error", message: firstIssue(parsed.error), field: issueField(parsed.error), values };
   if (parsed.data.institution_id && !(await getRepository().listPublic()).some((i) => i.id === parsed.data.institution_id))
     return { status: "error", message: USER_ERROR_MESSAGES.invalid, values };
 
@@ -49,7 +49,7 @@ export async function postAnswer(_prev: FormState, form: FormData): Promise<Form
     body: field(form, "body"),
     official: field(form, "official") === "1",
   });
-  if (!parsed.success) return { status: "error", message: firstIssue(parsed.error) };
+  if (!parsed.success) return { status: "error", message: firstIssue(parsed.error), field: issueField(parsed.error) };
   const viewer = await getViewer();
   if (viewer.state !== "signed_in") return { status: "error", message: USER_ERROR_MESSAGES.auth_required };
   const { question_id, body, official } = parsed.data;

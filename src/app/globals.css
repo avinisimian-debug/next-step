@@ -74,6 +74,11 @@ body {
   border-radius: 6px;
 }
 
+/* On dark sections the teal ring is too faint (under 3:1), so it turns white there. */
+:is(.bg-navy-950, .bg-navy-900) :focus-visible {
+  outline-color: #fff;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

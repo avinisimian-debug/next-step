@@ -24,7 +24,7 @@ export default async function AccountPage() {
   if (viewer.state === "unconfigured")
     return (
       <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
-        <NotConfigured feature="החשבון האישי" />
+        <NotConfigured feature="החשבון האישי" standalone />
       </div>
     );
   if (viewer.state === "anonymous") redirect(loginHref("/account"));

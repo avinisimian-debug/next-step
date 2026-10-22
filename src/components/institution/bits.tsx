@@ -141,6 +141,7 @@ export function FavoriteButton({ id, name }: { id: string; name: string }) {
   const [favs, setFavs] = useStored<string[]>(KEYS.favorites, []);
   const [state, setState] = useState<SaveState | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [announced, setAnnounced] = useState(false);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -155,9 +156,11 @@ export function FavoriteButton({ id, name }: { id: string; name: string }) {
 
   const account = state?.mode === "account";
   const on = account ? state.saved : favs.includes(id);
+  const savedLabel = account ? "נשמר בחשבון" : "נשמר במכשיר";
 
   const toggle = () => {
     setMessage(null);
+    setAnnounced(true);
     if (!account) {
       setFavs((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
       return;
@@ -173,16 +176,18 @@ export function FavoriteButton({ id, name }: { id: string; name: string }) {
     <span className="inline-flex flex-col items-start">
       <button
         type="button"
-        aria-pressed={on}
         disabled={pending || state === null}
         onClick={toggle}
         className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition disabled:opacity-60 ${on ? "bg-rose-50 text-rose-700" : "text-navy-800 hover:bg-sand-100"}`}
-        aria-label={on ? `הסרה מהשמורים: ${name}` : `שמירה: ${name}`}
+        aria-label={on ? `${savedLabel}, הסרה מהשמורים: ${name}` : `שמירה: ${name}`}
       >
         <Heart className={`size-4 ${on ? "fill-current" : ""}`} aria-hidden="true" />
-        {on ? (account ? "נשמר בחשבון" : "נשמר במכשיר") : "שמירה"}
+        {on ? savedLabel : "שמירה"}
       </button>
       <span aria-live="polite" className="px-4 text-xs text-stone-600">
+        {announced && !message && (
+          <span className="sr-only">{on ? `${name} ${savedLabel}` : `${name} הוסר מהשמורים`}</span>
+        )}
         {message ? (
           <span className="text-rose-700">{message}</span>
         ) : on && state?.mode === "local" && state.canSignIn ? (
@@ -201,18 +206,26 @@ export function CompareButton({ id, name }: { id: string; name: string }) {
   const [list, setList] = useStored<string[]>(KEYS.compare, []);
   const on = list.includes(id);
   const full = !on && list.length >= MAX_COMPARE;
+  const [announced, setAnnounced] = useState(false);
   return (
-    <button
-      type="button"
-      aria-pressed={on}
-      disabled={full}
-      title={full ? "אפשר להשוות עד שלוש מסגרות" : undefined}
-      onClick={() => setList((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id].slice(-MAX_COMPARE)))}
-      className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition disabled:opacity-40 ${on ? "bg-teal-100 text-teal-700" : "text-navy-800 hover:bg-sand-100"}`}
-      aria-label={on ? `הסרה מההשוואה: ${name}` : `הוספה להשוואה: ${name}`}
-    >
-      <Scale className="size-4" aria-hidden="true" />
-      {on ? "בהשוואה" : "השוואה"}
-    </button>
+    <>
+      <button
+        type="button"
+        disabled={full}
+        title={full ? "אפשר להשוות עד שלוש מסגרות" : undefined}
+        onClick={() => {
+          setAnnounced(true);
+          setList((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id].slice(-MAX_COMPARE)));
+        }}
+        className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition disabled:opacity-40 ${on ? "bg-teal-100 text-teal-700" : "text-navy-800 hover:bg-sand-100"}`}
+        aria-label={on ? `בהשוואה, הסרה מההשוואה: ${name}` : `השוואה, הוספה להשוואה: ${name}`}
+      >
+        <Scale className="size-4" aria-hidden="true" />
+        {on ? "בהשוואה" : "השוואה"}
+      </button>
+      <span aria-live="polite" className="sr-only">
+        {announced && (on ? `${name} נוסף להשוואה (${list.length} מתוך ${MAX_COMPARE})` : `${name} הוסר מההשוואה`)}
+      </span>
+    </>
   );
 }

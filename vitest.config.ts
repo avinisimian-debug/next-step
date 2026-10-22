@@ -9,5 +9,7 @@ export default defineConfig({
       "server-only": path.resolve(__dirname, "test/server-only-stub.ts"),
     },
   },
-  test: { include: ["src/**/*.test.ts", "supabase/tests/**/*.test.ts"], environment: "node" },
+  // The app's tsconfig keeps JSX for Next to compile; tests that render components need the automatic runtime.
+  esbuild: { jsx: "automatic" },
+  test: { include: ["src/**/*.test.ts", "src/**/*.test.tsx", "supabase/tests/**/*.test.ts"], environment: "node" },
 });

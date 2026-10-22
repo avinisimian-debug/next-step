@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
+import { useFieldErrors } from "@/components/ui/useFieldErrors";
 import { askQuestion, suggestSimilar, type AskState } from "@/app/community/actions";
 import { PATHWAY_INFO, PATHWAY_ORDER } from "@/lib/domain/pathways";
 import { Field, Notice, inputStyles } from "@/components/ui/ui";
@@ -34,11 +35,11 @@ export function AskForm({ institutions, defaultInstitution }: { institutions: { 
     };
   }, [title]);
 
-  const error = state.status === "error" ? state.message : undefined;
+  const { fieldError, formError } = useFieldErrors(state, { title: "title", body: "body", institution_id: "institution_id", pathway: "pathway" });
 
   return (
     <form action={action} className="space-y-5">
-      <Field id="title" label="השאלה בקצרה" hint="8 עד 160 תווים. למשל: ״איך נראה סדר היום בשנה הראשונה?״">
+      <Field id="title" label="השאלה בקצרה" hint="8 עד 160 תווים. למשל: ״איך נראה סדר היום בשנה הראשונה?״" error={fieldError("title")}>
         <input
           id="title"
           name="title"
@@ -70,12 +71,12 @@ export function AskForm({ institutions, defaultInstitution }: { institutions: { 
         )}
       </div>
 
-      <Field id="body" label="פרטים" hint="מה חשוב לך לדעת? בלי פרטים מזהים כמו טלפון או כתובת.">
+      <Field id="body" label="פרטים" hint="מה חשוב לך לדעת? בלי פרטים מזהים כמו טלפון או כתובת." error={fieldError("body")}>
         <textarea id="body" name="body" required minLength={10} maxLength={4000} rows={6} defaultValue={v.body} className={inputStyles} />
       </Field>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field id="institution_id" label="על איזו מסגרת? (לא חובה)">
+        <Field id="institution_id" label="על איזו מסגרת? (לא חובה)" error={fieldError("institution_id")}>
           <select id="institution_id" name="institution_id" defaultValue={v.institution_id ?? defaultInstitution ?? ""} className={inputStyles}>
             <option value="">שאלה כללית</option>
             {institutions.map((i) => (
@@ -85,7 +86,7 @@ export function AskForm({ institutions, defaultInstitution }: { institutions: { 
             ))}
           </select>
         </Field>
-        <Field id="pathway" label="מסלול (לא חובה)">
+        <Field id="pathway" label="מסלול (לא חובה)" error={fieldError("pathway")}>
           <select id="pathway" name="pathway" defaultValue={v.pathway ?? ""} className={inputStyles}>
             <option value="">לא משנה</option>
             {PATHWAY_ORDER.map((p) => (
@@ -97,7 +98,7 @@ export function AskForm({ institutions, defaultInstitution }: { institutions: { 
         </Field>
       </div>
 
-      {error && <Notice tone="error">{error}</Notice>}
+      {formError && <Notice tone="error">{formError}</Notice>}
       <SubmitButton pendingLabel="מפרסם…">פרסום השאלה</SubmitButton>
       <p className="text-xs leading-5 text-stone-600">
         השאלה תופיע בקהילה עם השם שבחרת בחשבון. תשובות בקהילה הן ניסיון אישי של אנשים, לא מידע רשמי — אלא אם מסומנות כתשובה רשמית של המסגרת.

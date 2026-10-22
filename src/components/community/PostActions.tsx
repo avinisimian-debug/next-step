@@ -47,9 +47,10 @@ export function HelpfulButton({
         className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-sm transition disabled:cursor-not-allowed disabled:opacity-60 ${on ? "bg-teal-100 text-teal-700" : "text-navy-800 hover:bg-sand-100"}`}
       >
         <ThumbsUp className={`size-4 ${on ? "fill-current" : ""}`} aria-hidden="true" />
-        עזר לי
-        <span className="tabular-nums" aria-label={`${shown} סימונים`}>
+        עזר לי<span className="sr-only">: סימון התשובה כמועילה</span>
+        <span className="tabular-nums">
           {shown}
+          <span className="sr-only"> סימונים</span>
         </span>
       </button>
       {error && (
@@ -78,7 +79,7 @@ export function ReportButton({ targetType, targetId }: { targetType: "question" 
         className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-sm text-stone-600 hover:bg-sand-100"
       >
         <Flag className="size-4" aria-hidden="true" />
-        דיווח
+        דיווח<span className="sr-only"> על {targetType === "question" ? "השאלה" : "התשובה"}</span>
       </button>
       {open && (
         <form id={formId} action={action} className="mt-2 space-y-3 rounded-2xl border border-sand-200 bg-sand-50 p-4">

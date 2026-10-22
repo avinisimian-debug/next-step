@@ -28,7 +28,7 @@ export function ModerationControls({
 
   const btn = "inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-sm hover:bg-sand-100 disabled:opacity-50";
   return (
-    <span className="inline-flex flex-wrap items-center gap-1 rounded-full border border-dashed border-sand-300 px-1" aria-label="פעולות ניהול">
+    <span className="inline-flex flex-wrap items-center gap-1 rounded-full border border-dashed border-sand-300 px-1" role="group" aria-label={`פעולות ניהול ל${targetType === "question" ? "שאלה" : "תשובה"}`}>
       {status === "published" ? (
         <button type="button" className={`${btn} text-amber-700`} disabled={pending} onClick={() => run("hidden")}>
           <EyeOff className="size-4" aria-hidden="true" />

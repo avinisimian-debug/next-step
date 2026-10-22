@@ -28,7 +28,7 @@ export function SavedControls({ institutionId, name, note }: { institutionId: st
   return (
     <div className="mt-4 space-y-2">
       <label htmlFor={fieldId} className="block text-sm font-medium text-navy-900">
-        הערה אישית (רק את/ה רואה אותה)
+        הערה אישית<span className="sr-only"> על {name}</span> (רק את/ה רואה אותה)
       </label>
       <textarea
         id={fieldId}
@@ -40,7 +40,7 @@ export function SavedControls({ institutionId, name, note }: { institutionId: st
       />
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="secondary" onClick={save} disabled={pending || value === (note ?? "")}>
-          שמירת הערה
+          שמירת הערה<span className="sr-only">: {name}</span>
         </Button>
         <Button variant="ghost" onClick={remove} disabled={pending} aria-label={`הסרה מהשמורים: ${name}`}>
           הסרה

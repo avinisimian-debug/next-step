@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ComponentProps, ReactNode } from "react";
+import { cloneElement, isValidElement, type ComponentProps, type ReactNode } from "react";
 import { AlertTriangle, CheckCircle2, Info, PlugZap } from "lucide-react";
 
 /** Shared building blocks so new screens look and behave like the rest of the site. */
@@ -38,6 +38,12 @@ export function Field({
   error?: string;
   children: ReactNode;
 }) {
+  // The control gets the hint and error as its description, and is marked invalid while there is an error.
+  const own = isValidElement<{ "aria-describedby"?: string }>(children) ? children.props["aria-describedby"] : undefined;
+  const describedBy = [...new Set([...(own ?? (hint ? `${id}-hint` : "")).split(" "), error ? `${id}-error` : ""])].filter(Boolean).join(" ");
+  const control = isValidElement<{ "aria-describedby"?: string; "aria-invalid"?: boolean }>(children)
+    ? cloneElement(children, { "aria-describedby": describedBy || undefined, "aria-invalid": error ? true : undefined })
+    : children;
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-navy-900">
@@ -48,9 +54,9 @@ export function Field({
           {hint}
         </p>
       )}
-      <div className="mt-2">{children}</div>
+      <div className="mt-2">{control}</div>
       {error && (
-        <p id={`${id}-error`} className="mt-1.5 text-sm text-rose-700">
+        <p id={`${id}-error`} role="alert" className="mt-1.5 text-sm text-rose-700">
           {error}
         </p>
       )}
@@ -79,11 +85,13 @@ export function Notice({ tone = "info", title, children }: { tone?: keyof typeof
 }
 
 /** Shown when a feature needs a service that this deployment does not have. Never pretends to work. */
-export function NotConfigured({ feature }: { feature: string }) {
+/** `standalone` when it is the whole page, so its title becomes the page's h1. */
+export function NotConfigured({ feature, standalone = false }: { feature: string; standalone?: boolean }) {
+  const Title = standalone ? "h1" : "h2";
   return (
     <div className="rounded-3xl border border-dashed border-sand-300 p-8 text-center">
       <PlugZap className="mx-auto size-8 text-stone-600" aria-hidden="true" />
-      <p className="mt-3 font-display text-xl font-bold text-navy-950">{feature} עדיין לא זמין באתר הזה</p>
+      <Title className="mt-3 font-display text-xl font-bold text-navy-950">{feature} עדיין לא זמין באתר הזה</Title>
       <p className="mx-auto mt-2 max-w-lg leading-7 text-stone-600">
         האפשרות הזו דורשת חיבור למסד הנתונים, והחיבור עוד לא הוגדר. שאר האתר — השאלון, ההמלצות, ההשוואה ותוכנית הפעולה — עובד כרגיל.
       </p>

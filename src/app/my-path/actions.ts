@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getViewer } from "@/lib/auth/viewer";
 import { getRepository } from "@/lib/data/repository";
-import { firstIssue, importedStepsSchema, stepSchema, stepStatusSchema } from "@/lib/community/schemas";
+import { firstIssue, importedStepsSchema, issueField, stepSchema, stepStatusSchema } from "@/lib/community/schemas";
 import { userErrorMessage, USER_ERROR_MESSAGES } from "@/lib/supabase/errors";
 import type { FormState } from "@/app/account/actions";
 import type { ActionResult } from "@/app/actions/saved";
@@ -27,7 +27,7 @@ async function nextPosition(viewer: NonNullable<Awaited<ReturnType<typeof signed
 
 export async function addStep(_prev: FormState, form: FormData): Promise<FormState> {
   const parsed = stepSchema.safeParse(Object.fromEntries(["title", "detail", "institution_id", "due_date"].map((k) => [k, form.get(k) ?? undefined])));
-  if (!parsed.success) return { status: "error", message: firstIssue(parsed.error) };
+  if (!parsed.success) return { status: "error", message: firstIssue(parsed.error), field: issueField(parsed.error) };
   if (!(await knownInstitution(parsed.data.institution_id))) return { status: "error", message: USER_ERROR_MESSAGES.invalid };
   const viewer = await signedIn();
   if (!viewer) return { status: "error", message: USER_ERROR_MESSAGES.auth_required };

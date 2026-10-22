@@ -33,7 +33,7 @@ export default async function RegistryReviewPage({ searchParams }: { searchParam
   if (viewer.state === "unconfigured")
     return (
       <div className="mx-auto max-w-4xl px-4 py-12">
-        <NotConfigured feature="בדיקת רשימות הייחוס" />
+        <NotConfigured feature="בדיקת רשימות הייחוס" standalone />
       </div>
     );
   if (viewer.state === "anonymous") redirect(loginHref("/registry-review"));

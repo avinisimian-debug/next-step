@@ -248,7 +248,7 @@ function QuestionInput({
           rows={5}
           placeholder={q.placeholder}
           onChange={(e) => onChange(e.target.value || undefined)}
-          className="w-full rounded-2xl border border-sand-300 bg-paper p-4 text-base leading-7 text-navy-950 shadow-sm placeholder:text-mist-500 focus:border-navy-600 focus:outline-none focus:ring-2 focus:ring-navy-600/20"
+          className="w-full rounded-2xl border border-sand-300 bg-paper p-4 text-base leading-7 text-navy-950 shadow-sm placeholder:text-mist-500 focus:border-navy-600"
         />
         <p className="mt-2 text-end text-xs text-mist-500" aria-live="polite">
           {v.length}/{MAX_TEXT}

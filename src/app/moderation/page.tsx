@@ -26,7 +26,7 @@ export default async function ModerationPage() {
   if (viewer.state === "unconfigured")
     return (
       <div className="mx-auto max-w-4xl px-4 py-12">
-        <NotConfigured feature="ניהול הקהילה" />
+        <NotConfigured feature="ניהול הקהילה" standalone />
       </div>
     );
   if (viewer.state === "anonymous") redirect(loginHref("/moderation"));

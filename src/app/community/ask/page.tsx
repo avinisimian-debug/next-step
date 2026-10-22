@@ -16,7 +16,7 @@ export default async function AskPage({ searchParams }: { searchParams: Promise<
   if (viewer.state === "unconfigured")
     return (
       <div className="mx-auto max-w-2xl px-4 py-12 sm:py-16">
-        <NotConfigured feature="הקהילה" />
+        <NotConfigured feature="הקהילה" standalone />
       </div>
     );
   if (viewer.state === "anonymous") redirect(loginHref(`/community/ask${institution ? `?institution=${encodeURIComponent(institution)}` : ""}`));

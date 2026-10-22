@@ -17,7 +17,7 @@ export default async function MyPathPage() {
   if (viewer.state === "unconfigured")
     return (
       <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
-        <NotConfigured feature="מפת הדרך האישית" />
+        <NotConfigured feature="מפת הדרך האישית" standalone />
       </div>
     );
   if (viewer.state === "anonymous") redirect(loginHref("/my-path"));

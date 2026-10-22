@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { AccountLink } from "./AccountLink";
@@ -19,6 +19,19 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const inFlow = pathname?.startsWith("/questionnaire");
+  const toggle = useRef<HTMLButtonElement>(null);
+
+  // Esc closes the mobile menu and returns focus to the button that opened it.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      toggle.current?.focus();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-40 print:hidden border-b border-sand-200/80 bg-paper/90 backdrop-blur supports-[backdrop-filter]:bg-paper/75">
@@ -61,6 +74,7 @@ export function SiteHeader() {
           )}
           {!inFlow && (
             <button
+              ref={toggle}
               type="button"
               className="inline-flex size-10 items-center justify-center rounded-lg text-navy-900 hover:bg-sand-100 lg:hidden"
               aria-expanded={open}
@@ -68,7 +82,7 @@ export function SiteHeader() {
               aria-label={open ? "סגירת תפריט" : "פתיחת תפריט"}
               onClick={() => setOpen((v) => !v)}
             >
-              {open ? <X className="size-5" /> : <Menu className="size-5" />}
+              {open ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
             </button>
           )}
         </div>

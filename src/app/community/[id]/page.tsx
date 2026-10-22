@@ -35,7 +35,7 @@ export default async function QuestionPage({ params }: { params: Promise<{ id: s
   if (viewer.state === "unconfigured")
     return (
       <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
-        <NotConfigured feature="הקהילה" />
+        <NotConfigured feature="הקהילה" standalone />
       </div>
     );
 

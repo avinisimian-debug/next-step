@@ -239,7 +239,7 @@ export function JourneyView({ catalog, account, canSignIn, accountError }: Props
                   <li key={p.inst.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
                     <span className="text-stone-600">{p.inst.name}</span>
                     <button type="button" onClick={() => changeStage(p.inst.id, "interested")} className="font-medium text-teal-700 underline underline-offset-4">
-                      להחזיר לרשימה
+                      להחזיר לרשימה<span className="sr-only">: {p.inst.name}</span>
                     </button>
                   </li>
                 ))}
@@ -268,7 +268,7 @@ export function JourneyView({ catalog, account, canSignIn, accountError }: Props
                     className="mt-4 inline-flex items-center justify-center gap-2 self-start rounded-full bg-navy-900 px-4 py-2 text-sm font-medium text-paper hover:bg-navy-800"
                   >
                     <Plus className="size-4" aria-hidden="true" />
-                    להוסיף למסע
+                    להוסיף למסע<span className="sr-only">: {r.institution.name}</span>
                   </button>
                 </li>
               ))}
@@ -352,7 +352,9 @@ function PlaceCard({ place, onStage, onRemove }: { place: Place; onStage: (s: St
       </div>
 
       <fieldset className="mt-5">
-        <legend className="text-sm font-medium text-navy-900">איפה אני עם המקום הזה?</legend>
+        <legend className="text-sm font-medium text-navy-900">
+          איפה אני עם המקום הזה?<span className="sr-only"> ({inst.name})</span>
+        </legend>
         <div className="mt-3 flex gap-1" aria-hidden="true">
           {stages.map((s, i) => (
             <span key={s} className={`h-2 flex-1 rounded-full transition-colors duration-500 ${i <= idx ? STAGE_BAR[i % STAGE_BAR.length] : "bg-sand-200"}`} />
@@ -386,11 +388,11 @@ function PlaceCard({ place, onStage, onRemove }: { place: Place; onStage: (s: St
 
       <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
         <button type="button" onClick={() => onStage("dropped")} className="text-stone-600 underline underline-offset-4 hover:text-navy-900">
-          לא ממשיך עם המקום הזה
+          לא ממשיך עם המקום הזה<span className="sr-only">: {inst.name}</span>
         </button>
         <button type="button" onClick={onRemove} className="inline-flex items-center gap-1 text-stone-600 underline underline-offset-4 hover:text-navy-900">
           <X className="size-3.5" aria-hidden="true" />
-          הסרה מהרשימה
+          הסרה מהרשימה<span className="sr-only">: {inst.name}</span>
         </button>
       </div>
     </li>

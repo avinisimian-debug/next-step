@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getViewer } from "@/lib/auth/viewer";
 import { userErrorMessage, USER_ERROR_MESSAGES } from "@/lib/supabase/errors";
 
-export type FormState = { status: "idle" } | { status: "ok"; message: string } | { status: "error"; message: string };
+export type FormState = { status: "idle" } | { status: "ok"; message: string } | { status: "error"; message: string; field?: string };
 
 const nameSchema = z.string().trim().min(2, "השם צריך להכיל לפחות 2 תווים.").max(40, "השם יכול להכיל עד 40 תווים.");
 

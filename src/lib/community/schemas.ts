@@ -59,3 +59,5 @@ export const reportSchema = z.object({
 });
 
 export const firstIssue = (e: z.ZodError) => e.issues[0]?.message ?? "חלק מהפרטים לא תקינים.";
+/** The form field the first issue belongs to, so the form can mark that field and link the message to it. */
+export const issueField = (e: z.ZodError) => (typeof e.issues[0]?.path[0] === "string" ? (e.issues[0].path[0] as string) : undefined);
