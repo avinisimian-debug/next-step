@@ -1,14 +1,9 @@
 import Link from "next/link";
-import { ArrowLeft, Compass, ListChecks, MessagesSquare, Scale, ShieldCheck, Sparkles, Eye } from "lucide-react";
+import { ArrowLeft, Scale, ShieldCheck, Sparkles, Eye } from "lucide-react";
 import { Landscape } from "@/components/art/Landscape";
 import { PATHWAY_INFO, PATHWAY_ORDER } from "@/lib/domain/pathways";
-
-const STEPS = [
-  { icon: ListChecks, title: "עונים על כמה שאלות", text: "שאלה אחת בכל מסך, בקצב שלך. אפשר לדלג, לחזור ולשנות." },
-  { icon: Compass, title: "מגלים אילו מסלולים מתאימים לכם", text: "ההתאמה מחושבת לפי מה שחשוב לך — עם הסבר לכל המלצה." },
-  { icon: Scale, title: "משווים בין שלושה מקומות", text: "השוואה צד לצד: לימוד, שירות, מיקום, משך ומה עוד לא ידוע." },
-  { icon: MessagesSquare, title: "יוצרים קשר וממשיכים לבדוק", text: "קישורים לאתרים הרשמיים ופרטי קשר שאומתו, כדי להמשיך משם." },
-];
+import { HomeJourney } from "@/components/journey/HomeJourney";
+import { ResumeLink } from "@/components/journey/ResumeLink";
 
 const WHY = [
   { icon: Sparkles, title: "התאמה אישית לפי ההעדפות שלך", text: "לא לפי מי שמפרסם יותר. כל מוסד נבחן לפי אותם קריטריונים." },
@@ -54,6 +49,7 @@ export default function Home() {
                 אני עדיין לא יודע מה מתאים לי
               </Link>
             </div>
+            <ResumeLink />
             <p className="mt-6 flex items-start gap-2 text-sm text-stone-600">
               <ShieldCheck className="mt-0.5 size-4 shrink-0 text-teal-600" aria-hidden="true" />
               ההמלצות מותאמות להעדפות שלך. הבחירה הסופית תמיד בידיים שלך.
@@ -113,25 +109,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How it works */}
-      <section id="how" className="scroll-mt-20 py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="text-sm font-semibold tracking-wide text-teal-700">איך זה עובד</p>
-          <h2 className="mt-2 font-display text-3xl font-bold text-navy-950 sm:text-4xl">ארבעה צעדים, בלי לחץ</h2>
-          <ol className="mt-10 grid gap-6 md:grid-cols-4">
-            {STEPS.map((s, i) => (
-              <li key={s.title} className="relative rounded-3xl border border-sand-200 bg-paper p-6">
-                <span className="font-display text-5xl font-bold text-sand-300" aria-hidden="true">
-                  {i + 1}
-                </span>
-                <s.icon className="absolute end-6 top-7 size-6 text-navy-600" aria-hidden="true" />
-                <h3 className="mt-3 text-lg font-semibold text-navy-950">{s.title}</h3>
-                <p className="mt-2 text-sm leading-7 text-stone-600">{s.text}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      <HomeJourney />
 
       {/* Why */}
       <section className="bg-navy-900 py-20 text-paper">

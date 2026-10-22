@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ClipboardList, Info, Pencil, RotateCcw, Scale, Sparkles, UserRound } from "lucide-react";
+import { ArrowLeft, ClipboardList, Info, Pencil, RotateCcw, Route, Scale, Sparkles, UserRound } from "lucide-react";
 import type { Institution } from "@/lib/domain/types";
 import { match } from "@/lib/matching/engine";
 import type { Answers } from "@/lib/questionnaire/questions";
@@ -65,6 +65,13 @@ export function ResultsView({ catalog }: { catalog: Institution[] }) {
               השוואה בין הכיוונים
             </button>
           )}
+          <Link
+            href="/journey"
+            className="inline-flex items-center gap-2 rounded-full bg-teal-700 px-5 py-2.5 text-sm font-semibold text-paper hover:bg-teal-600"
+          >
+            <Route className="size-4" aria-hidden="true" />
+            המסע שלי עד השיבוץ
+          </Link>
           <Link
             href="/plan"
             className="inline-flex items-center gap-2 rounded-full border border-teal-600 px-5 py-2.5 text-sm font-semibold text-teal-700 hover:bg-teal-100"

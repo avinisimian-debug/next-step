@@ -17,6 +17,7 @@ export function SiteFooter() {
           <ul className="space-y-2 text-sm">
             <li><Link className="hover:text-paper" href="/questionnaire">השאלון</Link></li>
             <li><Link className="hover:text-paper" href="/results">ההמלצות שלי</Link></li>
+            <li><Link className="hover:text-paper" href="/journey">המסע שלי</Link></li>
             <li><Link className="hover:text-paper" href="/compare">השוואה</Link></li>
             <li><Link className="hover:text-paper" href="/institutions">חיפוש מסגרות</Link></li>
             <li><Link className="hover:text-paper" href="/community">קהילה</Link></li>

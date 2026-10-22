@@ -259,10 +259,54 @@ test("external official links are labelled and open safely", async ({ page }) =>
   await expect(page.getByText("האתר הרשמי טרם אומת").first()).toBeVisible();
 });
 
-for (const path of ["/", "/questionnaire", "/institutions", "/institutions/hakotel", "/about", "/privacy", "/compare", "/plan", "/community", "/assistant", "/saved", "/login"]) {
+for (const path of ["/", "/questionnaire", "/institutions", "/institutions/hakotel", "/about", "/privacy", "/compare", "/plan", "/community", "/assistant", "/saved", "/login", "/journey"]) {
   test(`no horizontal overflow on ${path}`, async ({ page }) => {
     await page.goto(path);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(1);
   });
 }
+
+test("journey: save a place, move it through stages, and the route follows", async ({ page }) => {
+  await page.goto("/journey");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("מהשאלון ועד השיבוץ");
+  await expect(page.getByText("הרשימה עוד ריקה")).toBeVisible();
+  // the first stop is the current one for a new visitor
+  await expect(page.locator('[aria-current="step"]').first()).toContainText("מכירים את עצמך");
+
+  // save a real institution from its page, then find it on the journey
+  await page.goto("/institutions/hakotel");
+  await page.getByRole("button", { name: /^שמירה:/ }).first().click();
+  await page.goto("/journey");
+  const card = page.locator('[data-place="hesder-hakotel"]');
+  await expect(card).toBeVisible();
+  await expect(card.getByRole("button", { name: "מתעניין" })).toHaveAttribute("aria-pressed", "true");
+
+  await card.getByRole("button", { name: "הגשתי מועמדות" }).click();
+  await expect(card.getByRole("button", { name: "הגשתי מועמדות" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("מקום אחד בתהליך")).toBeVisible();
+
+  // survives a reload (stored on this device)
+  await page.reload();
+  await expect(page.locator('[data-place="hesder-hakotel"]').getByRole("button", { name: "הגשתי מועמדות" })).toHaveAttribute("aria-pressed", "true");
+
+  await page.locator('[data-place="hesder-hakotel"]').getByRole("button", { name: "זו הבחירה שלי" }).click();
+  await expect(page.getByText("נבחר מקום")).toBeVisible();
+  await expect(page.getByRole("img", { name: /התקדמות במסע/ })).toBeVisible();
+
+  // drop it: it leaves the active list but can be brought back
+  await page.locator('[data-place="hesder-hakotel"]').getByRole("button", { name: "לא ממשיך עם המקום הזה" }).click();
+  await expect(page.locator('[data-place="hesder-hakotel"]')).toHaveCount(0);
+  await page.getByText(/מקומות שהחלטתי לא להמשיך/).click();
+  await page.getByRole("button", { name: "להחזיר לרשימה" }).click();
+  await expect(page.locator('[data-place="hesder-hakotel"]')).toBeVisible();
+});
+
+test("home shows the journey route and a way back for returning visitors", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "מהשאלון ועד השיבוץ, צעד אחרי צעד" })).toBeVisible();
+  await page.evaluate(() => localStorage.setItem("nextstep.favorites.v1", JSON.stringify(["hesder-hakotel"])));
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "ממשיכים מאיפה שעצרת" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /להמשיך במסע שלי/ })).toBeVisible();
+});

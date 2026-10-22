@@ -8,11 +8,11 @@ import { Logo } from "./Logo";
 import { AccountLink } from "./AccountLink";
 
 const NAV = [
-  { href: "/#pathways", label: "המסלולים" },
+  { href: "/journey", label: "המסע שלי" },
   { href: "/institutions", label: "חיפוש מסגרות" },
   { href: "/community", label: "קהילה" },
   { href: "/assistant", label: "שאלו את העוזר" },
-  { href: "/compare", label: "השוואה" },
+  { href: "/#pathways", label: "המסלולים" },
 ];
 
 export function SiteHeader() {
@@ -32,7 +32,11 @@ export function SiteHeader() {
             <ul className="flex items-center gap-1 text-[15px] text-navy-800">
               {NAV.map((n) => (
                 <li key={n.href}>
-                  <Link href={n.href} className="rounded-lg px-3 py-2 transition-colors hover:bg-sand-100 hover:text-navy-950">
+                  <Link
+                    href={n.href}
+                    aria-current={pathname === n.href ? "page" : undefined}
+                    className="rounded-lg px-3 py-2 transition-colors hover:bg-sand-100 hover:text-navy-950 aria-[current=page]:bg-sand-100 aria-[current=page]:font-medium aria-[current=page]:text-navy-950"
+                  >
                     {n.label}
                   </Link>
                 </li>

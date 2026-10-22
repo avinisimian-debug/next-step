@@ -14,6 +14,7 @@ export const KEYS = {
   compare: "nextstep.compare.v1",
   aiConsent: "nextstep.aiConsent.v1",
   plan: "nextstep.plan.v1",
+  journey: "nextstep.journey.v1",
 } as const;
 
 const listeners = new Set<() => void>();

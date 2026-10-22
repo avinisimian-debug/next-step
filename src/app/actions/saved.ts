@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getViewer } from "@/lib/auth/viewer";
 import { getRepository } from "@/lib/data/repository";
 import { userErrorMessage, USER_ERROR_MESSAGES } from "@/lib/supabase/errors";
+import { STAGES } from "@/lib/journey/journey";
 
 export type SaveState = { mode: "local"; canSignIn: boolean } | { mode: "account"; saved: boolean };
 export type ActionResult<T = object> = ({ ok: true } & T) | { ok: false; message: string };
@@ -73,4 +74,28 @@ export async function updateSavedNote(institutionId: string, note: string): Prom
   if (error) return { ok: false, message: userErrorMessage(error)! };
   revalidatePath("/saved");
   return { ok: true };
+}
+
+/** Sets where the user is with a place (and saves it if it was not saved yet). */
+export async function setJourneyStage(institutionId: string, stage: string): Promise<ActionResult> {
+  const parsed = z.object({ id: idSchema, stage: z.enum(STAGES) }).safeParse({ id: institutionId, stage });
+  if (!parsed.success || !(await isPublicInstitution(parsed.data.id))) return { ok: false, message: USER_ERROR_MESSAGES.invalid };
+  const viewer = await getViewer();
+  if (viewer.state !== "signed_in") return { ok: false, message: USER_ERROR_MESSAGES.auth_required };
+  const { error } = await viewer.supabase
+    .from("saved_institutions")
+    .upsert({ institution_id: parsed.data.id, stage: parsed.data.stage }, { onConflict: "user_id,institution_id" });
+  if (error) return { ok: false, message: userErrorMessage(error)! };
+  revalidatePath("/journey");
+  revalidatePath("/saved");
+  return { ok: true };
+}
+
+/** The signed-in user's places with their stage, or null when the list lives on the device. */
+export async function getAccountPlaces(): Promise<{ institution_id: string; stage: (typeof STAGES)[number] }[] | null> {
+  const viewer = await getViewer();
+  if (viewer.state !== "signed_in") return null;
+  const { data, error } = await viewer.supabase.from("saved_institutions").select("institution_id, stage");
+  if (error) return null;
+  return (data ?? []).map((r) => ({ institution_id: r.institution_id, stage: (STAGES as readonly string[]).includes(r.stage) ? r.stage : "interested" }));
 }

@@ -52,7 +52,7 @@ suite("database security rules", () => {
     await client.connect();
     await client.query("drop schema if exists next_step cascade");
     await client.query(read("tests/supabase-stub.sql"));
-    for (const f of ["migrations/20261021210000_next_step_core.sql", "migrations/20261021213000_next_step_fk_indexes.sql", "migrations/20261021220000_next_step_touch_steps.sql"]) await client.query(read(f));
+    for (const f of ["migrations/20261021210000_next_step_core.sql", "migrations/20261021213000_next_step_fk_indexes.sql", "migrations/20261021220000_next_step_touch_steps.sql", "migrations/20261022120000_next_step_saved_stage.sql"]) await client.query(read(f));
     await client.query(
       `insert into auth.users (id) values ($1), ($2), ($3), ($4) on conflict do nothing`,
       [ALICE, BOB, MOD, REP],
@@ -117,6 +117,22 @@ suite("database security rules", () => {
       );
       await as(ALICE);
       expect((await q("select * from next_step.saved_institutions")).rowCount).toBe(1);
+    });
+  });
+
+  it("tracks the journey stage of a saved place for its owner only", async () => {
+    await tx(async (as, q) => {
+      await as(ALICE);
+      const { rows: [row] } = await q("insert into next_step.saved_institutions (institution_id, stage) values ('inst-a', 'visited') returning stage, stage_updated_at");
+      expect(row.stage).toBe("visited");
+      const { rows: [moved] } = await q("update next_step.saved_institutions set stage = 'applied' returning stage_updated_at");
+      expect(moved.stage_updated_at).not.toBeNull();
+      await fails(() => q("update next_step.saved_institutions set stage = 'admin'"), /check constraint/);
+      await fails(() => q("update next_step.saved_institutions set stage_updated_at = now()"), /permission denied/);
+      await as(BOB);
+      expect((await q("update next_step.saved_institutions set stage = 'dropped'")).rowCount).toBe(0);
+      await as(ALICE);
+      expect((await q("select stage from next_step.saved_institutions")).rows[0].stage).toBe("applied");
     });
   });
 
