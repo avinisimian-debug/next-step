@@ -287,14 +287,14 @@ test("journey: save a place, move it through stages, and the route follows", asy
 
   await card.getByRole("button", { name: "הגשתי מועמדות" }).click();
   await expect(card.getByRole("button", { name: "הגשתי מועמדות" })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByText("מקום אחד בתהליך")).toBeVisible();
+  await expect(page.getByText("מקום אחד בתהליך").filter({ visible: true })).toBeVisible();
 
   // survives a reload (stored on this device)
   await page.reload();
   await expect(page.locator('[data-place="hesder-hakotel"]').getByRole("button", { name: "הגשתי מועמדות" })).toHaveAttribute("aria-pressed", "true");
 
   await page.locator('[data-place="hesder-hakotel"]').getByRole("button", { name: "זו הבחירה שלי" }).click();
-  await expect(page.getByText("נבחר מקום")).toBeVisible();
+  await expect(page.getByText("נבחר מקום").filter({ visible: true })).toBeVisible();
   await expect(page.getByRole("img", { name: /התקדמות במסע/ })).toBeVisible();
 
   // drop it: it leaves the active list but can be brought back
