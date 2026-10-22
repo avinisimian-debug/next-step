@@ -9,7 +9,7 @@
   --color-navy-800: #17324d;
   --color-navy-700: #234567;
   --color-navy-600: #345a80;
-  --color-mist-500: #6f8aa3;
+  --color-mist-500: #4f6880;
   --color-mist-300: #a9bccd;
   --color-mist-100: #e3eaf1;
   --color-paper: #faf7f2;
@@ -80,4 +80,39 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Accessibility menu choices (AccessibilityMenu.tsx). Sizes are in rem, so scaling the root scales the page. */
+html[data-a11y-text="1"] { font-size: 115%; }
+html[data-a11y-text="2"] { font-size: 130%; }
+html[data-a11y-text="3"] { font-size: 150%; }
+
+html[data-a11y-contrast] {
+  --color-mist-500: #22313f;
+  --color-mist-300: #e8eef4;
+  --color-stone-600: #2b261f;
+  --color-navy-800: #0a1726;
+  --color-sand-200: #8a7d68;
+  --color-sand-300: #6b604f;
+  --color-teal-700: #123a37;
+}
+html[data-a11y-contrast] body { color: #000; }
+
+html[data-a11y-links] a {
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+}
+
+html[data-a11y-font] {
+  --font-display: Arial, "Heebo Variable", sans-serif;
+  --font-sans: Arial, "Heebo Variable", sans-serif;
+  letter-spacing: 0.01em;
+  word-spacing: 0.08em;
+}
+
+html[data-a11y-motion] { scroll-behavior: auto; }
+html[data-a11y-motion] *, html[data-a11y-motion] *::before, html[data-a11y-motion] *::after {
+  animation: none !important;
+  transition: none !important;
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/auth/viewer";
 import { loginHref } from "@/lib/auth/redirect";
@@ -28,6 +29,13 @@ export default async function AskPage({ searchParams }: { searchParams: Promise<
         institutions={catalog.map((i) => ({ id: i.id, name: i.name }))}
         defaultInstitution={catalog.some((i) => i.id === institution) ? institution : undefined}
       />
+      <p className="text-sm leading-6 text-stone-600">
+        בפרסום את/ה מסכים/ה ל
+        <Link href="/terms#community" className="font-medium text-teal-700 underline underline-offset-4">
+          כללי הקהילה
+        </Link>
+        . אל תכתבו פרטים אישיים, ותזכרו שהתשובות הן ניסיון אישי של משתמשים.
+      </p>
     </div>
   );
 }

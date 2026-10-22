@@ -6,6 +6,8 @@ import "./globals.css";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { BottomNav } from "@/components/site/BottomNav";
+import { AccessibilityMenu } from "@/components/site/AccessibilityMenu";
+import { A11Y_KEY } from "@/lib/a11y";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -31,10 +33,14 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// Applies the visitor's saved accessibility choices before first paint (see AccessibilityMenu).
+const A11Y_BOOT = `try{var p=JSON.parse(localStorage.getItem(${JSON.stringify(A11Y_KEY)})||"{}"),e=document.documentElement;if(p.text)e.setAttribute("data-a11y-text",String(p.text));["contrast","links","font","motion"].forEach(function(k){if(p[k])e.setAttribute("data-a11y-"+k,"1")})}catch(_){}`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="he" dir="rtl">
+    <html lang="he" dir="rtl" suppressHydrationWarning>
       <body className="min-h-dvh flex flex-col antialiased">
+        <script dangerouslySetInnerHTML={{ __html: A11Y_BOOT }} />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:start-3 focus:z-50 focus:rounded-lg focus:bg-navy-900 focus:px-4 focus:py-2 focus:text-paper"
@@ -47,6 +53,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </main>
         <SiteFooter />
         <BottomNav />
+        <AccessibilityMenu />
       </body>
     </html>
   );

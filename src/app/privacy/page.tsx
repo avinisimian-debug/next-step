@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ClearDataButton } from "@/components/site/ClearDataButton";
+import { ContactLines } from "@/components/site/LegalPage";
+import { LEGAL_UPDATED, SITE_OPERATOR } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "פרטיות",
@@ -15,6 +18,14 @@ export default function PrivacyPage() {
       </p>
 
       <div className="mt-10 space-y-10 leading-8 text-navy-800">
+        <section>
+          <h2 className="font-display text-2xl font-bold text-navy-950">מי אחראית על המידע</h2>
+          <p className="mt-3">
+            האתר מופעל על ידי {SITE_OPERATOR.name}, שהיא האחראית על המידע שנאסף בו. אפשר לפנות בכל שאלה או בקשה בנושא פרטיות
+            לפרטי הקשר שבסוף העמוד.
+          </p>
+        </section>
+
         <section>
           <h2 className="font-display text-2xl font-bold text-navy-950">מה נשמר ואיפה</h2>
           <ul className="mt-3 list-disc space-y-2 ps-6">
@@ -67,6 +78,46 @@ export default function PrivacyPage() {
           </ul>
         </section>
 
+        <section>
+          <h2 className="font-display text-2xl font-bold text-navy-950">עוגיות ואחסון מקומי</h2>
+          <p className="mt-3">
+            האתר לא משתמש בעוגיות פרסום או מעקב. אם נכנסת לחשבון, נשמרות עוגיות התחברות (שמתחילות ב־sb-) שנחוצות כדי שתישאר/י
+            מחובר/ת. בחירות כמו התשובות לשאלון והגדרות תפריט הנגישות נשמרות באחסון המקומי של הדפדפן ולא נשלחות אלינו.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-display text-2xl font-bold text-navy-950">ספקים שמעבדים מידע בשבילנו</h2>
+          <ul className="mt-3 list-disc space-y-2 ps-6">
+            <li>Vercel — אחסון האתר והפעלתו.</li>
+            <li>Supabase — מסד הנתונים והתחברות לחשבון (רק למי שנכנס לחשבון).</li>
+            <li>Anthropic — ניסוח תשובות העוזר והסיכומים, רק כשהשירות פעיל ובהיקף שמתואר למעלה.</li>
+          </ul>
+          <p className="mt-3">
+            השרתים של הספקים האלה עשויים להיות מחוץ לישראל. הם מקבלים רק את המידע הדרוש לשירות שהם נותנים.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-display text-2xl font-bold text-navy-950">הזכויות שלך</h2>
+          <p className="mt-3">
+            לפי חוק הגנת הפרטיות, התשמ״א־1981, אפשר לבקש לעיין במידע שנשמר עליך בחשבון, לתקן אותו, או למחוק את החשבון ואת
+            המידע שבו. את המסגרות השמורות, הצעדים ושם התצוגה אפשר לשנות ולמחוק בעצמך באתר. למחיקת החשבון כולו, או לכל בקשה אחרת,
+            פנה/י אלינו בדוא״ל ונטפל בבקשה. המידע בחשבון נשמר עד שתבקש/י למחוק אותו.
+          </p>
+          <p className="mt-3">
+            השירות מיועד גם לבני נוער. אם טרם מלאו לך 18, כדאי לשתף הורה או מבוגר אחראי לפני שפותחים חשבון או מפרסמים בקהילה.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-display text-2xl font-bold text-navy-950">אבטחה</h2>
+          <p className="mt-3">
+            התקשורת עם האתר מוצפנת (HTTPS), והגישה למידע בחשבון מוגבלת במסד הנתונים כך שכל משתמש רואה רק את המידע הפרטי שלו. אין
+            אבטחה מושלמת, ואם יתגלה אירוע שפוגע במידע שלך נפעל לפי הדין.
+          </p>
+        </section>
+
         <section className="rounded-3xl border border-sand-200 bg-paper p-6">
           <h2 className="font-display text-2xl font-bold text-navy-950">מחיקת המידע</h2>
           <p className="mt-2">הכפתור מוחק מהדפדפן הזה את כל מה ש־NEXT STEP שמר: תשובות, מועדפים, השוואות, סימונים בתוכנית הפעולה והסכמות. הוא לא מוחק את מה שנשמר בחשבון — את המסגרות השמורות והצעדים אפשר להסיר מהחשבון עצמו.</p>
@@ -74,7 +125,20 @@ export default function PrivacyPage() {
             <ClearDataButton />
           </div>
         </section>
+
+        <section>
+          <h2 className="font-display text-2xl font-bold text-navy-950">יצירת קשר</h2>
+          <div className="[&_a]:font-medium [&_a]:text-teal-700 [&_a]:underline [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:ps-6">
+            <ContactLines {...SITE_OPERATOR} />
+          </div>
+          <p className="mt-3">
+            ראו גם את <Link href="/terms" className="font-medium text-teal-700 underline">תנאי השימוש</Link>.
+          </p>
+        </section>
       </div>
+      <p className="mt-12 text-sm text-mist-500">
+        עודכן לאחרונה: <time dateTime={LEGAL_UPDATED}>{new Date(LEGAL_UPDATED).toLocaleDateString("he-IL")}</time>
+      </p>
     </div>
   );
 }

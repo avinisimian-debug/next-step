@@ -9,7 +9,7 @@ export function SiteFooter() {
           <Logo tone="light" />
           <p className="max-w-sm text-sm leading-7">
             NEXT STEP עוזר לבוגרי תיכון להכיר מסלולים אחרי י״ב ולהשוות ביניהם. ההמלצות הן מידע בלבד ואינן מחליפות
-            ייעוץ אישי, הכוונה רשמית לגיוס או פנייה ישירה למוסדות.
+            ייעוץ אישי, הכוונה רשמית לגיוס או פנייה ישירה למוסדות. האתר אינו קשור לצה״ל או למוסדות המופיעים בו.
           </p>
         </div>
         <nav aria-label="קישורים">
@@ -29,12 +29,15 @@ export function SiteFooter() {
           <h2 className="mb-3 text-sm font-semibold text-paper">מידע</h2>
           <ul className="space-y-2 text-sm">
             <li><Link className="hover:text-paper" href="/about">אודות והשיטה</Link></li>
-            <li><Link className="hover:text-paper" href="/privacy">פרטיות</Link></li>
+            <li><Link className="hover:text-paper" href="/privacy">מדיניות פרטיות</Link></li>
+            <li><Link className="hover:text-paper" href="/terms">תנאי שימוש</Link></li>
+            <li><Link className="hover:text-paper" href="/accessibility">הצהרת נגישות</Link></li>
+            <li><Link className="hover:text-paper" href="/credits">קרדיטים ומקורות</Link></li>
           </ul>
         </nav>
       </div>
       <div className="border-t border-navy-800">
-        <p className="mx-auto max-w-6xl px-4 py-5 text-xs text-mist-500 sm:px-6">
+        <p className="mx-auto max-w-6xl px-4 py-5 text-xs text-mist-300 sm:px-6">
           המידע על המוסדות נאסף ממקורות ציבוריים ומוצג עם תאריך האימות. לפני החלטה יש לוודא את הפרטים העדכניים מול כל מוסד.
         </p>
       </div>

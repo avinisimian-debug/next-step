@@ -4,13 +4,13 @@ import { Check, Compass, Flag, Heart, MapPin, Scale, Send, type LucideIcon } fro
 import type { Milestone, MilestoneId } from "@/lib/journey/journey";
 
 /** Each stop on the road gets its own colour and icon, so the map reads at a glance. */
-const STOP_STYLE: Record<MilestoneId, { icon: LucideIcon; hex: string; solid: string; soft: string; text: string; ring: string }> = {
-  discover: { icon: Compass, hex: "#8b5cf6", solid: "bg-violet-500", soft: "bg-violet-500/15", text: "text-violet-500", ring: "ring-violet-400/40" },
-  shortlist: { icon: Heart, hex: "#f43f5e", solid: "bg-rose-500", soft: "bg-rose-500/15", text: "text-rose-500", ring: "ring-rose-400/40" },
-  explore: { icon: MapPin, hex: "#f59e0b", solid: "bg-amber-500", soft: "bg-amber-500/15", text: "text-amber-500", ring: "ring-amber-400/40" },
-  compare: { icon: Scale, hex: "#0ea5e9", solid: "bg-sky-500", soft: "bg-sky-500/15", text: "text-sky-500", ring: "ring-sky-400/40" },
-  apply: { icon: Send, hex: "#14b8a6", solid: "bg-teal-500", soft: "bg-teal-500/15", text: "text-teal-500", ring: "ring-teal-400/40" },
-  placement: { icon: Flag, hex: "#10b981", solid: "bg-emerald-500", soft: "bg-emerald-500/15", text: "text-emerald-500", ring: "ring-emerald-400/40" },
+const STOP_STYLE: Record<MilestoneId, { icon: LucideIcon; hex: string; solid: string; soft: string; text: string; textDark: string; ring: string }> = {
+  discover: { icon: Compass, hex: "#8b5cf6", solid: "bg-violet-500", soft: "bg-violet-500/15", text: "text-violet-700", textDark: "text-violet-300", ring: "ring-violet-400/40" },
+  shortlist: { icon: Heart, hex: "#f43f5e", solid: "bg-rose-500", soft: "bg-rose-500/15", text: "text-rose-700", textDark: "text-rose-300", ring: "ring-rose-400/40" },
+  explore: { icon: MapPin, hex: "#f59e0b", solid: "bg-amber-500", soft: "bg-amber-500/15", text: "text-amber-700", textDark: "text-amber-300", ring: "ring-amber-400/40" },
+  compare: { icon: Scale, hex: "#0ea5e9", solid: "bg-sky-500", soft: "bg-sky-500/15", text: "text-sky-700", textDark: "text-sky-300", ring: "ring-sky-400/40" },
+  apply: { icon: Send, hex: "#14b8a6", solid: "bg-teal-500", soft: "bg-teal-500/15", text: "text-teal-700", textDark: "text-teal-300", ring: "ring-teal-400/40" },
+  placement: { icon: Flag, hex: "#10b981", solid: "bg-emerald-500", soft: "bg-emerald-500/15", text: "text-emerald-700", textDark: "text-emerald-300", ring: "ring-emerald-400/40" },
 };
 
 type Pt = { x: number; y: number };
@@ -158,9 +158,9 @@ function Station({ m, tone, bubble = "top" }: { m: Milestone; tone: Tone; bubble
   return (
     <span className="relative inline-flex" aria-hidden="true">
       {current && (
-        <span className={`absolute left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold text-white shadow-lg ${bubble === "top" ? "-top-9" : "-bottom-9"} ${st.solid}`}>
+        <span className={`absolute left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-2.5 py-1 text-xs font-bold text-navy-950 shadow-lg ring-2 ${st.ring} ${bubble === "top" ? "-top-9" : "-bottom-9"}`}>
           אתה כאן
-          <span className={`absolute left-1/2 size-2 -translate-x-1/2 rotate-45 ${bubble === "top" ? "-bottom-1" : "-top-1"} ${st.solid}`} />
+          <span className={`absolute left-1/2 size-2 -translate-x-1/2 rotate-45 bg-white ${bubble === "top" ? "-bottom-1" : "-top-1"}`} />
         </span>
       )}
       <span
@@ -186,7 +186,7 @@ function StopText({ m, i, tone, linked }: { m: Milestone; i: number; tone: Tone;
   const current = m.status === "current";
   const body = (
     <>
-      <p className={`text-xs font-semibold ${current || done ? st.text : dark ? "text-mist-300" : "text-mist-500"}`}>
+      <p className={`text-xs font-semibold ${current || done ? (dark ? st.textDark : st.text) : dark ? "text-mist-300" : "text-mist-500"}`}>
         תחנה {i + 1}
         <span className="sr-only">{done ? " (הושלם)" : current ? " (אתה כאן)" : " (עוד לא)"}</span>
       </p>
