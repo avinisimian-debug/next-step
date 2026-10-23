@@ -132,6 +132,21 @@ html[data-a11y-motion] .cinema-art, html[data-a11y-motion] .cinema-copy, html[da
 }
 html[data-a11y-motion] .cinema-flood, html[data-a11y-motion] .cinema-caption { opacity: 0 !important; }
 
+/* The same walk-in on phones, as its own scene under the opening text so the text stays sharp:
+   the artwork pins, the camera moves into the doorway, and its light becomes the next section. */
+@media (prefers-reduced-motion: no-preference) and (max-width: 767px) {
+  html.js .door { height: 240svh; }
+  html.js .door-stage { position: sticky; top: 4rem; height: calc(100svh - 4rem); }
+  html.js .door-art { transform: scale(calc(1 + var(--p) * var(--p) * 6)); transform-origin: 63% 33%; will-change: transform; }
+  html.js .door-flood { opacity: clamp(0, calc((var(--p) - 0.42) * 2.4), 1); }
+  html.js .door-caption { opacity: clamp(0, calc((var(--p) - 0.7) * 6), 1); transform: translateY(calc((1 - var(--p)) * 40px)); }
+}
+.door-flood, .door-caption { opacity: 0; }
+html[data-a11y-motion] .door { height: auto !important; }
+html[data-a11y-motion] .door-stage { position: relative !important; height: auto !important; }
+html[data-a11y-motion] .door-art { transform: none !important; }
+html[data-a11y-motion] .door-flood, html[data-a11y-motion] .door-caption { opacity: 0 !important; }
+
 /* The doorway light breathes. */
 @keyframes glow { 0%, 100% { opacity: 0.75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
 @media (prefers-reduced-motion: no-preference) { .animate-glow { animation: glow 7s ease-in-out infinite; } }

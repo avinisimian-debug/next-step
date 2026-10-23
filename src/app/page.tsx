@@ -211,7 +211,7 @@ export default async function Home() {
               </div>
 
               {/* The brand artwork, melted into the night. The camera zooms toward its doorway. */}
-              <div className="animate-rise relative mx-auto w-full max-w-sm [animation-delay:200ms] md:max-w-none">
+              <div className="animate-rise relative hidden [animation-delay:200ms] md:block">
                 <div className="cinema-art relative">
                   <Image
                     src={hero}
@@ -256,6 +256,41 @@ export default async function Home() {
             </a>
           </section>
         </Spotlight>
+      </CinemaHero>
+
+      {/* Phones: the doorway gets its own scene under the opening text. Scroll walks into its light. */}
+      <CinemaHero
+        id="door"
+        media="(max-width: 767px)"
+        className="door bg-night md:hidden"
+      >
+        <div className="door-stage grain relative isolate flex items-center justify-center overflow-hidden">
+          <Dust className="-z-10" count={40} />
+          <div className="door-art relative w-full max-w-md px-2">
+            <Image
+              src={hero}
+              alt=""
+              sizes="100vw"
+              className="w-full [mask-image:radial-gradient(ellipse_72%_72%_at_55%_45%,#000_45%,transparent_80%)]"
+            />
+            <span
+              aria-hidden="true"
+              className="animate-glow absolute start-[52%] top-[18%] size-32 rounded-full bg-dawn/30 blur-3xl"
+            />
+          </div>
+          <div
+            aria-hidden="true"
+            className="door-flood pointer-events-none absolute inset-0 z-20 bg-[radial-gradient(circle_at_60%_36%,#fffaf0_0%,#ffe6bf_24%,#faf7f2_64%)]"
+          />
+          <p
+            aria-hidden="true"
+            className="door-caption pointer-events-none absolute inset-x-0 top-[36%] z-30 px-6 text-center font-display text-4xl font-bold text-navy-950"
+          >
+            מאחורי כל דלת,
+            <br />
+            <span className="text-sky-500">מסלול אחר.</span>
+          </p>
+        </div>
       </CinemaHero>
 
       {/* Pathways: cards that stack as you scroll. */}
