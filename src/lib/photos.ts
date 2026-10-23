@@ -4,6 +4,8 @@ import idf from "@/assets/photos/idf.webp";
 import mechina from "@/assets/photos/mechina.webp";
 import hesder from "@/assets/photos/hesder.webp";
 import yeshiva from "@/assets/photos/yeshiva.webp";
+import nationalService from "@/assets/photos/national-service.webp";
+import midrasha from "@/assets/photos/midrasha.webp";
 
 /**
  * Real photographs from Wikimedia Commons, each under a free licence that requires (or allows) credit.
@@ -20,7 +22,7 @@ export type Photo = {
   source: string;
 };
 
-/** National service and midrashot have no free photo yet; their pages show a tint instead. */
+/** A pathway without a free photo shows a tint instead. */
 export const PATHWAY_PHOTOS: Partial<Record<Pathway, Photo>> = {
   idf: {
     src: idf,
@@ -53,6 +55,22 @@ export const PATHWAY_PHOTOS: Partial<Record<Pathway, Photo>> = {
     license: "CC0",
     licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/",
     source: "https://commons.wikimedia.org/wiki/File:%D7%91%D7%99%D7%AA_%D7%9E%D7%93%D7%A8%D7%A9_%D7%99%D7%A9%D7%99%D7%91%D7%94_%D7%9C%D7%A6%D7%A2%D7%99%D7%A8%D7%99%D7%9D.jpg",
+  },
+  national_service: {
+    src: nationalService,
+    alt: "בנות שירות לאומי רוקדות עם קשישים במועדון בקהילה",
+    author: "Michal pu",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    source: "https://commons.wikimedia.org/wiki/File:%D7%94%D7%AA%D7%A0%D7%93%D7%91%D7%95%D7%AA_%D7%A9%D7%9C_%D7%91%D7%A0%D7%95%D7%AA_%D7%A9%D7%99%D7%A8%D7%95%D7%AA_%D7%A2%D7%9D_%D7%A7%D7%A9%D7%99%D7%A9%D7%99%D7%9D_%D7%91%D7%A7%D7%94%D7%99%D7%9C%D7%94.jpg",
+  },
+  midrasha: {
+    src: midrasha,
+    alt: "שתי תלמידות לומדות יחד מול ספרים פתוחים בספריית מדרשה",
+    author: "Shai Grin",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    source: "https://commons.wikimedia.org/wiki/File:The_students_a_Midreshet_Shilat.JPG",
   },
 };
 
