@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
+import { PATHWAY_ORDER } from "@/lib/domain/pathways";
+import { PATHWAY_PAGES, pathwayHref } from "@/lib/seo";
 
 export function SiteFooter() {
   return (
     <footer className="mt-24 bg-navy-950 print:hidden text-mist-300">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="space-y-4">
           <Logo tone="light" />
           <p className="max-w-sm text-sm leading-7">
@@ -12,6 +14,18 @@ export function SiteFooter() {
             ייעוץ אישי, הכוונה רשמית לגיוס או פנייה ישירה למוסדות. האתר אינו קשור לצה״ל או למוסדות המופיעים בו.
           </p>
         </div>
+        <nav aria-label="מסלולים">
+          <h2 className="mb-3 text-sm font-semibold text-paper">מסלולים</h2>
+          <ul className="space-y-2 text-sm">
+            {PATHWAY_ORDER.map((p) => (
+              <li key={p}>
+                <Link className="hover:text-paper" href={pathwayHref(p)}>
+                  {PATHWAY_PAGES[p].h1.split(":")[0]}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
         <nav aria-label="קישורים">
           <h2 className="mb-3 text-sm font-semibold text-paper">ניווט</h2>
           <ul className="space-y-2 text-sm">

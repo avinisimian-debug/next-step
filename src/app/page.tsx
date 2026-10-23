@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Scale, ShieldCheck, Sparkles, Eye } from "lucide-react";
 import { PhotoCredit, PhotoFrame } from "@/components/art/PhotoFrame";
@@ -5,6 +6,10 @@ import { PATHWAY_PHOTOS } from "@/lib/photos";
 import { PATHWAY_INFO, PATHWAY_ORDER } from "@/lib/domain/pathways";
 import { HomeJourney } from "@/components/journey/HomeJourney";
 import { ResumeLink } from "@/components/journey/ResumeLink";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { SITE_NAME, SITE_URL, pathwayHref } from "@/lib/seo";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 const WHY = [
   { icon: Sparkles, title: "התאמה אישית לפי ההעדפות שלך", text: "לא לפי מי שמפרסם יותר. כל מוסד נבחן לפי אותם קריטריונים." },
@@ -16,6 +21,20 @@ const WHY = [
 export default function Home() {
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: SITE_NAME,
+          url: `${SITE_URL}/`,
+          inLanguage: "he",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: `${SITE_URL}/institutions?q={search_term_string}`,
+            "query-input": "required name=search_term_string",
+          },
+        }}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-10 sm:px-6 md:grid-cols-[1.05fr_1fr] md:pb-24 md:pt-16">
@@ -100,7 +119,7 @@ export default function Home() {
               return (
                 <li key={id} className="relative">
                   <Link
-                    href={`/institutions?pathway=${id}`}
+                    href={pathwayHref(id)}
                     className="group flex h-full flex-col overflow-hidden rounded-3xl border border-sand-200 bg-paper shadow-card transition hover:-translate-y-0.5 hover:shadow-lift"
                   >
                     <div className="relative h-44 overflow-hidden">

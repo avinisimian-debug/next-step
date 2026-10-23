@@ -15,6 +15,8 @@ import {
 import { PersonalFit } from "@/components/institution/PersonalFit";
 import { DURATION_LABELS, INTENSITY_LABELS, MILITARY_MODEL_LABELS, PATHWAY_INFO } from "@/lib/domain/pathways";
 import type { Pathway } from "@/lib/domain/types";
+import { SITE_URL, pathwayHref } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 export const revalidate = 300;
 
@@ -27,7 +29,13 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const inst = await getRepository().getPublicBySlug((await params).slug);
   if (!inst) return { title: "לא נמצא" };
-  return { title: inst.name, description: inst.shortDescription };
+  const path = `/institutions/${inst.slug}`;
+  return {
+    title: `${inst.name}: ${inst.typeLabel}`,
+    description: inst.shortDescription,
+    alternates: { canonical: path },
+    openGraph: { title: inst.name, description: inst.shortDescription, url: path },
+  };
 }
 
 // A tint per pathway instead of a photo: a stock photo here would read as a picture of this specific place.
@@ -60,6 +68,31 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
 
   return (
     <article>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "EducationalOrganization",
+          name: inst.name,
+          description: inst.shortDescription,
+          url: `${SITE_URL}/institutions/${inst.slug}`,
+          ...(inst.website ? { sameAs: [inst.website] } : {}),
+          // Only a location a source states; the "not verified" placeholder is left out.
+          ...(inst.locationLabel.includes(NOT_VERIFIED)
+            ? {}
+            : { address: { "@type": "PostalAddress", addressLocality: inst.locationLabel, addressCountry: "IL" } }),
+        }}
+      />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "הצעד הבא", item: `${SITE_URL}/` },
+            { "@type": "ListItem", position: 2, name: PATHWAY_INFO[inst.pathway].name, item: `${SITE_URL}${pathwayHref(inst.pathway)}` },
+            { "@type": "ListItem", position: 3, name: inst.name, item: `${SITE_URL}/institutions/${inst.slug}` },
+          ],
+        }}
+      />
       <header className="relative overflow-hidden border-b border-sand-200">
         <div className={`absolute inset-0 bg-gradient-to-bl ${HEADER_TINT[inst.pathway]} to-paper`} aria-hidden="true" />
         <div className="relative mx-auto max-w-5xl px-4 pb-10 pt-8 sm:px-6 sm:pt-12">
@@ -68,7 +101,10 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
             חזרה להמלצות
           </Link>
           <p className="mt-6 text-sm font-semibold text-teal-700">
-            {PATHWAY_INFO[inst.pathway].name} · {inst.typeLabel}
+            <Link href={pathwayHref(inst.pathway)} className="underline-offset-4 hover:underline">
+              {PATHWAY_INFO[inst.pathway].name}
+            </Link>{" "}
+            · {inst.typeLabel}
           </p>
           <h1 className="mt-2 font-display text-4xl font-bold leading-tight text-navy-950 sm:text-5xl">{inst.name}</h1>
           <div className="mt-4 flex flex-wrap items-center gap-3">

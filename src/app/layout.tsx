@@ -15,15 +15,19 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "הצעד הבא: המסלול שלך אחרי התיכון",
+    default: "הצעד הבא: מכינות, ישיבות הסדר, ישיבות גבוהות וצה״ל אחרי י״ב",
     template: "%s · הצעד הבא",
   },
   description:
-    "צה״ל, מכינה, ישיבת הסדר או ישיבה גבוהה? עונים על כמה שאלות קצרות ומקבלים שלושה כיוונים מותאמים אישית, עם הסבר שקוף ומידע מאומת.",
+    "מכינה קדם־צבאית, ישיבת הסדר, ישיבה גבוהה או צה״ל? רשימות של המכינות והישיבות בישראל לפי אזור, השוואה ביניהן ושאלון קצר שמתאים לך מסלול ומקום אחרי י״ב.",
+  applicationName: "הצעד הבא",
+  // Set GOOGLE_SITE_VERIFICATION in Vercel to the code from Google Search Console ("HTML tag" method).
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
   openGraph: {
     title: "הצעד הבא: המסלול שלך אחרי י״ב מתחיל כאן",
     description: "מוצאים את המסלול שמתאים לך אחרי י״ב: צה״ל, מכינה, ישיבת הסדר או ישיבה גבוהה.",
     locale: "he_IL",
+    siteName: "הצעד הבא",
     type: "website",
   },
 };
