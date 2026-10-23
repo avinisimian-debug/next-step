@@ -51,7 +51,7 @@ export function SiteHeader() {
     <header
       className={`sticky top-0 z-40 border-b backdrop-blur transition-colors duration-500 print:hidden ${
         dark
-          ? "border-navy-800 bg-night/90 supports-[backdrop-filter]:bg-night/75"
+          ? "border-navy-800 bg-night"
           : "border-sand-200/80 bg-paper/90 supports-[backdrop-filter]:bg-paper/75"
       }`}
     >
