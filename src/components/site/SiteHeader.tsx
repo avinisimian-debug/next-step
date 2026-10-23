@@ -25,8 +25,12 @@ export function SiteHeader() {
   useEffect(() => {
     if (!home) return;
     const onScroll = () => {
-      const light = document.getElementById("pathways");
-      setOverDark(!light || window.scrollY + 64 < light.offsetTop);
+      // Dark over the opening scene until its doorway light starts to fill the screen (see CinemaHero).
+      const hero = document.getElementById("hero");
+      if (!hero) return setOverDark(false);
+      const pinned = hero.offsetHeight - window.innerHeight;
+      const end = pinned > window.innerHeight * 0.5 ? hero.offsetTop + pinned * 0.7 : hero.offsetTop + hero.offsetHeight - 64;
+      setOverDark(window.scrollY < end);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });

@@ -11,11 +11,14 @@ export function Reveal({
   delay = 0,
   className = "",
   as: Tag = "div",
+  variant = "fade",
 }: {
   children: React.ReactNode;
   delay?: number;
   className?: string;
-  as?: "div" | "li" | "section";
+  as?: "div" | "li" | "section" | "h2";
+  /** "fade" fades the block up; "lines" slides each <Lines> line up from behind a mask. */
+  variant?: "fade" | "lines";
 }) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -34,8 +37,23 @@ export function Reveal({
   }, []);
   return (
     // @ts-expect-error -- the ref fits each of the allowed tags
-    <Tag ref={ref} data-reveal="" className={className} style={delay ? { "--d": `${delay}ms` } : undefined}>
+    <Tag ref={ref} data-reveal={variant} className={className} style={delay ? { "--d": `${delay}ms` } : undefined}>
       {children}
     </Tag>
+  );
+}
+
+/** Splits a heading into lines for `<Reveal variant="lines">`. Each string is one line. */
+export function Lines({ lines }: { lines: React.ReactNode[] }) {
+  return (
+    <>
+      {lines.map((l, i) => (
+        <span key={i} className="line">
+          <span className="line-in" style={{ "--l": i } as React.CSSProperties}>
+            {l}
+          </span>
+        </span>
+      ))}
+    </>
   );
 }
