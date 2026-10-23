@@ -224,7 +224,7 @@ const NATIONAL_SERVICE: Institution[] = [
 ];
 
 // ───────────────────────── מדרשות ─────────────────────────
-// Base list: midrashot.co.il (read 2026-10-23, its four regional lists), plus every active midrasha in
+// Base list: midrashot.co.il (read 2026-10-23: all 66 places on its four regional lists and the explore page), plus every active midrasha in
 // Hebrew Wikipedia's category "מדרשות לנשים". Locations are the ones those sources state.
 
 const MIDRASHOT: MidrashaEntry[] = [
@@ -235,10 +235,12 @@ const MIDRASHOT: MidrashaEntry[] = [
   at({ id: "midrasha-maayanotecha", name: "מדרשת מעיינותיך", location: "ירושלים", region: J, tagline: "הבית שלך ללימוד תורה לאור החסידות", modes: ["shiluv"], sources: [SITE("maynotecha", "מדרשת מעיינותיך")] }),
   at({ id: "midrasha-shirat-yerushalayim", name: "מדרשת שירת ירושלים", location: "ירושלים", region: J, tagline: "מדרשה ללימודי יהדות, צמיחה רוחנית והעצמה אישית", sources: [SITE("shirat-yerushalayim", "מדרשת שירת ירושלים")] }),
   at({ id: "midrasha-tairi-zion", name: "מדרשת תאירי ציון", location: "ירושלים", region: J, tagline: "מדרשת שילוב בירושלים", modes: ["shiluv"], sources: [SITE("tair-zion", "מדרשת תאירי ציון")] }),
+  at({ id: "midrasha-maamakim", name: "מדרשת מעמקים", location: "ירושלים", region: J, tagline: "מדרשה חסידית ישראלית: לימוד תורה לשמה, תוכנית חלקית ושילוב", modes: ["shiluv"], sources: [SITE("maamakim", "מדרשת מעמקים")] }),
+  at({ id: "midrasha-tal", name: "מדרשת טל", location: "קמפוס טל, ירושלים", region: J, tagline: "שילוב מדרשה עם לימודים אקדמיים בקמפוס טל", modes: ["shiluv"], sources: [SITE("tal", "מדרשת טל")] }),
   at({ id: "midrasha-beit-morasha", name: "בית המדרש לנשים בבית מורשה", location: "ירושלים", region: J, wiki: { title: "בית המדרש לנשים בבית מורשה", facts: "בית המדרש לנשים על שם משה גרין הוא מוסד תורני־אקדמי של המרכז האקדמי בית מורשה בירושלים." }, sources: [] }),
-  at({ id: "midrasha-harova", name: "מדרשת הרובע", location: "הרובע היהודי, ירושלים", region: J, wiki: { title: "מדרשת הרובע", facts: "מדרשה תורנית לבנות ברובע היהודי, שנוסדה ב־1993 על ידי הרב אוהד תירוש והרבנית דנה סליי. לומדות בה נשים בגילים מגוונים." }, sources: [] }),
+  at({ id: "midrasha-harova", name: "מדרשת הרובע", location: "הרובע היהודי, ירושלים", region: J, tagline: "מדרשה תורנית גבוהה לבנות בעיר העתיקה בירושלים", wiki: { title: "מדרשת הרובע", facts: "מדרשה תורנית לבנות ברובע היהודי, שנוסדה ב־1993 על ידי הרב אוהד תירוש והרבנית דנה סליי. לומדות בה נשים בגילים מגוונים." }, sources: [SITE("harova", "מדרשת הרובע")] }),
   at({ id: "midrasha-bat-zion", name: "מדרשת בת־ציון", location: "קריית משה, ירושלים", region: J, modes: ["shiluv"], wiki: { title: "מדרשת בת-ציון", facts: "מדרשה תורנית לנשים מיסודה של ישיבת מרכז הרב, המיועדת בעיקר לבנות שירות לאומי ולסטודנטיות שרוצות לשלב לימוד תורה בשנות השירות והלימודים." }, sources: [] }),
-  at({ id: "midrasha-machon-ora", name: "מכון אורה", location: "גבעת שאול, ירושלים", region: J, wiki: { title: "מכון אורה", facts: "מדרשה ללימודי יהדות לבנות לא־דתיות, דתיות ובעלות תשובה. רוב התלמידות מגיעות אחרי שירות לאומי או צבאי." }, sources: [] }),
+  at({ id: "midrasha-machon-ora", name: "מכון אורה", location: "גבעת שאול, ירושלים", region: J, tagline: "מדרשה ללימודי יהדות באהבה ובאמונה, ברוח מכון מאיר", wiki: { title: "מכון אורה", facts: "מדרשה ללימודי יהדות לבנות לא־דתיות, דתיות ובעלות תשובה. רוב התלמידות מגיעות אחרי שירות לאומי או צבאי." }, sources: [SITE("ora", "מכון אורה")] }),
   at({ id: "midrasha-matan", name: "מת״ן — מכון תורני לנשים", wiki: { title: "מת\"ן - מכון תורני לנשים", facts: "מכון ללימוד תורה מעמיק לנשים, שהקימה ב־1988 הרבנית מלכה בינה." }, sources: [] }),
   at({ id: "midrasha-neve-yerushalayim", name: "נווה ירושלים", location: "הר נוף, ירושלים", region: J, haredi: true, wiki: { title: "נווה ירושלים", facts: "רשת חרדית של מדרשות לנשים. הסניף הראשי נמצא בשכונת הר נוף בירושלים." }, sources: [] }),
 
@@ -251,8 +253,9 @@ const MIDRASHOT: MidrashaEntry[] = [
   at({ id: "midrasha-reshit-maon", name: "מכון ראשית — מדרשת מעון", location: "מעון", region: JS, tagline: "מדרשה ללימודי יהדות לבנות", sources: [SITE("reshit", "מכון ראשית — מדרשת מעון")] }),
   at({ id: "midrasha-shirat-hevron", name: "מדרשת שירת חברון", location: "קריית ארבע", region: JS, tagline: "מדרשה לבנות", sources: [SITE("shirat-hevron", "מדרשת שירת חברון")] }),
   at({ id: "midrasha-torat-hayim", name: "מדרשת תורת חיים", location: "הר ברכה", region: JS, tagline: "מדרשה בשילוב תואר או שירות לאומי", modes: ["shiluv"], sources: [SITE("torat-hayim", "מדרשת תורת חיים")] }),
-  at({ id: "midrasha-migdal-oz", name: "בית המדרש לנשים מגדל עוז", location: "מגדל עוז, גוש עציון", region: JS, wiki: { title: "בית המדרש לנשים מגדל עוז", facts: "מדרשה תורנית לבנות ליד ישיבת הר עציון, בקיבוץ מגדל עוז שבגוש עציון, בתוך קמפוס מגדל עוז של המכללה האקדמית הרצוג." }, sources: [] }),
-  at({ id: "midrasha-shilat", name: "מדרשת שיל״ת", location: "אלוני שילה", region: JS, wiki: { title: "מדרשת שיל\"ת", facts: "מדרשה תורנית לבנות שהוקמה באלול תשס״א (2001). השם הוא ראשי תיבות של ״שיויתי ה׳ לנגדי תמיד״." }, sources: [] }),
+  at({ id: "midrasha-zohar", name: "מדרשת זוהר", location: "בת עין", region: JS, tagline: "בית מדרש לבנייה והתחדשות, לבעלות תשובה ולדתיות מבית, ברוח חסידית ארצישראלית", sources: [SITE("zohar", "מדרשת זוהר")] }),
+  at({ id: "midrasha-migdal-oz", name: "בית המדרש לנשים מגדל עוז", location: "מגדל עוז, גוש עציון", region: JS, tagline: "בית מדרש לבנות שרוצות לפתח את אישיותן הרוחנית ולהעמיק את השכלתן התורנית", wiki: { title: "בית המדרש לנשים מגדל עוז", facts: "מדרשה תורנית לבנות ליד ישיבת הר עציון, בקיבוץ מגדל עוז שבגוש עציון, בתוך קמפוס מגדל עוז של המכללה האקדמית הרצוג." }, sources: [SITE("migdal-oz", "מדרשת מגדל עוז")] }),
+  at({ id: "midrasha-shilat", name: "מדרשת שיל״ת", location: "אלוני שילה", region: JS, tagline: "מדרשה תורנית לבנות: שנת תורה לשמה, ושילוב עם שירות לאומי, לימודים או עבודה", modes: ["full_year", "shiluv"], wiki: { title: "מדרשת שיל\"ת", facts: "מדרשה תורנית לבנות שהוקמה באלול תשס״א (2001). השם הוא ראשי תיבות של ״שיויתי ה׳ לנגדי תמיד״." }, sources: [SITE("shilat", "מדרשת שיל״ת")] }),
 
   // מרכז
   at({ id: "midrasha-tohar", name: "מדרשת טהר", location: "יד בנימין", region: "center", tagline: "מדרשה תורנית לבנות, באווירה חסידית חמה ומשפחתית", modes: ["shiluv"], wiki: { title: "מדרשת טהר", facts: "מדרשה תורנית לבנות, חלק ממוסדות ״תורת החיים״. הוקמה ב־תשנ״ט ביישוב גן אור שבגוש קטיף." }, sources: [SITE("מדרשת-טוהר", "מדרשת טהר")] }),
@@ -267,7 +270,10 @@ const MIDRASHOT: MidrashaEntry[] = [
   at({ id: "midrasha-orot-etzion", name: "מדרשת אורות עציון", location: "גבעת וושינגטון", region: "center", tagline: "בית מדרש גבוה לבנות", modes: ["before_army", "shiluv"], sources: [SITE("orot-etzion", "מדרשת אורות עציון")] }),
   at({ id: "midrasha-pnimiyut", name: "מדרשת פנימיות (חב״ד)", location: "רמת אביב, תל אביב", region: "center", tagline: "מרכז לימודי יהדות וחסידות לנשים ובנות", sources: [SITE("pnimiyut", "מדרשת פנימיות")] }),
   at({ id: "midrasha-yafo", name: "מדרשת יפו", location: "תל אביב־יפו", region: "center", tagline: "מדרשה ללימודי יהדות לנשים", sources: [SITE("yafo", "מדרשת יפו")] }),
-  at({ id: "midrasha-bar-ilan", name: "המכון הגבוה לתורה — המדרשה לנשים", location: "אוניברסיטת בר־אילן, רמת גן", region: "center", wiki: { title: "המכון הגבוה לתורה", facts: "המכון הגבוה לתורה (מג״ל) פועל בתוך אוניברסיטת בר־אילן, ולצד המוסד לגברים פועלת בו מדרשה תורנית לנשים." }, sources: [] }),
+  at({ id: "midrasha-binat-pt", name: "מדרשת בינת פתח תקווה", location: "פתח תקווה", region: "center", tagline: "מדרשת שילוב לבנות שירות לאומי", modes: ["shiluv"], sources: [SITE("binat-pt", "מדרשת בינת פתח תקווה")] }),
+  at({ id: "midrasha-nevia", name: "מדרשת נביעה", location: "רמת גן", region: "center", tagline: "מרכז צמיחה רוחנית לבעלות תשובה ומתקרבות", sources: [SITE("nevia", "מדרשת נביעה")] }),
+  at({ id: "midrasha-shoshanat-aviv", name: "מדרשת שושנת אביב", location: "תל אביב", region: "center", tagline: "מדרשת ערב לבעלות תשובה", sources: [SITE("shoshanat-aviv", "מדרשת שושנת אביב")] }),
+  at({ id: "midrasha-bar-ilan", name: "המכון הגבוה לתורה — המדרשה לנשים", location: "אוניברסיטת בר־אילן, רמת גן", region: "center", tagline: "מדרשה לבנות מכל גווני הקשת הדתית", wiki: { title: "המכון הגבוה לתורה", facts: "המכון הגבוה לתורה (מג״ל) פועל בתוך אוניברסיטת בר־אילן, ולצד המוסד לגברים פועלת בו מדרשה תורנית לנשים." }, sources: [SITE("bar-ilan", "המדרשה בבר־אילן")] }),
 
   // צפון
   at({ id: "midrasha-baorech", name: "מדרשת באורך", location: "נווה שאנן, חיפה", region: "north", tagline: "מדרשת שילוב בחיפה", modes: ["shiluv"], sources: [SITE("מדרשת-באורך", "מדרשת באורך")] }),
