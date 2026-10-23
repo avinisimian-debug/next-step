@@ -105,9 +105,10 @@ html[data-a11y-motion] [data-reveal], html[data-a11y-motion] [data-reveal] .line
 }
 
 /* The opening scene (CinemaHero.tsx sets --p from 0 to 1 while the scene is pinned):
-   the camera moves into the lit doorway until its light fills the screen. Static when motion is reduced. */
+   the camera moves into the lit doorway until its light fills the screen. Static when motion is reduced,
+   and on phones, where a pinned scene blurs the text and fights the browser's toolbar. */
 .cinema { --p: 0; }
-@media (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
   html.js .cinema { height: 260vh; }
   html.js .cinema-stage { position: sticky; top: 4rem; height: calc(100svh - 4rem); min-height: 34rem; }
   html.js .cinema-art { transform: scale(calc(1 + var(--p) * var(--p) * 7)); transform-origin: 67% 31%; will-change: transform; }
@@ -123,7 +124,7 @@ html[data-a11y-motion] [data-reveal], html[data-a11y-motion] [data-reveal] .line
 .cinema-flood, .cinema-caption { opacity: 0; }
 html[data-a11y-motion] .cinema { height: auto !important; }
 /* The "scroll in" hint only makes sense with the walk-in; without motion it would overlap the trust line. */
-@media (prefers-reduced-motion: reduce) { .scroll-hint { display: none !important; } }
+@media (prefers-reduced-motion: reduce), (max-width: 767px) { .scroll-hint { display: none !important; } }
 html[data-a11y-motion] .scroll-hint { display: none !important; }
 html[data-a11y-motion] .cinema-stage { position: relative !important; height: auto !important; }
 html[data-a11y-motion] .cinema-art, html[data-a11y-motion] .cinema-copy, html[data-a11y-motion] .cinema-fade {
