@@ -6,7 +6,15 @@ import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
 import { getHeaderState, type HeaderState } from "@/app/actions/session";
 
-export function AccountLink({ onNavigate, block = false }: { onNavigate?: () => void; block?: boolean }) {
+export function AccountLink({
+  onNavigate,
+  block = false,
+  tone = "dark",
+}: {
+  onNavigate?: () => void;
+  block?: boolean;
+  tone?: "dark" | "light";
+}) {
   const [state, setState] = useState<HeaderState | null>(null);
   const pathname = usePathname();
   useEffect(() => {
@@ -22,7 +30,9 @@ export function AccountLink({ onNavigate, block = false }: { onNavigate?: () => 
   if (!state || state.state === "unconfigured") return null;
   const cls = block
     ? "flex items-center gap-2 rounded-lg px-2 py-3 text-navy-900 hover:bg-sand-100"
-    : "inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-navy-900 hover:bg-sand-100";
+    : `inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium ${
+        tone === "light" ? "text-paper hover:bg-paper/10" : "text-navy-900 hover:bg-sand-100"
+      }`;
   if (state.state === "anonymous")
     return (
       <Link href={`/login?next=${encodeURIComponent(pathname ?? "/")}`} onClick={onNavigate} className={cls}>

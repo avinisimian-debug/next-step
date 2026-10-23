@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Scale, ShieldCheck, Sparkles, Eye } from "lucide-react";
 import { PhotoCredit, PhotoFrame } from "@/components/art/PhotoFrame";
 import { PATHWAY_PHOTOS } from "@/lib/photos";
 import { PATHWAY_INFO, PATHWAY_ORDER } from "@/lib/domain/pathways";
+import { getRepository } from "@/lib/data/repository";
 import { HomeJourney } from "@/components/journey/HomeJourney";
 import { ResumeLink } from "@/components/journey/ResumeLink";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { SITE_NAME, SITE_URL, pathwayHref } from "@/lib/seo";
+import { Reveal } from "@/components/motion/Reveal";
+import { Spotlight } from "@/components/motion/Spotlight";
+import { CountUp } from "@/components/motion/CountUp";
+import { PATHWAY_PAGES, SITE_NAME, SITE_URL, pathwayHref } from "@/lib/seo";
+import hero from "@/assets/brand/hero.webp";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -18,7 +24,30 @@ const WHY = [
   { icon: ShieldCheck, title: "גם יתרונות וגם נקודות לבדיקה", text: "כל המלצה מציגה מה עלול לא להתאים ומה עוד לא אומת." },
 ];
 
-export default function Home() {
+const CYCLE = ["מכינה", "ישיבת הסדר", "ישיבה גבוהה", "צה״ל"];
+
+/** Splits a line into words that rise in one after another (see .word in globals.css). */
+function Words({ text, from = 0, className = "" }: { text: string; from?: number; className?: string }) {
+  return (
+    <>
+      {text.split(" ").map((w, i) => (
+        <span key={i}>
+          <span className={`word ${className}`} style={{ "--i": from + i } as React.CSSProperties}>
+            {w}
+          </span>{" "}
+        </span>
+      ))}
+    </>
+  );
+}
+
+export default async function Home() {
+  const all = await getRepository().listPublic();
+  const count = (p: (typeof PATHWAY_ORDER)[number]) => all.filter((i) => i.pathway === p).length;
+  // Two rows of real names from the catalog for the moving band.
+  const names = all.filter((i) => i.pathway !== "idf").map((i) => i.name.replace(/^ישיבת ההסדר /, "ישיבת "));
+  const rows = [names.filter((_, i) => i % 2 === 0), names.filter((_, i) => i % 2 === 1)];
+
   return (
     <>
       <JsonLd
@@ -35,170 +64,260 @@ export default function Home() {
           },
         }}
       />
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-10 sm:px-6 md:grid-cols-[1.05fr_1fr] md:pb-24 md:pt-16">
-          <div className="animate-rise">
-            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-sand-300 bg-sand-100 px-3 py-1 text-sm text-stone-600">
-              <span className="size-1.5 rounded-full bg-teal-600" aria-hidden="true" />
-              לבוגרי י״ב ולתלמידי י״א–י״ב
-            </p>
-            <h1 className="font-display text-[2.6rem] font-bold leading-[1.1] text-navy-950 sm:text-6xl">
-              הצעד הבא שלך
-              <br />
-              מתחיל כאן.
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-navy-800">
-              בין צה״ל, מכינה, ישיבת הסדר וישיבה גבוהה — הדרך הנכונה מתחילה בהיכרות עם עצמך.
-            </p>
-            <p className="mt-3 max-w-xl text-base leading-7 text-stone-600">
-              ענה על כמה שאלות קצרות ונמצא יחד את המסלולים והמקומות שהכי מתאימים לך.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link
-                href="/questionnaire"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-navy-900 px-7 py-4 text-base font-semibold text-paper shadow-lift transition hover:bg-navy-800"
-              >
-                בוא נמצא את המסלול שלך
-                <ArrowLeft className="size-5 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
-              </Link>
-              <Link
-                href="/questionnaire?mode=explore"
-                className="inline-flex items-center justify-center rounded-full px-5 py-4 text-base font-medium text-navy-800 underline decoration-sand-300 underline-offset-[6px] hover:decoration-navy-700"
-              >
-                אני עדיין לא יודע מה מתאים לי
-              </Link>
-            </div>
-            <ResumeLink />
-            <p className="mt-6 flex items-start gap-2 text-sm text-stone-600">
-              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-teal-600" aria-hidden="true" />
-              ההמלצות מותאמות להעדפות שלך. הבחירה הסופית תמיד בידיים שלך.
-            </p>
-          </div>
 
-          <div className="relative animate-rise [animation-delay:120ms]">
-            <ul className="grid aspect-[4/3.4] grid-cols-2 grid-rows-2 gap-2 overflow-hidden rounded-[28px] shadow-lift ring-1 ring-navy-900/5">
-              {PATHWAY_ORDER.map((id) => (
-                <li key={id} className="relative overflow-hidden">
-                  <PhotoFrame
-                    photo={PATHWAY_PHOTOS[id]}
-                    priority
-                    sizes="(min-width: 768px) 280px, 50vw"
-                    credit={false}
-                  />
-                  <PhotoCredit photo={PATHWAY_PHOTOS[id]} className="top-1.5 start-1.5" />
-                  <span className="absolute bottom-2 end-2 rounded-full bg-paper/95 px-3 py-1 text-xs font-bold text-navy-950 shadow-card">
-                    {PATHWAY_INFO[id].name}
+      {/* Hero: night, a lit doorway, and the path toward it. */}
+      <Spotlight className="relative isolate overflow-hidden bg-night text-paper">
+        <section aria-labelledby="h-hero">
+          <div className="spotlight-layer" aria-hidden="true" />
+          {/* Fine grid that fades out from the centre. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 opacity-[0.18] [background-image:linear-gradient(rgb(127_220_255/0.25)_1px,transparent_1px),linear-gradient(90deg,rgb(127_220_255/0.25)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_at_30%_40%,#000_10%,transparent_65%)]"
+          />
+          <div aria-hidden="true" className="animate-glow absolute -end-40 top-0 -z-10 size-[42rem] rounded-full bg-sky-500/25 blur-[120px]" />
+          <div aria-hidden="true" className="animate-glow absolute -start-20 bottom-[-10rem] -z-10 size-[30rem] rounded-full bg-dawn/10 blur-[110px] [animation-delay:-3s]" />
+
+          <div className="mx-auto grid max-w-6xl items-center gap-6 px-4 pb-16 pt-12 sm:px-6 md:min-h-[calc(100svh-4rem)] md:grid-cols-[1.1fr_1fr] md:pb-24 md:pt-10">
+            <div className="relative z-10">
+              <p className="animate-rise mb-6 inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-400/10 px-3.5 py-1.5 text-sm text-sky-300 backdrop-blur">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-sky-400 opacity-60" aria-hidden="true" />
+                  <span className="relative inline-flex size-2 rounded-full bg-sky-400" aria-hidden="true" />
+                </span>
+                לבוגרי י״ב ולתלמידי י״א–י״ב
+              </p>
+              <h1 id="h-hero" className="font-display text-[3.1rem] font-bold leading-[1.02] tracking-tight sm:text-7xl lg:text-[5.4rem]">
+                <Words text="הצעד" />
+                <span className="word bg-gradient-to-l from-sky-300 via-sky-400 to-sky-500 bg-clip-text text-transparent [filter:drop-shadow(0_0_24px_rgb(63_208_255/0.45))]" style={{ "--i": 1 } as React.CSSProperties}>
+                  הבא
+                </span>{" "}
+                <Words text="שלך" from={2} />
+                <br />
+                <Words text="מתחיל כאן." from={3} className="text-mist-300" />
+              </h1>
+
+              <p className="animate-rise mt-7 font-display text-2xl text-mist-100 [animation-delay:550ms] sm:text-3xl">
+                <span className="sr-only">צה״ל, מכינה, ישיבת הסדר או ישיבה גבוהה?</span>
+                <span aria-hidden="true">
+                  אולי{" "}
+                  <span className="relative inline-flex h-[1.5em] overflow-hidden align-bottom">
+                    <span className="animate-cycle flex flex-col font-bold text-paper">
+                      {CYCLE.map((w) => (
+                        <span key={w} className="h-[1.5em] leading-[1.5em]">
+                          {w}?
+                        </span>
+                      ))}
+                    </span>
                   </span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-4 hidden rounded-2xl border border-sand-200 bg-paper p-4 shadow-card sm:block">
-              <p className="text-xs font-medium text-mist-500">איך זה עובד</p>
-              <p className="mt-1 text-sm leading-6 text-navy-900">
-                כ־5 דקות של שאלות, ושלושה כיוונים עם הסבר שקוף למה הם מתאימים לך.
+                </span>
+              </p>
+              <p className="animate-rise mt-4 max-w-xl text-lg leading-8 text-mist-100 [animation-delay:650ms]">
+                הדרך הנכונה מתחילה בהיכרות עם עצמך. כמה שאלות קצרות, ונמצא יחד את המסלולים והמקומות שהכי מתאימים לך.
+              </p>
+
+              <div className="animate-rise mt-9 flex flex-col gap-3 [animation-delay:750ms] sm:flex-row sm:items-center">
+                <Link
+                  href="/questionnaire"
+                  className="shine group inline-flex items-center justify-center gap-2 rounded-full bg-paper px-8 py-4 text-base font-bold text-night shadow-[0_0_0_1px_rgb(255_255_255/0.2),0_18px_50px_-12px_rgb(63_208_255/0.55)] transition hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgb(255_255_255/0.3),0_24px_60px_-10px_rgb(63_208_255/0.75)]"
+                >
+                  בוא נמצא את המסלול שלך
+                  <ArrowLeft className="size-5 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
+                </Link>
+                <Link
+                  href="/questionnaire?mode=explore"
+                  className="inline-flex items-center justify-center rounded-full border border-paper/20 px-6 py-4 text-base font-medium text-paper backdrop-blur transition hover:border-paper/50 hover:bg-paper/5"
+                >
+                  אני עדיין לא יודע מה מתאים לי
+                </Link>
+              </div>
+              <ResumeLink />
+              <p className="animate-rise mt-7 flex items-start gap-2 text-sm text-mist-300 [animation-delay:900ms]">
+                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-sky-400" aria-hidden="true" />
+                ההמלצות מותאמות להעדפות שלך. הבחירה הסופית תמיד בידיים שלך.
               </p>
             </div>
+
+            {/* The brand artwork, melted into the night around it. */}
+            <div className="animate-rise relative -mx-4 [animation-delay:200ms] sm:mx-0">
+              <Image
+                src={hero}
+                alt=""
+                priority
+                sizes="(min-width: 768px) 560px, 100vw"
+                className="w-full [mask-image:radial-gradient(ellipse_70%_70%_at_55%_45%,#000_45%,transparent_78%)]"
+              />
+              <span aria-hidden="true" className="animate-glow absolute start-[52%] top-[18%] size-40 rounded-full bg-dawn/30 blur-3xl" />
+            </div>
           </div>
+
+          {/* Scroll cue */}
+          <a href="#pathways" className="group absolute inset-x-0 bottom-6 mx-auto hidden w-fit flex-col items-center gap-2 text-xs text-mist-300 md:flex">
+            <span>גוללים למסלולים</span>
+            <span className="relative h-10 w-px overflow-hidden bg-paper/15" aria-hidden="true">
+              <span className="animate-scroll-cue absolute inset-x-0 top-0 h-1/2 bg-sky-400" />
+            </span>
+          </a>
+        </section>
+      </Spotlight>
+
+      {/* A moving band of real names from the catalog. Decorative: the full list is one link away. */}
+      <section aria-labelledby="h-names" className="relative overflow-hidden border-y border-navy-800 bg-navy-950 py-6 text-mist-300">
+        <h2 id="h-names" className="sr-only">
+          המוסדות שבאתר
+        </h2>
+        <div aria-hidden="true" dir="ltr" className="space-y-3 [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]">
+          {rows.map((row, r) => (
+            <div key={r} className="marquee">
+              <div className="marquee-track" data-back={r === 1 ? "" : undefined} style={{ "--speed": `${row.length * 2.6}s` } as React.CSSProperties}>
+                {[...row, ...row].map((n, i) => (
+                  <span key={i} className="flex items-center whitespace-nowrap px-5 font-display text-xl" dir="rtl">
+                    {n}
+                    <span className="ms-10 size-1.5 rounded-full bg-sky-400/60" />
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
+        <p className="mt-4 text-center text-sm">
+          <Link href="/institutions" className="text-sky-300 underline underline-offset-4 hover:text-paper">
+            לכל {all.length} המסגרות במאגר
+          </Link>
+        </p>
       </section>
 
-      {/* Pathways */}
-      <section id="pathways" className="scroll-mt-20 bg-sand-100/60 py-20">
+      {/* Numbers */}
+      <section aria-labelledby="h-numbers" className="bg-navy-950 pb-20 pt-14 text-paper">
+        <h2 id="h-numbers" className="sr-only">
+          המאגר במספרים
+        </h2>
+        <ul className="mx-auto grid max-w-6xl grid-cols-2 gap-px overflow-hidden rounded-3xl border border-navy-800 bg-navy-800 px-0 md:grid-cols-4">
+          {PATHWAY_ORDER.map((p, i) => (
+            <Reveal as="li" key={p} delay={i * 90} className="bg-navy-950">
+              <Link href={pathwayHref(p)} className="group block p-6 transition hover:bg-navy-900 sm:p-8">
+                <span className="block font-display text-5xl font-bold text-paper sm:text-6xl">
+                  <CountUp to={count(p)} />
+                </span>
+                <span className="mt-2 block text-sm text-mist-300 group-hover:text-paper">
+                  {PATHWAY_PAGES[p].h1.split(":")[0]}
+                </span>
+              </Link>
+            </Reveal>
+          ))}
+        </ul>
+      </section>
+
+      {/* Pathways: cards that stack as you scroll. */}
+      <section id="pathways" aria-labelledby="h-pathways" className="scroll-mt-20 bg-paper py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="max-w-2xl">
+          <Reveal className="max-w-2xl">
             <p className="text-sm font-semibold tracking-wide text-teal-700">ארבעה מסלולים</p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-navy-950 sm:text-4xl">מה אפשר לעשות אחרי י״ב?</h2>
-            <p className="mt-4 text-base leading-7 text-stone-600">
-              לכל מסלול יש אופי משלו. אין כאן דירוג — רק היכרות, כדי שתוכל לבחור ממקום של ידע.
+            <h2 id="h-pathways" className="mt-2 font-display text-4xl font-bold text-navy-950 sm:text-6xl">
+              מה אפשר לעשות אחרי י״ב?
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-stone-600">
+              לכל מסלול יש אופי משלו. אין כאן דירוג, רק היכרות, כדי שתוכל לבחור ממקום של ידע.
             </p>
-          </div>
-          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {PATHWAY_ORDER.map((id) => {
+          </Reveal>
+          <ol className="mt-14 space-y-6">
+            {PATHWAY_ORDER.map((id, n) => {
               const p = PATHWAY_INFO[id];
               return (
-                <li key={id} className="relative">
+                <li key={id} className="sticky" style={{ top: `calc(5.5rem + ${n * 1.25}rem)` }}>
                   <Link
                     href={pathwayHref(id)}
-                    className="group flex h-full flex-col overflow-hidden rounded-3xl border border-sand-200 bg-paper shadow-card transition hover:-translate-y-0.5 hover:shadow-lift"
+                    className="group grid overflow-hidden rounded-[32px] border border-sand-200 bg-paper shadow-lift transition-shadow hover:shadow-[0_30px_80px_-30px_rgb(15_34_54/0.5)] md:min-h-[26rem] md:grid-cols-[1fr_1.1fr]"
                   >
-                    <div className="relative h-44 overflow-hidden">
-                      <PhotoFrame
-                        photo={PATHWAY_PHOTOS[id]}
-                        credit={false}
-                        sizes="(min-width: 1024px) 280px, (min-width: 640px) 50vw, 100vw"
-                        className="transition-transform duration-500 group-hover:scale-[1.04]"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-navy-950/35 to-transparent" aria-hidden="true" />
+                    <div className="relative h-56 overflow-hidden md:h-auto">
+                      <div className="parallax absolute inset-0">
+                        <PhotoFrame photo={PATHWAY_PHOTOS[id]} credit={false} sizes="(min-width: 768px) 560px, 100vw" className="transition-transform duration-700 group-hover:scale-105" />
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-night/60 via-transparent to-transparent md:bg-gradient-to-l" aria-hidden="true" />
                     </div>
-                    <div className="flex flex-1 flex-col p-6">
-                      <p className="text-xs font-medium text-mist-500">{p.short}</p>
-                      <h3 className="mt-1 font-display text-2xl font-bold text-navy-950">{p.name}</h3>
-                      <p className="mt-3 flex-1 text-sm leading-7 text-navy-800">{p.description}</p>
-                      <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-teal-700">
-                        למסגרות במסלול
-                        <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
+                    <div className="flex flex-col p-7 sm:p-10">
+                      <span className="font-display text-6xl font-bold text-sky-500 transition-colors group-hover:text-navy-950" aria-hidden="true">
+                        0{n + 1}
+                      </span>
+                      <p className="mt-4 text-sm font-medium text-mist-500">{p.short}</p>
+                      <h3 className="mt-1 font-display text-3xl font-bold text-navy-950 sm:text-4xl">{p.name}</h3>
+                      <p className="mt-4 flex-1 text-base leading-8 text-navy-800">{p.description}</p>
+                      <span className="mt-6 inline-flex items-center gap-2 font-semibold text-navy-950">
+                        <span className="relative">
+                          לכל ה{PATHWAY_PAGES[id].noun} במסלול
+                          <span className="absolute -bottom-1 start-0 h-0.5 w-full origin-right scale-x-0 bg-sky-500 transition-transform duration-500 group-hover:scale-x-100" aria-hidden="true" />
+                        </span>
+                        <span className="grid size-9 place-items-center rounded-full bg-navy-950 text-paper transition-transform duration-500 group-hover:-translate-x-1.5">
+                          <ArrowLeft className="size-4" aria-hidden="true" />
+                        </span>
                       </span>
                     </div>
                   </Link>
-                  <PhotoCredit photo={PATHWAY_PHOTOS[id]} className="end-2 top-[9.4rem]" />
+                  <PhotoCredit photo={PATHWAY_PHOTOS[id]} className="start-3 top-3" />
                 </li>
               );
             })}
-          </ul>
+          </ol>
         </div>
       </section>
 
       <HomeJourney />
 
-      {/* Why */}
-      <section className="bg-navy-900 py-20 text-paper">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid gap-12 md:grid-cols-[0.9fr_1.1fr]">
-            <div>
-              <p className="text-sm font-semibold tracking-wide text-teal-100">למה דווקא ״הצעד הבא״</p>
-              <h2 className="mt-2 font-display text-3xl font-bold sm:text-4xl">מידע שקוף, החלטה שלך</h2>
-              <p className="mt-4 max-w-md leading-8 text-mist-300">
-                ההתאמה מבוססת על נתונים מובנים על כל מסגרת, ועל מקורות ציבוריים שמוצגים עם תאריך אימות. מה שלא אומת —
-                מסומן ככזה.
-              </p>
-              <Link href="/about" className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-teal-100 underline underline-offset-4">
-                איך עובד מנגנון ההתאמה
-              </Link>
+      {/* Why: cards whose borders light up under the pointer. */}
+      <Spotlight className="relative overflow-hidden bg-night py-24 text-paper">
+        <section aria-labelledby="h-why">
+          <div className="spotlight-layer" aria-hidden="true" />
+          <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="grid gap-12 md:grid-cols-[0.9fr_1.1fr]">
+              <Reveal>
+                <p className="text-sm font-semibold tracking-wide text-sky-300">למה דווקא ״הצעד הבא״</p>
+                <h2 id="h-why" className="mt-2 font-display text-4xl font-bold sm:text-5xl">
+                  מידע שקוף,
+                  <br />
+                  <span className="text-sky-400">החלטה שלך.</span>
+                </h2>
+                <p className="mt-5 max-w-md leading-8 text-mist-300">
+                  ההתאמה מבוססת על נתונים מובנים על כל מסגרת, ועל מקורות ציבוריים שמוצגים עם תאריך אימות. מה שלא אומת מסומן
+                  ככזה.
+                </p>
+                <Link href="/about" className="mt-7 inline-flex items-center gap-1.5 text-sm font-medium text-sky-300 underline underline-offset-4 hover:text-paper">
+                  איך עובד מנגנון ההתאמה
+                </Link>
+              </Reveal>
+              <ul className="grid gap-4 sm:grid-cols-2">
+                {WHY.map((w, i) => (
+                  <Reveal as="li" key={w.title} delay={i * 100} className="spot-card rounded-3xl border border-navy-800 bg-navy-950/70 p-6 backdrop-blur">
+                    <span className="grid size-11 place-items-center rounded-2xl bg-sky-400/10 ring-1 ring-sky-400/30">
+                      <w.icon className="size-5 text-sky-300" aria-hidden="true" />
+                    </span>
+                    <h3 className="mt-5 text-lg font-semibold">{w.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-mist-300">{w.text}</p>
+                  </Reveal>
+                ))}
+              </ul>
             </div>
-            <ul className="grid gap-4 sm:grid-cols-2">
-              {WHY.map((w) => (
-                <li key={w.title} className="rounded-2xl border border-navy-700 bg-navy-800/60 p-5">
-                  <w.icon className="size-5 text-teal-100" aria-hidden="true" />
-                  <h3 className="mt-3 font-semibold">{w.title}</h3>
-                  <p className="mt-1.5 text-sm leading-6 text-mist-300">{w.text}</p>
-                </li>
-              ))}
-            </ul>
           </div>
-        </div>
-      </section>
+        </section>
+      </Spotlight>
 
-      {/* Closing CTA */}
-      <section className="px-4 pt-20 sm:px-6">
-        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-navy-950">
-          <PhotoFrame photo={PATHWAY_PHOTOS.mechina} credit={false} sizes="(min-width: 1152px) 1152px, 100vw" className="opacity-40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/70 to-navy-950/40" aria-hidden="true" />
-          <div className="relative px-6 py-16 text-center sm:py-20">
-            <h2 className="font-display text-3xl font-bold text-paper sm:text-5xl">לא צריך לדעת הכול מראש.</h2>
-            <p className="mx-auto mt-4 max-w-lg text-lg leading-8 text-mist-100">
-              מתחילים ממה שחשוב לך היום, ומתקדמים צעד אחד בכל פעם.
-            </p>
+      {/* Closing: the doorway again. */}
+      <section aria-labelledby="h-close" className="px-4 pt-24 sm:px-6">
+        <Reveal className="relative mx-auto max-w-6xl overflow-hidden rounded-[40px] bg-night">
+          <div aria-hidden="true" className="animate-glow absolute inset-0 m-auto size-[36rem] rounded-full bg-sky-500/30 blur-[100px]" />
+          <div aria-hidden="true" className="absolute inset-0 m-auto h-64 w-40 rounded-t-xl bg-gradient-to-b from-dawn/60 via-dawn/20 to-transparent blur-sm" />
+          <div className="relative px-6 py-20 text-center sm:py-28">
+            <h2 id="h-close" className="font-display text-4xl font-bold text-paper sm:text-6xl">
+              לא צריך לדעת הכול מראש.
+            </h2>
+            <p className="mx-auto mt-5 max-w-lg text-lg leading-8 text-mist-100">מתחילים ממה שחשוב לך היום, ומתקדמים צעד אחד בכל פעם.</p>
             <Link
               href="/questionnaire"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-paper px-7 py-4 font-semibold text-navy-950 transition hover:bg-sand-100"
+              className="shine group mt-10 inline-flex items-center gap-2 rounded-full bg-paper px-8 py-4 font-bold text-night shadow-[0_18px_50px_-12px_rgb(63_208_255/0.6)] transition hover:-translate-y-0.5"
             >
               מתחילים למצוא את המסלול שלי
-              <ArrowLeft className="size-5" aria-hidden="true" />
+              <ArrowLeft className="size-5 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
             </Link>
           </div>
-          <PhotoCredit photo={PATHWAY_PHOTOS.mechina} className="bottom-2 end-3" />
-        </div>
+        </Reveal>
       </section>
     </>
   );

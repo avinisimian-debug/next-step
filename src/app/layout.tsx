@@ -39,7 +39,7 @@ export const viewport: Viewport = {
 };
 
 // Applies the visitor's saved accessibility choices before first paint (see AccessibilityMenu).
-const A11Y_BOOT = `try{var p=JSON.parse(localStorage.getItem(${JSON.stringify(A11Y_KEY)})||"{}"),e=document.documentElement;if(p.text)e.setAttribute("data-a11y-text",String(p.text));["contrast","links","font","motion"].forEach(function(k){if(p[k])e.setAttribute("data-a11y-"+k,"1")})}catch(_){}`;
+const A11Y_BOOT = `document.documentElement.classList.add("js");try{var p=JSON.parse(localStorage.getItem(${JSON.stringify(A11Y_KEY)})||"{}"),e=document.documentElement;if(p.text)e.setAttribute("data-a11y-text",String(p.text));["contrast","links","font","motion"].forEach(function(k){if(p[k])e.setAttribute("data-a11y-"+k,"1")})}catch(_){}`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -52,6 +52,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         >
           דילוג לתוכן הראשי
         </a>
+        <div aria-hidden="true" className="scroll-bar pointer-events-none fixed inset-x-0 top-0 z-50 h-[3px] bg-gradient-to-l from-sky-400 to-sky-500" />
         <SiteHeader />
         <main id="main" className="flex-1">
           {children}

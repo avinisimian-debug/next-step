@@ -25,6 +25,12 @@
   --color-teal-100: #dcebe8;
   --color-amber-700: #8a5a12;
   --color-amber-100: #f6ead2;
+  /* From the brand artwork: the night sky, the lit doorway and the blue of "הבא". */
+  --color-night: #050f24;
+  --color-sky-300: #7fdcff;
+  --color-sky-400: #3fd0ff;
+  --color-sky-500: #1a8cff;
+  --color-dawn: #ffd9a0;
 
   --shadow-card: 0 1px 2px rgb(15 34 54 / 0.04), 0 8px 24px -12px rgb(15 34 54 / 0.14);
   --shadow-lift: 0 2px 4px rgb(15 34 54 / 0.05), 0 18px 40px -18px rgb(15 34 54 / 0.28);
@@ -44,6 +50,104 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-bob, .animate-pulse { animation: none; }
 }
+
+/* ───────────── Motion ─────────────
+   Everything below is decoration. It only runs with "no-preference" for reduced motion, and the
+   accessibility menu's "stop motion" switch (html[data-a11y-motion]) turns it off as well. */
+
+::selection { background: var(--color-sky-400); color: var(--color-night); }
+
+/* Words of a headline rise in one after another; each word sets --i. */
+.word { display: inline-block; }
+@media (prefers-reduced-motion: no-preference) {
+  .word { animation: word-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 90ms + 150ms); }
+}
+@keyframes word-in {
+  from { opacity: 0; transform: translateY(0.45em) rotate(2deg); filter: blur(8px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+/* Sections fade up as they scroll into view (Reveal.tsx sets data-shown). Without JS nothing is hidden. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-reveal] {
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), filter 0.9s;
+    transition-delay: var(--d, 0ms);
+  }
+  html.js [data-reveal]:not([data-shown]) { opacity: 0; transform: translateY(28px); filter: blur(6px); }
+}
+html[data-a11y-motion] [data-reveal] { opacity: 1 !important; transform: none !important; filter: none !important; }
+
+/* The doorway light breathes. */
+@keyframes glow { 0%, 100% { opacity: 0.75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+@media (prefers-reduced-motion: no-preference) { .animate-glow { animation: glow 7s ease-in-out infinite; } }
+
+/* Endless rows of names. The track holds the list twice and moves by half its width. */
+@keyframes marquee { to { transform: translateX(-50%); } }
+@keyframes marquee-back { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+.marquee-track { display: flex; width: max-content; direction: ltr; }
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track { animation: marquee var(--speed, 60s) linear infinite; }
+  .marquee-track[data-back] { animation-name: marquee-back; }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+}
+
+/* A word that changes every few seconds ("מכינה" → "ישיבת הסדר" …). Four words, one at a time. */
+@keyframes cycle {
+  0%, 20% { transform: translateY(0); }
+  25%, 45% { transform: translateY(-25%); }
+  50%, 70% { transform: translateY(-50%); }
+  75%, 95% { transform: translateY(-75%); }
+  100% { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) { .animate-cycle { animation: cycle 10s cubic-bezier(0.7, 0, 0.2, 1) infinite; } }
+
+/* A thin line that draws itself down the page. */
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  .animate-draw { stroke-dasharray: 1; animation: draw 2.4s cubic-bezier(0.65, 0, 0.35, 1) 0.6s both; }
+}
+@keyframes scroll-cue { 0% { transform: translateY(-100%); } 100% { transform: translateY(200%); } }
+@media (prefers-reduced-motion: no-preference) { .animate-scroll-cue { animation: scroll-cue 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite; } }
+
+/* Light sweeps across a button on hover. */
+.shine { position: relative; overflow: hidden; isolation: isolate; }
+.shine::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.55) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .shine:hover::after { transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1); transform: translateX(120%); }
+}
+
+/* A soft light that follows the pointer (Spotlight.tsx sets --mx/--my). */
+.spotlight { --mx: 50%; --my: 30%; }
+.spotlight-layer {
+  pointer-events: none; position: absolute; inset: 0;
+  background: radial-gradient(600px circle at var(--mx) var(--my), rgb(63 208 255 / 0.12), transparent 60%);
+}
+.spot-card { position: relative; }
+.spot-card::before {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: radial-gradient(260px circle at var(--mx) var(--my), rgb(63 208 255 / 0.7), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity 0.3s;
+}
+.spotlight:hover .spot-card::before { opacity: 1; }
+
+/* Hidden until the browser can tie it to scrolling. */
+.scroll-bar { transform: scaleX(0); }
+
+/* Scroll-linked effects where the browser supports them: a reading bar and slow photo parallax. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scroll-bar { transform-origin: right; animation: grow-x linear both; animation-timeline: scroll(root); }
+    .parallax { animation: parallax linear both; animation-timeline: view(); }
+  }
+}
+@keyframes grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes parallax { from { transform: translateY(-8%) scale(1.12); } to { transform: translateY(8%) scale(1.12); } }
+
 
 :root {
   color-scheme: light;
