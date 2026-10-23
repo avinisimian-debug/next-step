@@ -38,9 +38,10 @@ export function PhotoCredit({ photo, className = "bottom-1.5 end-1.5" }: { photo
       href={photo.source}
       target="_blank"
       rel="noopener noreferrer"
-      className={`absolute z-10 max-w-[85%] truncate rounded-md bg-black/45 px-1.5 py-0.5 text-[10px] leading-4 text-white/90 backdrop-blur-sm hover:bg-black/60 ${className}`}
+      className={`absolute z-10 max-w-[85%] truncate rounded-md bg-black/70 px-1.5 py-0.5 text-[10px] leading-4 text-white backdrop-blur-sm hover:bg-black/85 ${className}`}
     >
       צילום: {photo.author} · {photo.license}
+      <span className="sr-only"> (נפתח בלשונית חדשה)</span>
     </a>
   );
 }

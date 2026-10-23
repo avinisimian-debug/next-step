@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { ArrowLeft, ClipboardList, ExternalLink, Footprints, MapPin, Plus, Scale, X } from "lucide-react";
 import type { Institution } from "@/lib/domain/types";
 import { match } from "@/lib/matching/engine";
@@ -50,6 +50,9 @@ export function JourneyView({ catalog, account, canSignIn, accountError }: Props
   const [pendingStages, setPendingStages] = useState<Record<string, Stage>>({});
   const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  // Screen-reader announcement for changes made on this page, and where focus goes after a card leaves the list.
+  const [announcement, setAnnouncement] = useState("");
+  const [focusTarget, setFocusTarget] = useState<string | null>(null);
 
   const byId = useMemo(() => new Map(catalog.map((i) => [i.id, i])), [catalog]);
   const result = useMemo(() => match(catalog, answers), [catalog, answers]);
@@ -64,6 +67,16 @@ export function JourneyView({ catalog, account, canSignIn, accountError }: Props
       .sort((a, b) => stageRank(b.stage) - stageRank(a.stage));
   }, [account, favs, localStages, pendingStages, byId]);
 
+  useEffect(() => {
+    if (!focusTarget) return;
+    const el =
+      focusTarget === "heading"
+        ? document.getElementById("h-places")
+        : document.querySelector<HTMLElement>(`[data-place="${CSS.escape(focusTarget)}"] h3 a`);
+    el?.focus();
+    setFocusTarget(null);
+  }, [focusTarget, places]);
+
   if (!hydrated) return <Loading label="טוען את המסע שלך…" />;
 
   const answered = Object.keys(answers).length;
@@ -77,8 +90,27 @@ export function JourneyView({ catalog, account, canSignIn, accountError }: Props
   const lead = active[0];
   const leadAction = lead ? nextActionFor(lead.inst, lead.stage) : null;
 
+  // The card after this one (or before it, when it is last), so focus stays in the list when a card leaves it.
+  const neighbour = (id: string) => {
+    const i = active.findIndex((p) => p.inst.id === id);
+    const rest = active.filter((p) => p.inst.id !== id);
+    return rest[Math.min(i, rest.length - 1)]?.inst.id ?? "heading";
+  };
+
   const changeStage = (id: string, stage: Stage) => {
     setError(null);
+    const inst = byId.get(id);
+    if (inst) {
+      const wasDropped = dropped.some((p) => p.inst.id === id);
+      const action = nextActionFor(inst, stage);
+      setAnnouncement(
+        stage === "dropped"
+          ? `${inst.name} הועבר למקומות שלא ממשיכים איתם`
+          : `${inst.name}: ${stageLabel(stage, inst.kind)}${action ? `. מה עכשיו: ${action.text}` : ""}`,
+      );
+      if (stage === "dropped") setFocusTarget(neighbour(id));
+      else if (wasDropped || !listed.has(id)) setFocusTarget(id);
+    }
     if (!account) {
       setLocalStages((prev) => ({ ...prev, [id]: stage }));
       setFavs((prev) => (prev.includes(id) ? prev : [...prev, id]));
@@ -100,6 +132,8 @@ export function JourneyView({ catalog, account, canSignIn, accountError }: Props
 
   const remove = (id: string) => {
     setError(null);
+    setAnnouncement(`${byId.get(id)?.name ?? "המקום"} הוסר מהרשימה`);
+    setFocusTarget(neighbour(id));
     if (!account) {
       setFavs((prev) => prev.filter((x) => x !== id));
       setLocalStages((prev) => {
@@ -185,11 +219,15 @@ export function JourneyView({ catalog, account, canSignIn, accountError }: Props
           </section>
         )}
 
+        <p role="status" className="sr-only">
+          {announcement}
+        </p>
+
         {/* My places */}
         <section id="places" aria-labelledby="h-places" className="scroll-mt-24">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 id="h-places" className="font-display text-3xl font-bold text-navy-950">
+              <h2 id="h-places" tabIndex={-1} className="font-display text-3xl font-bold text-navy-950">
                 המקומות שאני בודק
               </h2>
               <p className="mt-2 max-w-2xl leading-7 text-stone-600">
@@ -409,7 +447,7 @@ function ActionLine({ action }: { action: { text: string; href?: string } }) {
           <>
             {" "}
             <a href={action.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium text-teal-700 underline underline-offset-4">
-              לקישור
+              לקישור<span className="sr-only">: {action.text}</span>
               <ExternalLink className="size-3.5" aria-hidden="true" />
               <span className="sr-only">(נפתח בלשונית חדשה)</span>
             </a>
@@ -418,7 +456,7 @@ function ActionLine({ action }: { action: { text: string; href?: string } }) {
           <>
             {" "}
             <Link href={action.href} className="font-medium text-teal-700 underline underline-offset-4">
-              לקישור
+              לקישור<span className="sr-only">: {action.text}</span>
             </Link>
           </>
         ))}

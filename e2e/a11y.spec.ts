@@ -151,3 +151,58 @@ test("animations stop when the system asks for reduced motion", async ({ page })
   });
   expect(animation).toMatch(/^none |1e-05s$|0\.00001s$/);
 });
+
+test("removing a place keeps focus in the list and announces it", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => localStorage.setItem("nextstep.favorites.v1", JSON.stringify(["hesder-hakotel", "hesder-birkat-moshe"])));
+  await page.goto("/journey");
+  const first = page.locator("[data-place]").first();
+  const firstName = await first.locator("h3").innerText();
+  await first.getByRole("button", { name: /^הסרה מהרשימה/ }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("status").filter({ hasText: `${firstName} הוסר מהרשימה` })).toBeAttached();
+  const focused = await page.evaluate(() => document.activeElement?.closest("[data-place]")?.querySelector("h3")?.textContent);
+  expect(focused).toBeTruthy();
+  expect(focused).not.toBe(firstName);
+
+  // The last card: focus goes to the list heading.
+  await page.locator("[data-place]").first().getByRole("button", { name: /^הסרה מהרשימה/ }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#h-places")).toBeFocused();
+});
+
+test("changing a place's stage is announced with the next step", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => localStorage.setItem("nextstep.favorites.v1", JSON.stringify(["hesder-hakotel"])));
+  await page.goto("/journey");
+  const card = page.locator('[data-place="hesder-hakotel"]');
+  await card.getByRole("button", { name: "הגשתי מועמדות" }).click();
+  await expect(page.getByRole("status").filter({ hasText: /^ישיבת הכותל: הגשתי מועמדות/ })).toBeAttached();
+});
+
+test("removing an institution from the comparison keeps focus on the page", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => localStorage.setItem("nextstep.compare.v1", JSON.stringify(["hesder-hakotel", "hesder-birkat-moshe"])));
+  await page.goto("/compare");
+  await page.getByRole("button", { name: "הסרה מההשוואה: ישיבת הכותל" }).filter({ visible: true }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("status").filter({ hasText: "ישיבת הכותל הוסרה מההשוואה" })).toBeAttached();
+  expect(await page.evaluate(() => document.activeElement?.id)).toMatch(/^(d|m)-hesder-birkat-moshe$/);
+  await page.getByRole("button", { name: /^הסרה מההשוואה/ }).filter({ visible: true }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+});
+
+test("questionnaire summary passes axe, including its description list", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => {
+    localStorage.setItem("nextstep.answers.v1", JSON.stringify({ stage: "grade12" }));
+    localStorage.setItem("nextstep.progress.v1", JSON.stringify({ index: 0, phase: "summary" }));
+  });
+  await page.goto("/questionnaire");
+  await page.getByRole("button", { name: "להמשיך מאיפה שעצרתי" }).click({ timeout: 5000 }).catch(() => {});
+  await expect(page.locator("main dl")).toBeVisible();
+  await page.waitForTimeout(800);
+  const { violations } = await new AxeBuilder({ page }).include("main dl").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect(violations.map((v) => v.id)).toEqual([]);
+});

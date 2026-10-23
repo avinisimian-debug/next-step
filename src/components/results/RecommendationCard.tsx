@@ -114,7 +114,7 @@ export function RecommendationCard({ rec, rank, aiSummary }: { rec: Recommendati
             href={`/institutions/${inst.slug}`}
             className="inline-flex items-center gap-2 rounded-full bg-navy-900 px-5 py-2.5 text-sm font-semibold text-paper hover:bg-navy-800"
           >
-            לפרטים מלאים
+            לפרטים מלאים<span className="sr-only">: {inst.name}</span>
             <ArrowLeft className="size-4" aria-hidden="true" />
           </Link>
           <CompareButton id={inst.id} name={inst.name} />
@@ -130,7 +130,9 @@ export function RecommendationCard({ rec, rank, aiSummary }: { rec: Recommendati
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between border-t border-sand-200 bg-sand-100/50 px-6 py-4 text-sm font-medium text-navy-900 hover:bg-sand-100 sm:px-8"
       >
-        פירוט ההתאמה, מה לבדוק ומה עוד לא ידוע
+        <span>
+          פירוט ההתאמה, מה לבדוק ומה עוד לא ידוע<span className="sr-only">: {inst.name}</span>
+        </span>
         <ChevronDown className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
       </button>
 

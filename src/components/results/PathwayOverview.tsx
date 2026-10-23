@@ -40,7 +40,7 @@ export function PathwayOverview({ pathways }: { pathways: PathwayFit[] }) {
               )}
               {p.considered > 0 && (
                 <Link href={`/institutions?pathway=${p.pathway}`} className="mt-1 inline-block text-sm font-medium text-teal-700 underline underline-offset-4">
-                  לכל המסגרות במסלול
+                  לכל המסגרות במסלול<span className="sr-only"> {info.name}</span>
                 </Link>
               )}
             </li>

@@ -75,7 +75,7 @@ export function PlanView({ catalog }: { catalog: Institution[] }) {
             {section.subtitle && <p className="mt-1 text-sm text-stone-600">{section.subtitle}</p>}
             <ul className="mt-5 space-y-4">
               {section.steps.map((step) => (
-                <Step key={step.id} step={step} checked={checked.has(step.id)} onChange={(on) => toggle(step.id, on)} />
+                <Step key={step.id} step={step} section={section.title} checked={checked.has(step.id)} onChange={(on) => toggle(step.id, on)} />
               ))}
             </ul>
           </section>
@@ -93,7 +93,7 @@ export function PlanView({ catalog }: { catalog: Institution[] }) {
   );
 }
 
-function Step({ step, checked, onChange }: { step: PlanStep; checked: boolean; onChange: (on: boolean) => void }) {
+function Step({ step, section, checked, onChange }: { step: PlanStep; section: string; checked: boolean; onChange: (on: boolean) => void }) {
   const inputId = `step-${step.id}`;
   const external = step.href?.startsWith("http");
   return (
@@ -114,13 +114,13 @@ function Step({ step, checked, onChange }: { step: PlanStep; checked: boolean; o
             {step.href &&
               (external ? (
                 <a href={step.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium text-teal-700 underline underline-offset-4">
-                  לקישור
+                  לקישור<span className="sr-only">: {step.text}, {section}</span>
                   <ExternalLink className="size-3.5" aria-hidden="true" />
                   <span className="sr-only">(נפתח בלשונית חדשה)</span>
                 </a>
               ) : (
                 <Link href={step.href} className="font-medium text-teal-700 underline underline-offset-4">
-                  לקישור
+                  לקישור<span className="sr-only">: {step.text}, {section}</span>
                 </Link>
               ))}
             {step.source && <span className="text-stone-600">מקור: {step.source}</span>}

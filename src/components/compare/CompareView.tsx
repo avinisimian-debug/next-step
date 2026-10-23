@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Info, X } from "lucide-react";
 import type { Institution } from "@/lib/domain/types";
 import { match, scoreInstitution } from "@/lib/matching/engine";
@@ -35,6 +35,9 @@ export function CompareView({ catalog }: { catalog: Institution[] }) {
   const [ids, setIds, hydrated] = useStored<string[]>(KEYS.compare, []);
   const [answers] = useStored<Answers>(KEYS.answers, {});
   const hasAnswers = Object.keys(answers).length > 0;
+  const heading = useRef<HTMLHeadingElement>(null);
+  const [announcement, setAnnouncement] = useState("");
+  const [focusTarget, setFocusTarget] = useState<string | null>(null);
 
   // Default to the user's current top three if nothing was picked explicitly.
   const selected = useMemo(() => {
@@ -55,11 +58,35 @@ export function CompareView({ catalog }: { catalog: Institution[] }) {
     [selected, answers, hasAnswers],
   );
 
+  // After a removal, focus goes to the next institution's name (desktop table or mobile card, whichever shows),
+  // or to the page heading when none is left.
+  useEffect(() => {
+    if (!focusTarget) return;
+    const el =
+      [document.getElementById(`d-${focusTarget}`), document.getElementById(`m-${focusTarget}`)].find((e) => e?.offsetParent) ??
+      heading.current;
+    el?.focus();
+    setFocusTarget(null);
+  }, [focusTarget, selected]);
+
   if (!hydrated) return <Loading label="טוען את ההשוואה…" />;
+
+  const remove = (inst: Institution) => {
+    const i = selected.findIndex((x) => x.id === inst.id);
+    const rest = ids.filter((x) => x !== inst.id);
+    setIds(rest);
+    setAnnouncement(`${inst.name} הוסרה מההשוואה`);
+    setFocusTarget(rest[Math.min(i, rest.length - 1)] ?? "heading");
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="font-display text-4xl font-bold text-navy-950">השוואה בין מסגרות</h1>
+      <h1 ref={heading} tabIndex={-1} className="font-display text-4xl font-bold text-navy-950">
+        השוואה בין מסגרות
+      </h1>
+      <p role="status" className="sr-only">
+        {announcement}
+      </p>
       <p className="mt-3 max-w-2xl leading-7 text-stone-600">אפשר להשוות עד שלוש מסגרות. הוסיפו מסגרות מכרטיסי ההמלצות או מדפי המסגרות.</p>
 
       {selected.length === 0 ? (
@@ -81,7 +108,7 @@ export function CompareView({ catalog }: { catalog: Institution[] }) {
           <div className="mt-8 space-y-6 md:hidden">
             {selected.map((i) => (
               <section key={i.id} className="rounded-3xl border border-sand-200 bg-paper p-5 shadow-card" aria-labelledby={`m-${i.id}`}>
-                <Head inst={i} onRemove={ids.includes(i.id) ? () => setIds(ids.filter((x) => x !== i.id)) : undefined} titleId={`m-${i.id}`} />
+                <Head inst={i} onRemove={ids.includes(i.id) ? () => remove(i) : undefined} titleId={`m-${i.id}`} />
                 <dl className="mt-4 divide-y divide-sand-200">
                   {ROWS.map((r) => (
                     <div key={r.label} className="py-3">
@@ -105,7 +132,7 @@ export function CompareView({ catalog }: { catalog: Institution[] }) {
                   </th>
                   {selected.map((i) => (
                     <th key={i.id} scope="col" className="p-5 text-start align-top font-normal">
-                      <Head inst={i} onRemove={ids.includes(i.id) ? () => setIds(ids.filter((x) => x !== i.id)) : undefined} titleId={`d-${i.id}`} />
+                      <Head inst={i} onRemove={ids.includes(i.id) ? () => remove(i) : undefined} titleId={`d-${i.id}`} />
                     </th>
                   ))}
                 </tr>

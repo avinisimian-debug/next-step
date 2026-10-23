@@ -364,21 +364,22 @@ function Summary({
       <dl className="mt-8 divide-y divide-sand-200 rounded-3xl border border-sand-200 bg-paper">
         {questions.map((q, i) => {
           const val = display(q);
+          // dt and dd sit directly in the row's div, as a description list requires; the edit button is a second dd.
           return (
-            <div key={q.id} className="flex items-start gap-4 px-5 py-4">
-              <div className="flex-1">
-                <dt className="text-sm text-stone-600">{q.title}</dt>
-                <dd className={`mt-1 ${val ? "font-medium text-navy-950" : "text-mist-500"}`}>{val ?? "דילגת"}</dd>
-              </div>
-              <button
-                type="button"
-                onClick={() => onEdit(i)}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-100"
-                aria-label={`שינוי התשובה: ${q.title}`}
-              >
-                <Pencil className="size-3.5" aria-hidden="true" />
-                שינוי
-              </button>
+            <div key={q.id} className="grid grid-cols-[1fr_auto] items-start gap-x-4 px-5 py-4">
+              <dt className="text-sm text-stone-600">{q.title}</dt>
+              <dd className={`col-start-1 mt-1 ${val ? "font-medium text-navy-950" : "text-mist-500"}`}>{val ?? "דילגת"}</dd>
+              <dd className="col-start-2 row-span-2 row-start-1">
+                <button
+                  type="button"
+                  onClick={() => onEdit(i)}
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-100"
+                  aria-label={`שינוי התשובה: ${q.title}`}
+                >
+                  <Pencil className="size-3.5" aria-hidden="true" />
+                  שינוי
+                </button>
+              </dd>
             </div>
           );
         })}
