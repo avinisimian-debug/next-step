@@ -13,6 +13,9 @@ const PAGES = [
   "/institutions/hakotel",
   "/maslul/mechinot",
   "/maslul/tzahal",
+  "/maslul/sherut-leumi",
+  "/maslul/midrashot",
+  "/institutions/midrasha-nishmat",
   "/community",
   "/community/ask",
   "/assistant",
@@ -38,6 +41,8 @@ for (const path of PAGES) {
   });
 
   test(`structure and keyboard walk on ${path}`, async ({ page }) => {
+    // The catalog lists every place (over 280 now), so its 250-step walk needs more than the default minute.
+    test.setTimeout(150_000);
     await page.goto(path);
     await page.waitForLoadState("networkidle");
 

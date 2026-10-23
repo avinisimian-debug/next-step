@@ -1,5 +1,6 @@
-import type { Institution, Pathway } from "@/lib/domain/types";
-import { asArray, isUndecided, optionLabel, type Answers } from "@/lib/questionnaire/questions";
+import { PATHWAYS, type Institution, type Pathway } from "@/lib/domain/types";
+import { PATHWAYS_FOR, pathwaysFor } from "@/lib/domain/pathways";
+import { asArray, genderOf, isUndecided, optionLabel, type Answers } from "@/lib/questionnaire/questions";
 import { COMPONENT_KEYS, DEFAULT_CONFIG, type ComponentKey, type EngineConfig } from "./config";
 
 /**
@@ -63,7 +64,7 @@ export interface PathwayFit {
 }
 
 export interface MatchResult {
-  /** All four pathways, best first. */
+  /** The pathways offered to the chosen gender (all of them if none was chosen), best first. */
   pathways: PathwayFit[];
   recommendations: Recommendation[];
   /** All scored options, best first — useful for tests and "see more". */
@@ -92,19 +93,24 @@ const single = (a: Answers, id: string): string | undefined => {
 // ───────────────────────── Hard constraints ─────────────────────────
 
 export function hardConstraint(inst: Institution, a: Answers): string | null {
-  const audience = single(a, "audience");
+  const gender = genderOf(a);
   const instAudience = inst.attributes.audience;
-  if (audience === "men" && instAudience === "women") return "המסגרת מיועדת לבנות.";
-  if (audience === "women" && instAudience === "men") return "המסגרת מיועדת לבנים.";
+  if (gender === "men" && instAudience === "women") return "המסגרת מיועדת לבנות.";
+  if (gender === "women" && instAudience === "men") return "המסגרת מיועדת לבנים.";
+  // The pathway itself belongs to the other track (e.g. a yeshiva whose audience wasn't stated).
+  if (gender && !PATHWAYS_FOR[gender].includes(inst.pathway))
+    return gender === "men" ? "המסלול הזה שייך למסלול לבנות." : "המסלול הזה שייך למסלול לבנים.";
   return null;
 }
+
+const isPathway = (p: string): p is Pathway => (PATHWAYS as readonly string[]).includes(p);
 
 // ───────────────────────── Components ─────────────────────────
 
 function pathwaySignals(inst: Institution, a: Answers): Signal[] {
   const out: Signal[] = [];
   const paths = asArray(a.paths);
-  const specific = paths.filter((p): p is Pathway => ["idf", "mechina", "hesder", "yeshiva"].includes(p));
+  const specific = paths.filter(isPathway);
   const p = inst.attributes;
 
   if (specific.length > 0 && !paths.includes("not_sure")) {
@@ -113,7 +119,7 @@ function pathwaySignals(inst: Institution, a: Answers): Signal[] {
       score: hit ? 1 : paths.includes("open") ? 0.45 : 0.1,
       weight: 3,
       generic: true,
-      reason: hit ? `הכיוון ״${optionLabel("paths", inst.pathway)}״ הוא אחד הכיוונים שציינת שאתה שוקל.` : undefined,
+      reason: hit ? `הכיוון ״${optionLabel("paths", inst.pathway, a)}״ הוא אחד הכיוונים שבחרת.` : undefined,
       concern: hit ? undefined : `זה לא אחד הכיוונים שבחרת — שווה להכיר בכל זאת, כי שאר ההעדפות שלך מתאימות.`,
     });
   }
@@ -121,17 +127,19 @@ function pathwaySignals(inst: Institution, a: Answers): Signal[] {
   const next = isUndecided(a) ? single(a, "undecided_next_year") : undefined;
   if (next) {
     const table: Record<string, Record<Pathway, number>> = {
-      beit_midrash: { yeshiva: 1, hesder: 0.85, mechina: 0.4, idf: 0.1 },
-      group_prep: { mechina: 1, hesder: 0.4, idf: 0.4, yeshiva: 0.2 },
-      start_service: { idf: 1, mechina: 0.35, hesder: 0.3, yeshiva: 0.1 },
-      combination: { hesder: 1, mechina: 0.6, yeshiva: 0.5, idf: 0.3 },
+      beit_midrash: { yeshiva: 1, hesder: 0.85, mechina: 0.4, idf: 0.1, midrasha: 1, national_service: 0.1 },
+      group_prep: { mechina: 1, hesder: 0.4, idf: 0.4, yeshiva: 0.2, midrasha: 0.7, national_service: 0.4 },
+      start_service: { idf: 1, mechina: 0.35, hesder: 0.3, yeshiva: 0.1, midrasha: 0.2, national_service: 1 },
+      give: { national_service: 1, mechina: 0.6, midrasha: 0.4, idf: 0.4, hesder: 0.3, yeshiva: 0.1 },
+      combination: { hesder: 1, mechina: 0.6, yeshiva: 0.5, idf: 0.3, midrasha: 0.6, national_service: 0.4 },
     };
     let s = table[next]?.[inst.pathway] ?? 0.5;
     if (next === "combination" && (p.militaryModel === "shiluv" || p.militaryModel === "hesder")) s = 1;
+    if (next === "combination" && p.programModes?.includes("shiluv")) s = 1;
     out.push({
       score: s,
       weight: 2,
-      reason: s >= 0.8 ? `כשדמיינת את השנה הבאה בחרת ״${optionLabel("undecided_next_year", next)}״ — וזה בדיוק מה שהמסגרת מציעה.` : undefined,
+      reason: s >= 0.8 ? `כשדמיינת את השנה הבאה בחרת ״${optionLabel("undecided_next_year", next, a)}״ — וזה בדיוק מה שהמסגרת מציעה.` : undefined,
     });
   }
   return out;
@@ -174,7 +182,7 @@ function educationSignals(inst: Institution, a: Answers): Signal[] {
     if (le === "intensive_torah") s = p.torahIntensity >= 4 ? 1 : (p.torahIntensity / 4) * 0.8;
     if (le === "torah_and_service")
       s =
-        p.militaryModel === "hesder" || p.militaryModel === "shiluv"
+        p.militaryModel === "hesder" || p.militaryModel === "shiluv" || p.programModes?.includes("shiluv")
           ? 1
           : p.militaryModel === "individual"
             ? 0.75
@@ -182,28 +190,30 @@ function educationSignals(inst: Institution, a: Answers): Signal[] {
               ? 0.7
               : 0.2;
     if (le === "structured_development")
-      s = { mechina: 1, idf: 0.4, hesder: 0.4, yeshiva: 0.3 }[inst.pathway];
-    if (le === "practical_service") s = { idf: 1, mechina: 0.7, hesder: 0.3, yeshiva: 0.1 }[inst.pathway];
+      s = { mechina: 1, idf: 0.4, hesder: 0.4, yeshiva: 0.3, midrasha: 0.7, national_service: 0.5 }[inst.pathway];
+    if (le === "practical_service")
+      s = { idf: 1, mechina: 0.7, hesder: 0.3, yeshiva: 0.1, national_service: 1, midrasha: 0.2 }[inst.pathway];
     out.push({
       score: s,
       weight: 2,
-      reason: s >= 0.8 ? `חיפשת ${optionLabel("learning_env", le)} — וזה אופי המסגרת.` : undefined,
-      concern: s <= 0.3 ? `חיפשת ${optionLabel("learning_env", le)}, ואופי המסגרת הזו שונה.` : undefined,
+      reason: s >= 0.8 ? `חיפשת ${optionLabel("learning_env", le, a)} — וזה אופי המסגרת.` : undefined,
+      concern: s <= 0.3 ? `חיפשת ${optionLabel("learning_env", le, a)}, ואופי המסגרת הזו שונה.` : undefined,
     });
   }
 
   const re = single(a, "religious_env");
-  if (re && ["religious_zionist", "open_religious", "exploring"].includes(re)) {
+  if (re && ["religious_zionist", "open_religious", "exploring", "haredi"].includes(re)) {
     const envScore: Record<string, Record<string, number>> = {
-      religious_zionist: { religious_zionist: 1, open_religious: 0.8, mixed_backgrounds: 0.5, general: 0.3 },
-      open_religious: { open_religious: 1, religious_zionist: 0.7, mixed_backgrounds: 0.7, general: 0.5 },
-      exploring: { mixed_backgrounds: 1, general: 0.9, open_religious: 0.7, religious_zionist: 0.4 },
+      religious_zionist: { religious_zionist: 1, open_religious: 0.8, mixed_backgrounds: 0.5, general: 0.3, haredi: 0.4 },
+      open_religious: { open_religious: 1, religious_zionist: 0.7, mixed_backgrounds: 0.7, general: 0.5, haredi: 0.2 },
+      exploring: { mixed_backgrounds: 1, general: 0.9, open_religious: 0.7, religious_zionist: 0.4, haredi: 0.2 },
+      haredi: { haredi: 1, religious_zionist: 0.4, open_religious: 0.2, mixed_backgrounds: 0.1, general: 0.1 },
     };
     const s = Math.max(...p.religiousEnvironments.map((e) => envScore[re][e] ?? 0.3));
     out.push({
       score: s,
       weight: 1.5,
-      reason: s >= 0.9 ? `האווירה כאן מתאימה למה שתיארת: ${optionLabel("religious_env", re)}.` : undefined,
+      reason: s >= 0.9 ? `האווירה כאן מתאימה למה שתיארת: ${optionLabel("religious_env", re, a)}.` : undefined,
       concern: s <= 0.45 ? "האווירה במסגרת שונה מזו שתיארת — כדאי לבקר ולהרגיש בעצמך." : undefined,
     });
   }
@@ -234,7 +244,45 @@ function educationSignals(inst: Institution, a: Answers): Signal[] {
       concern: s <= 0.3 ? "הרכב הקבוצה כאן שונה ממה שביקשת." : undefined,
     });
   }
+
+  const mm = single(a, "midrasha_mode");
+  if (mm && mm !== "no_pref" && (inst.pathway === "midrasha" || (mm === "before_army" && inst.pathway === "mechina"))) {
+    const modes = p.programModes ?? [];
+    const hit = modes.includes(mm as never) || (mm === "before_army" && inst.pathway === "mechina");
+    // A midrasha whose programmes no source listed is neither a match nor a mismatch.
+    const s = hit ? 1 : modes.length === 0 ? 0.55 : 0.3;
+    out.push({
+      score: s,
+      weight: 1.5,
+      reason: hit ? `חיפשת ${optionLabel("midrasha_mode", mm)} — וזו מסגרת כזו.` : undefined,
+      concern: !hit && modes.length > 0 ? "סוג התוכנית כאן שונה ממה שחיפשת." : undefined,
+    });
+  }
   return out;
+}
+
+const NS_AREA_TEXT: Record<string, string> = {
+  education: "חינוך",
+  youth: "תנועות נוער",
+  health: "בריאות",
+  welfare: "רווחה וקהילה",
+  security: "ביטחון והצלה",
+  abroad: "שליחות בחו״ל",
+};
+
+function serviceAreaSignals(inst: Institution, a: Answers): Signal[] {
+  const wanted = asArray(a.ns_area);
+  if (wanted.length === 0 || inst.pathway !== "national_service") return [];
+  const offered = inst.attributes.serviceAreas ?? [];
+  if (offered.length === 0) return [];
+  const o = overlapScore(wanted, offered)!;
+  return [
+    {
+      score: o.score,
+      weight: 2,
+      reason: o.hits.length > 0 ? `רצית לשרת ב${listHe(o.hits.map((h) => NS_AREA_TEXT[h]))} — וזה תחום שהמסגרת עוסקת בו.` : undefined,
+    },
+  ];
 }
 
 const MECHINA_FOCUS_MATCH: Record<string, (i: Institution) => boolean> = {
@@ -315,14 +363,33 @@ function militarySignals(inst: Institution, a: Answers): Signal[] {
               : p.militaryModel === "unknown"
                 ? 0.3
                 : 0.25;
-    if (mf === "prep_first") s = p.militaryModel === "pre_military" ? 1 : p.militaryModel === "shiluv" ? 0.4 : 0.3;
+    if (mf === "prep_first")
+      s =
+        p.militaryModel === "pre_military" || (inst.pathway === "midrasha" && p.programModes?.includes("before_army"))
+          ? 1
+          : inst.pathway === "midrasha"
+            ? 0.75
+            : p.militaryModel === "shiluv"
+              ? 0.4
+              : 0.3;
+    if (mf === "national_service")
+      s =
+        inst.pathway === "national_service"
+          ? 1
+          : inst.pathway === "midrasha"
+            ? p.programModes?.includes("shiluv") ? 0.85 : 0.6
+            : inst.pathway === "idf"
+              ? 0.1
+              : 0.35;
     out.push({
       score: s,
       weight: 3,
-      reason: s >= 0.8 ? `לגבי השירות אמרת: ״${optionLabel("military_feeling", mf)}״ — והמסגרת בנויה לכך.` : undefined,
+      reason: s >= 0.8 ? `לגבי השירות אמרת: ״${optionLabel("military_feeling", mf, a)}״ — והמסגרת בנויה לכך.` : undefined,
       concern:
         s <= 0.35
-          ? p.militaryModel === "unknown"
+          ? mf === "national_service"
+            ? "זו לא מסגרת של שירות לאומי."
+            : p.militaryModel === "unknown"
             ? "לא אימתנו איך משתלב כאן השירות הצבאי — חשוב לברר."
             : "הדרך שבה המסגרת משלבת שירות צבאי שונה ממה שתיארת."
           : undefined,
@@ -449,7 +516,7 @@ function practicalSignals(inst: Institution, a: Answers): Signal[] {
 
 const BUILDERS: Record<ComponentKey, (i: Institution, a: Answers) => Signal[]> = {
   pathway: pathwaySignals,
-  education: educationSignals,
+  education: (i, a) => [...educationSignals(i, a), ...serviceAreaSignals(i, a)],
   development: developmentSignals,
   military: militarySignals,
   location: locationSignals,
@@ -464,6 +531,8 @@ const VERIFY_BY_PATHWAY: Record<Pathway, string[]> = {
   mechina: ["מועדי ההרשמה ותהליך המיון", "עלות ההשתתפות ואפשרויות מלגה", "איך נראה שבוע טיפוסי"],
   hesder: ["באיזה מסלול הסדר פועלת הישיבה ומה משך השירות", "תהליך הקבלה ומועדי שבתות פתוחות", "סדר היום ותנאי המגורים"],
   yeshiva: ["איך משתלב השירות הצבאי, אם בכלל", "תהליך הקבלה", "סדר היום ותנאי המגורים"],
+  national_service: ["אילו מקומות שירות פנויים באזור שלך", "מועדי ההרשמה ותהליך השיבוץ", "תנאי השירות: מגורים, דמי כיס והסעות"],
+  midrasha: ["אילו תוכניות יש במדרשה (שנה מלאה, שילוב, לפני צבא)", "תהליך הקבלה ומועדי ימים פתוחים", "עלות ההשתתפות ותנאי המגורים"],
 };
 
 function unknownsFor(inst: Institution): string[] {
@@ -471,8 +540,9 @@ function unknownsFor(inst: Institution): string[] {
   if (inst.verificationStatus !== "verified") u.push("חלק מהפרטים מבוססים על מקור משני ולא על האתר הרשמי.");
   if (!inst.website) u.push("האתר הרשמי טרם אומת.");
   if (!inst.contact || (inst.contact.phone.length === 0 && !inst.contact.email)) u.push("פרטי קשר רשמיים טרם אומתו.");
-  if (!inst.profile.financial && inst.pathway !== "idf") u.push("עלויות ומלגות — המידע עדיין לא אומת.");
-  if (!inst.profile.admissions && inst.pathway !== "idf") u.push("תנאי קבלה — המידע עדיין לא אומת.");
+  const free = inst.pathway === "idf" || inst.pathway === "national_service";
+  if (!inst.profile.financial && !free) u.push("עלויות ומלגות — המידע עדיין לא אומת.");
+  if (!inst.profile.admissions && !free) u.push("תנאי קבלה — המידע עדיין לא אומת.");
   if (inst.attributes.audience === "unknown") u.push("לא אימתנו למי מיועדת המסגרת (בנים, בנות או שניהם).");
   return u;
 }
@@ -540,7 +610,7 @@ export function match(catalog: Institution[], a: Answers, config: EngineConfig =
     .sort((x, y) => y.score - x.score || x.institution.id.localeCompare(y.institution.id));
 
   // Prefer variety across pathways when the user is open to more than one.
-  const specific = asArray(a.paths).filter((p) => ["idf", "mechina", "hesder", "yeshiva"].includes(p));
+  const specific = asArray(a.paths).filter(isPathway);
   const wantsVariety = specific.length !== 1;
   const pool = ranked.filter((r) => r.score >= config.minScore);
   const chosen: Recommendation[] = [];
@@ -571,14 +641,17 @@ export function match(catalog: Institution[], a: Answers, config: EngineConfig =
     limitation = `מצאנו ${chosen.length === 1 ? "אפשרות אחת" : "שתי אפשרויות"} שמתאימות מספיק. לא נציג התאמות חלשות רק כדי למלא שלושה מקומות.`;
   }
 
-  const pathways = rankPathways(ranked, excluded, config);
+  const pathways = rankPathways(ranked, excluded, config, pathwaysFor(genderOf(a)));
   return { pathways, recommendations: chosen, ranked, excluded, lowConfidence, needsGuidance, limitation };
 }
 
-const ALL_PATHWAYS: Pathway[] = ["idf", "mechina", "hesder", "yeshiva"];
-
-export function rankPathways(ranked: Recommendation[], excluded: Exclusion[], config: EngineConfig = DEFAULT_CONFIG): PathwayFit[] {
-  return ALL_PATHWAYS.map((pathway): PathwayFit => {
+export function rankPathways(
+  ranked: Recommendation[],
+  excluded: Exclusion[],
+  config: EngineConfig = DEFAULT_CONFIG,
+  offered: Pathway[] = [...PATHWAYS],
+): PathwayFit[] {
+  return offered.map((pathway): PathwayFit => {
     const inPath = ranked.filter((r) => r.institution.pathway === pathway);
     const best = inPath[0];
     const excludedHere = excluded.filter((e) => e.institution.pathway === pathway).length;
@@ -591,5 +664,5 @@ export function rankPathways(ranked: Recommendation[], excluded: Exclusion[], co
       excludedNote:
         !best && excludedHere > 0 ? "המסגרות שבמאגר במסלול הזה מיועדות לקהל אחר מזה שציינת." : undefined,
     };
-  }).sort((x, y) => (y.score ?? -1) - (x.score ?? -1) || ALL_PATHWAYS.indexOf(x.pathway) - ALL_PATHWAYS.indexOf(y.pathway));
+  }).sort((x, y) => (y.score ?? -1) - (x.score ?? -1) || offered.indexOf(x.pathway) - offered.indexOf(y.pathway));
 }

@@ -83,7 +83,7 @@ const KOLZCHUT_SERVICE_YEAR: Source = {
 
 type Stream = "torani" | "torani_girls" | "general" | "unclassified";
 
-interface Entry {
+export interface Entry {
   id: string;
   name: string;
   /** Location as stated by a source. Omit when no source states it. */
@@ -96,6 +96,10 @@ interface Entry {
   note?: string;
   /** Facts summarized from the institution's Hebrew Wikipedia article (title as on he.wikipedia.org). */
   wiki?: { title: string; facts: string; location?: string };
+  /** The official site, set only when it was opened and its title matched the institution. */
+  website?: string;
+  /** When the cited list was read, if not LISTED_ON. */
+  listedOn?: string;
 }
 interface MechinaEntry extends Entry {
   stream: Stream;
@@ -112,7 +116,7 @@ const BASE_LIMITATION =
 
 const toRegions = (r: Entry["region"]): Region[] => (r === undefined ? ["nationwide"] : Array.isArray(r) ? r : [r]);
 
-const hewiki = (title: string): Source => ({
+export const hewiki = (title: string): Source => ({
   label: `ויקיפדיה — ${title}`,
   url: `https://he.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`,
   kind: "encyclopedia",
@@ -136,10 +140,14 @@ function locationOf(e: Entry): { label: string; regions: Region[]; note: string 
   };
 }
 
-function build(
+export function build(
   e: Entry,
   opts: {
     pathway: Pathway;
+    /** A pathway/track (e.g. national service through any association) rather than one institution. */
+    kind?: Institution["kind"];
+    /** Extra matching attributes (serviceAreas, programModes) the sources support. */
+    extraAttributes?: Partial<Institution["attributes"]>;
     typeLabel: string;
     environments: ReligiousEnvironment[];
     audience: Institution["attributes"]["audience"];
@@ -162,7 +170,7 @@ function build(
     name: e.name,
     pathway: opts.pathway,
     typeLabel: opts.typeLabel,
-    kind: "institution",
+    kind: opts.kind ?? "institution",
     regions: loc.regions,
     locationLabel: loc.label,
     shortDescription: e.wiki ? `${opts.typeLabel}${where}.${wikiFacts}` : `${opts.typeLabel}${where}. ${opts.identity} פרטי התוכנית — ${NV}.`,
@@ -183,6 +191,7 @@ function build(
       duration: opts.duration,
       communitySize: "unknown",
       audience: opts.audience,
+      ...opts.extraAttributes,
     },
     profile: {
       overview: `${e.name} — ${opts.typeLabel}${where}. ${opts.identity}${wikiFacts} מעבר לכך, ${NV}: אין כאן עדיין מידע על הגישה החינוכית, סדר היום, המגורים, העלויות או תנאי הקבלה.`,
@@ -190,7 +199,8 @@ function build(
       faq: [],
     },
     sources: e.wiki ? [...e.sources, hewiki(e.wiki.title)] : e.sources,
-    lastVerified: e.wiki ? WIKI_CHECKED_ON : LISTED_ON,
+    website: e.website,
+    lastVerified: e.wiki ? WIKI_CHECKED_ON : (e.listedOn ?? LISTED_ON),
     verificationStatus: "partial",
     verificationNotes: [
       `${e.sources.length ? "אומתו שם המוסד וסוגו מול הרשימה שבמקורות." : "שם המוסד וסוגו לפי ויקיפדיה בלבד."} ${loc.note}`,

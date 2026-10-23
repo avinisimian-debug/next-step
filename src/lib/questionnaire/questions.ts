@@ -1,3 +1,5 @@
+import type { Gender } from "@/lib/domain/types";
+
 /**
  * Questionnaire definition. Pure data + visibility rules, no UI.
  * Option ids are stable keys used by the matching engine; labels are Hebrew UI copy.
@@ -11,6 +13,10 @@ export type QuestionKind = "single" | "multi" | "text";
 export interface Option {
   id: string;
   label: string;
+  /** Wording when the questionnaire is filled in for a girl. */
+  labelF?: string;
+  /** Shown only for this gender (answer to `audience`). */
+  for?: Gender;
   hint?: string;
   /** Icon name from lucide-react, resolved in the UI layer. */
   icon?: string;
@@ -22,6 +28,9 @@ export interface Question {
   kind: QuestionKind;
   title: string;
   subtitle?: string;
+  /** Wording when the questionnaire is filled in for a girl. */
+  titleF?: string;
+  subtitleF?: string;
   options?: Option[];
   maxSelections?: number;
   optional?: boolean;
@@ -47,6 +56,11 @@ export const asArray = (v: AnswerValue | undefined): string[] =>
 
 const pathsInclude = (a: Answers, id: string) => asArray(a.paths).includes(id);
 
+/** The gender the questionnaire is filled in for, from the first question. */
+export const genderOf = (a: Answers): Gender | undefined =>
+  a.audience === "men" || a.audience === "women" ? a.audience : undefined;
+const isGirl = (a: Answers) => genderOf(a) === "women";
+
 /** True when the user hasn't committed to specific pathways. */
 export const isUndecided = (a: Answers): boolean => {
   const p = asArray(a.paths);
@@ -57,30 +71,29 @@ export const isUndecided = (a: Answers): boolean => {
 export const QUESTIONS: Question[] = [
   // ── A. Current situation ──
   {
+    id: "audience",
+    section: "situation",
+    kind: "single",
+    title: "בשביל מי השאלון?",
+    subtitle: "לבנים ולבנות יש מסלולים שונים אחרי י״ב, ולכן מתחילים מכאן.",
+    options: [
+      { id: "men", label: "בן", hint: "מכינות, ישיבות הסדר, ישיבות גבוהות וצה״ל" },
+      { id: "women", label: "בת", hint: "שירות לאומי וקומונריות, מדרשות וסמינרים, מכינות לבנות וצה״ל" },
+    ],
+  },
+  {
     id: "stage",
     section: "situation",
     kind: "single",
     title: "איפה אתה נמצא היום?",
+    titleF: "איפה את נמצאת היום?",
     subtitle: "זה עוזר לנו להבין כמה זמן יש לך לבדוק אפשרויות.",
     options: [
       { id: "grade11", label: "כיתה י״א", icon: "BookOpen" },
       { id: "grade12", label: "כיתה י״ב", icon: "GraduationCap" },
       { id: "graduated", label: "סיימתי תיכון", icon: "Flag" },
-      { id: "changing", label: "כבר במסגרת ושוקל שינוי", icon: "RefreshCw" },
+      { id: "changing", label: "כבר במסגרת ושוקל שינוי", labelF: "כבר במסגרת ושוקלת שינוי", icon: "RefreshCw" },
       { id: "other", label: "אחר", icon: "MoreHorizontal" },
-    ],
-  },
-  {
-    id: "audience",
-    section: "situation",
-    kind: "single",
-    optional: true,
-    title: "לאילו מסגרות לחפש?",
-    subtitle: "חלק מהמסגרות מיועדות לבנים בלבד או לבנות בלבד. אפשר לדלג.",
-    options: [
-      { id: "men", label: "מסגרות לבנים" },
-      { id: "women", label: "מסגרות לבנות" },
-      { id: "any", label: "לא משנה / מעדיף לא לציין" },
     ],
   },
   {
@@ -88,14 +101,17 @@ export const QUESTIONS: Question[] = [
     section: "situation",
     kind: "multi",
     title: "אילו כיוונים אתה שוקל כרגע?",
+    titleF: "אילו כיוונים את שוקלת כרגע?",
     subtitle: "אפשר לבחור כמה. אין תשובה לא נכונה.",
     options: [
+      { id: "national_service", label: "שירות לאומי", hint: "כולל קומונריות בתנועות נוער", for: "women", icon: "HeartHandshake" },
+      { id: "midrasha", label: "מדרשה או סמינר", for: "women", icon: "BookOpen" },
       { id: "idf", label: "שירות צבאי", icon: "Shield" },
-      { id: "mechina", label: "מכינה קדם־צבאית", icon: "Compass" },
-      { id: "hesder", label: "ישיבת הסדר", icon: "BookMarked" },
-      { id: "yeshiva", label: "ישיבה גבוהה", icon: "Library" },
-      { id: "not_sure", label: "עוד לא יודע", icon: "HelpCircle" },
-      { id: "open", label: "פתוח לכמה אפשרויות", icon: "Shuffle" },
+      { id: "mechina", label: "מכינה קדם־צבאית", labelF: "מכינה קדם־צבאית לבנות", icon: "Compass" },
+      { id: "hesder", label: "ישיבת הסדר", for: "men", icon: "BookMarked" },
+      { id: "yeshiva", label: "ישיבה גבוהה", for: "men", icon: "Library" },
+      { id: "not_sure", label: "עוד לא יודע", labelF: "עוד לא יודעת", icon: "HelpCircle" },
+      { id: "open", label: "פתוח לכמה אפשרויות", labelF: "פתוחה לכמה אפשרויות", icon: "Shuffle" },
     ],
   },
   {
@@ -105,11 +121,13 @@ export const QUESTIONS: Question[] = [
     optional: true,
     showIf: isUndecided,
     title: "דמיין את השנה הבאה. מה הכי מושך אותך?",
+    titleF: "דמייני את השנה הבאה. מה הכי מושך אותך?",
     subtitle: "בלי להתחייב — רק כדי להבין מה מדבר אליך.",
     options: [
       { id: "beit_midrash", label: "ללמוד בבית מדרש, עם זמן להעמיק", icon: "BookOpen" },
       { id: "group_prep", label: "להתכונן עם קבוצה לשירות ולחיים", icon: "Users" },
-      { id: "start_service", label: "להתחיל כבר את השירות", icon: "Shield" },
+      { id: "start_service", label: "להתחיל כבר את השירות", labelF: "להתחיל כבר לשרת, בצבא או בשירות לאומי", icon: "Shield" },
+      { id: "give", label: "לתת שנה לקהילה ולחברה", for: "women", icon: "HeartHandshake" },
       { id: "combination", label: "שילוב של לימוד ושירות", icon: "Layers" },
     ],
   },
@@ -184,6 +202,39 @@ export const QUESTIONS: Question[] = [
     ],
   },
 
+  {
+    id: "ns_area",
+    section: "situation",
+    kind: "multi",
+    maxSelections: 3,
+    optional: true,
+    showIf: (a) => pathsInclude(a, "national_service"),
+    title: "בשירות לאומי — באיזה תחום היית רוצה לשרת?",
+    subtitle: "עד 3 בחירות. השיבוץ בפועל נעשה דרך העמותה ולפי המקומות הפנויים.",
+    options: [
+      { id: "education", label: "חינוך — בית ספר, גן או פנימייה", icon: "GraduationCap" },
+      { id: "youth", label: "תנועת נוער — קומונרית", icon: "Users" },
+      { id: "health", label: "בריאות ורפואה", icon: "Heart" },
+      { id: "welfare", label: "רווחה, קהילה ואוכלוסיות מיוחדות", icon: "HeartHandshake" },
+      { id: "security", label: "ביטחון, משטרה והצלה", icon: "Shield" },
+      { id: "abroad", label: "שליחות בקהילה יהודית בחו״ל", icon: "Compass" },
+    ],
+  },
+  {
+    id: "midrasha_mode",
+    section: "situation",
+    kind: "single",
+    optional: true,
+    showIf: (a) => pathsInclude(a, "midrasha"),
+    title: "במדרשה — איזו מסגרת מתאימה לך?",
+    options: [
+      { id: "full_year", label: "שנה מלאה של לימוד", hint: "לפני השירות או אחריו" },
+      { id: "shiluv", label: "מדרשת שילוב", hint: "לומדים לצד שירות לאומי, לימודים או עבודה" },
+      { id: "before_army", label: "שנת הכנה לפני צבא", hint: "מדרשה או מכינה לבנות לפני גיוס" },
+      { id: "no_pref", label: "עוד לא יודעת" },
+    ],
+  },
+
   // ── B. Religious and educational preferences ──
   {
     id: "torah_importance",
@@ -206,10 +257,10 @@ export const QUESTIONS: Question[] = [
     title: "איזו סביבה לימודית מושכת אותך יותר?",
     options: [
       { id: "intensive_torah", label: "לימוד תורה אינטנסיבי ומסורתי", icon: "BookMarked" },
-      { id: "torah_and_service", label: "לימוד תורה בשילוב שירות צבאי", icon: "Layers" },
+      { id: "torah_and_service", label: "לימוד תורה בשילוב שירות צבאי", labelF: "לימוד תורה בשילוב שירות", icon: "Layers" },
       { id: "structured_development", label: "מסגרת חינוכית עם התפתחות אישית", icon: "Sprout" },
       { id: "practical_service", label: "סביבה מעשית, של שירות ועשייה", icon: "Hammer" },
-      { id: "not_sure", label: "עוד לא בטוח", icon: "HelpCircle" },
+      { id: "not_sure", label: "עוד לא בטוח", labelF: "עוד לא בטוחה", icon: "HelpCircle" },
     ],
   },
   {
@@ -218,13 +269,15 @@ export const QUESTIONS: Question[] = [
     kind: "single",
     optional: true,
     title: "איזו אווירה דתית אתה מחפש?",
+    titleF: "איזו אווירה דתית את מחפשת?",
     subtitle: "שאלה אופציונלית. התשובה משמשת רק להתאמה.",
     options: [
       { id: "religious_zionist", label: "ציונות דתית" },
       { id: "open_religious", label: "דתי־לאומי באווירה פתוחה יותר" },
-      { id: "exploring", label: "מסורתי או עדיין מחפש" },
+      { id: "exploring", label: "מסורתי או עדיין מחפש", labelF: "מסורתית או עדיין מחפשת" },
+      { id: "haredi", label: "חרדי" , labelF: "חרדית" },
       { id: "other", label: "סביבה אחרת שמתאימה לי" },
-      { id: "advisor", label: "מעדיף לדבר על זה עם יועץ" },
+      { id: "advisor", label: "מעדיף לדבר על זה עם יועץ", labelF: "מעדיפה לדבר על זה עם יועצת" },
     ],
   },
 
@@ -234,11 +287,13 @@ export const QUESTIONS: Question[] = [
     section: "military",
     kind: "single",
     title: "איך אתה מרגיש כרגע לגבי שירות צבאי?",
+    titleF: "איך את מרגישה כרגע לגבי שירות — צבאי או לאומי?",
     options: [
-      { id: "motivated", label: "יש לי מוטיבציה לשרת", icon: "Shield" },
+      { id: "motivated", label: "יש לי מוטיבציה לשרת", labelF: "יש לי מוטיבציה לשרת בצבא", icon: "Shield" },
+      { id: "national_service", label: "מעדיפה שירות לאומי", for: "women", icon: "HeartHandshake" },
       { id: "serve_with_torah", label: "רוצה לשרת ולהמשיך ללמוד תורה", icon: "Layers" },
-      { id: "prep_first", label: "שוקל קודם תוכנית הכנה", icon: "Compass" },
-      { id: "uncertain", label: "לא בטוח, רוצה להבין את האפשרויות", icon: "HelpCircle" },
+      { id: "prep_first", label: "שוקל קודם תוכנית הכנה", labelF: "שוקלת קודם שנת מדרשה או מכינה", icon: "Compass" },
+      { id: "uncertain", label: "לא בטוח, רוצה להבין את האפשרויות", labelF: "לא בטוחה, רוצה להבין את האפשרויות", icon: "HelpCircle" },
       { id: "individual", label: "יש לי נסיבות שדורשות ליווי אישי", icon: "UserRound" },
     ],
   },
@@ -250,6 +305,7 @@ export const QUESTIONS: Question[] = [
     optional: true,
     title: "מה הכי מעניין אותך בשירות?",
     subtitle: "עד 3 בחירות. השיבוץ בפועל נקבע על ידי צה״ל לפי דרישות ומבדקים רשמיים.",
+    subtitleF: "עד 3 בחירות, בצבא או בשירות לאומי. השיבוץ בפועל נקבע על ידי הגוף המשבץ.",
     options: [
       { id: "combat", label: "לחימה ותפקידי שטח", icon: "Mountain" },
       { id: "tech_intel", label: "טכנולוגיה, מודיעין או סייבר", icon: "Cpu" },
@@ -257,7 +313,7 @@ export const QUESTIONS: Question[] = [
       { id: "education_community", label: "חינוך, אנשים וקהילה", icon: "Users" },
       { id: "professional_technical", label: "תפקידים מקצועיים או טכניים", icon: "Wrench" },
       { id: "other_meaningful", label: "שירות משמעותי בתחום אחר", icon: "Heart" },
-      { id: "dont_know", label: "עוד לא יודע", icon: "HelpCircle" },
+      { id: "dont_know", label: "עוד לא יודע", labelF: "עוד לא יודעת", icon: "HelpCircle" },
     ],
   },
 
@@ -285,6 +341,7 @@ export const QUESTIONS: Question[] = [
     kind: "multi",
     maxSelections: 2,
     title: "באיזו סביבה אתה במיטבך?",
+    titleF: "באיזו סביבה את במיטבך?",
     subtitle: "עד 2 בחירות.",
     options: [
       { id: "structure", label: "מבנה ברור ומשמעת" },
@@ -300,6 +357,7 @@ export const QUESTIONS: Question[] = [
     section: "development",
     kind: "single",
     title: "איך אתה הכי אוהב ללמוד?",
+    titleF: "איך את הכי אוהבת ללמוד?",
     options: [
       { id: "intensive_study", label: "לימוד מעמיק ואינטנסיבי" },
       { id: "experiential", label: "דרך התנסות" },
@@ -316,6 +374,7 @@ export const QUESTIONS: Question[] = [
     kind: "multi",
     optional: true,
     title: "באיזה אזור היית מעדיף להיות?",
+    titleF: "באיזה אזור היית מעדיפה להיות?",
     subtitle: "אפשר לבחור כמה.",
     options: [
       { id: "north", label: "צפון" },
@@ -337,7 +396,7 @@ export const QUESTIONS: Question[] = [
       { id: "yes", label: "כן" },
       { id: "prefer_not", label: "עדיף שלא" },
       { id: "depends", label: "תלוי במסגרת" },
-      { id: "not_sure", label: "עוד לא בטוח" },
+      { id: "not_sure", label: "עוד לא בטוח", labelF: "עוד לא בטוחה" },
     ],
   },
   {
@@ -346,6 +405,7 @@ export const QUESTIONS: Question[] = [
     kind: "single",
     optional: true,
     title: "איזו סביבה חברתית אתה מעדיף?",
+    titleF: "איזו סביבה חברתית את מעדיפה?",
     options: [
       { id: "small", label: "קהילה קטנה ומגובשת" },
       { id: "large", label: "קהילה גדולה ומגוונת" },
@@ -360,6 +420,7 @@ export const QUESTIONS: Question[] = [
     kind: "single",
     optional: true,
     title: "לכמה זמן אתה רואה את עצמך במסגרת?",
+    titleF: "לכמה זמן את רואה את עצמך במסגרת?",
     options: [
       { id: "short", label: "תקופת הכנה קצרה" },
       { id: "one_year", label: "בערך שנה" },
@@ -377,11 +438,11 @@ export const QUESTIONS: Question[] = [
     optional: true,
     title: "יש שיקול כלכלי שכדאי שנתחשב בו?",
     options: [
-      { id: "low_cost", label: "מעדיף אפשרויות בעלות נמוכה" },
+      { id: "low_cost", label: "מעדיף אפשרויות בעלות נמוכה", labelF: "מעדיפה אפשרויות בעלות נמוכה" },
       { id: "scholarships", label: "מלגות או סיוע כלכלי חשובים לי" },
       { id: "flexible", label: "גמיש, תלוי במסגרת" },
       { id: "none", label: "אין העדפה מיוחדת" },
-      { id: "skip", label: "מעדיף לא לענות" },
+      { id: "skip", label: "מעדיף לא לענות", labelF: "מעדיפה לא לענות" },
     ],
   },
   {
@@ -390,10 +451,11 @@ export const QUESTIONS: Question[] = [
     kind: "multi",
     maxSelections: 3,
     title: "מה הכי חשוב לך כשאתה בוחר מקום?",
+    titleF: "מה הכי חשוב לך כשאת בוחרת מקום?",
     subtitle: "עד 3 בחירות.",
     options: [
       { id: "torah_quality", label: "איכות לימוד התורה" },
-      { id: "military_prep", label: "הכנה לצבא" },
+      { id: "military_prep", label: "הכנה לצבא", labelF: "הכנה לשירות" },
       { id: "personal_attention", label: "יחס אישי" },
       { id: "leadership", label: "פיתוח מנהיגות" },
       { id: "community", label: "קהילה וחברים" },
@@ -411,19 +473,63 @@ export const QUESTIONS: Question[] = [
     optional: true,
     title: "יש משהו שחשוב לך שנדע כדי למצוא לך התאמה טובה יותר?",
     subtitle: "לא חובה. אל תכתוב כאן פרטים מזהים או מידע רפואי.",
+    subtitleF: "לא חובה. אל תכתבי כאן פרטים מזהים או מידע רפואי.",
     placeholder: "למשל: חשוב לי מקום עם הרבה טבע, או שאני רוצה להמשיך לנגן…",
   },
 ];
 
-/** The ordered list of questions that apply to the given answers. */
-export function visibleQuestions(answers: Answers): Question[] {
-  return QUESTIONS.filter((q) => !q.showIf || q.showIf(answers));
+/** The options of a question that apply to the chosen gender, in that gender's wording. */
+function localizeOptions(options: Option[] | undefined, a: Answers): Option[] | undefined {
+  const g = genderOf(a);
+  return options
+    ?.filter((o) => !o.for || o.for === g)
+    .map((o) => (g === "women" && o.labelF ? { ...o, label: o.labelF } : o));
 }
 
-/** Remove answers to questions that are no longer visible (e.g. after changing `paths`). */
+/** A question in the wording for the chosen gender, with only the options that apply to it. */
+export function localize(q: Question, a: Answers): Question {
+  const girl = isGirl(a);
+  return {
+    ...q,
+    title: girl && q.titleF ? q.titleF : q.title,
+    subtitle: girl && q.subtitleF ? q.subtitleF : q.subtitle,
+    options: localizeOptions(q.options, a),
+  };
+}
+
+/** The ordered list of questions that apply to the given answers, worded for the chosen gender. */
+export function visibleQuestions(answers: Answers): Question[] {
+  return QUESTIONS.filter((q) => !q.showIf || q.showIf(answers)).map((q) => localize(q, answers));
+}
+
+/**
+ * Remove answers to questions that are no longer visible (e.g. after changing `paths`), and choices
+ * that don't apply to the chosen gender (e.g. "ישיבת הסדר" after switching to the girls' track).
+ */
 export function pruneAnswers(answers: Answers): Answers {
-  const visible = new Set(visibleQuestions(answers).map((q) => q.id));
-  return Object.fromEntries(Object.entries(answers).filter(([k]) => visible.has(k)));
+  let current = answers;
+  // Dropping a choice can hide a follow-up question, so repeat until nothing changes.
+  for (let i = 0; i < 3; i++) {
+    const visible = new Map(visibleQuestions(current).map((q) => [q.id, q]));
+    const next: Answers = {};
+    for (const [k, v] of Object.entries(current)) {
+      const q = visible.get(k);
+      if (!q) continue;
+      if (!q.options || v === undefined) {
+        next[k] = v;
+        continue;
+      }
+      const allowed = new Set(q.options.map((o) => o.id));
+      if (Array.isArray(v)) {
+        const kept = v.filter((x) => allowed.has(x));
+        if (kept.length > 0) next[k] = kept;
+      } else if (allowed.has(v)) next[k] = v;
+    }
+    const same = JSON.stringify(next) === JSON.stringify(current);
+    current = next;
+    if (same) break;
+  }
+  return current;
 }
 
 export function isAnswered(q: Question, answers: Answers): boolean {
@@ -433,7 +539,9 @@ export function isAnswered(q: Question, answers: Answers): boolean {
   return v.trim().length > 0;
 }
 
-export function optionLabel(questionId: string, optionId: string): string {
+export function optionLabel(questionId: string, optionId: string, answers: Answers = {}): string {
   const q = QUESTIONS.find((x) => x.id === questionId);
-  return q?.options?.find((o) => o.id === optionId)?.label ?? optionId;
+  const o = q?.options?.find((x) => x.id === optionId);
+  if (!o) return optionId;
+  return isGirl(answers) && o.labelF ? o.labelF : o.label;
 }

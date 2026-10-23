@@ -181,7 +181,9 @@ describe("matching engine — fairness and missing data", () => {
     expect(women.excluded.some((e) => e.institution.id === "hesder-hakotel")).toBe(true);
     expect(women.ranked.some((r) => r.institution.id === "idf-midrasha-garin")).toBe(true);
     // unknown audience is kept and flagged
-    expect(women.ranked.some((r) => r.institution.id === "shiluv-maale-gilboa")).toBe(true);
+    expect(women.ranked.some((r) => r.institution.id === "mechina-hadar")).toBe(true);
+    // a yeshiva whose audience wasn't stated is still in the boys' track
+    expect(women.excluded.some((e) => e.institution.id === "shiluv-maale-gilboa")).toBe(true);
 
     const men = match(catalog, { ...PROFILES.torahAndService, audience: "men" });
     expect(men.ranked.some((r) => r.institution.id === "idf-midrasha-garin")).toBe(false);
@@ -190,6 +192,54 @@ describe("matching engine — fairness and missing data", () => {
   it("women interested in torah and service get the midrasha track", () => {
     const res = match(catalog, { ...PROFILES.torahAndService, audience: "women", paths: ["idf", "hesder", "open"] });
     expect(res.recommendations.map((r) => r.institution.id)).toContain("idf-midrasha-garin");
+  });
+});
+
+describe("matching engine — boys' and girls' tracks", () => {
+  const girl: Answers = {
+    stage: "grade12",
+    audience: "women",
+    paths: ["national_service", "midrasha"],
+    torah_importance: "alongside",
+    learning_env: "structured_development",
+    military_feeling: "national_service",
+    dev_goals: ["torah_growth", "independence"],
+  };
+
+  it("offers girls national service, midrashot, mechinot and the IDF, and boys the four boys' pathways", () => {
+    expect(match(catalog, girl).pathways.map((p) => p.pathway).sort()).toEqual(
+      ["idf", "mechina", "midrasha", "national_service"].sort(),
+    );
+    expect(match(catalog, PROFILES.torahAndService).pathways.map((p) => p.pathway).sort()).toEqual(
+      ["hesder", "idf", "mechina", "yeshiva"].sort(),
+    );
+  });
+
+  it("never shows a boy national service or midrashot, and never shows a girl a yeshiva", () => {
+    const boy = match(catalog, { ...PROFILES.torahAndService, paths: ["open"] });
+    expect(boy.ranked.some((r) => ["national_service", "midrasha"].includes(r.institution.pathway))).toBe(false);
+    const res = match(catalog, girl);
+    expect(res.ranked.some((r) => ["hesder", "yeshiva"].includes(r.institution.pathway))).toBe(false);
+  });
+
+  it("recommends national service and midrashot to a girl who chose them", () => {
+    const res = match(catalog, girl);
+    expect(res.recommendations.length).toBeGreaterThan(0);
+    for (const r of res.recommendations) expect(["national_service", "midrasha"]).toContain(r.institution.pathway);
+  });
+
+  it("prefers a shiluv midrasha when that is the programme she asked for", () => {
+    const res = match(catalog, { ...girl, paths: ["midrasha"], midrasha_mode: "shiluv" });
+    expect(res.recommendations[0].institution.attributes.programModes).toContain("shiluv");
+  });
+
+  it("every girls' record is published, sourced and in a girls' or shared pathway", () => {
+    const girls = catalog.filter((i) => i.pathway === "national_service" || i.pathway === "midrasha");
+    expect(girls.length).toBeGreaterThan(60);
+    for (const i of girls) {
+      expect(institutionSchema.safeParse(i).success).toBe(true);
+      expect(i.sources.length).toBeGreaterThan(0);
+    }
   });
 });
 
@@ -257,6 +307,21 @@ describe("questionnaire logic", () => {
     const n = visibleQuestions({ paths: ["idf"] }).length;
     expect(n).toBeGreaterThanOrEqual(12);
     expect(n).toBeLessThanOrEqual(22);
+  });
+
+  it("asks boy or girl first, and words the questions for a girl", () => {
+    expect(visibleQuestions({})[0].id).toBe("audience");
+    const paths = (a: Answers) => visibleQuestions(a).find((q) => q.id === "paths")!;
+    expect(paths({ audience: "women" }).title).toBe("אילו כיוונים את שוקלת כרגע?");
+    expect(paths({ audience: "women" }).options!.map((o) => o.id)).not.toContain("hesder");
+    expect(paths({ audience: "women" }).options!.map((o) => o.id)).toContain("national_service");
+    expect(paths({ audience: "men" }).options!.map((o) => o.id)).not.toContain("midrasha");
+  });
+
+  it("drops the other track's choices when the gender changes", () => {
+    const pruned = pruneAnswers({ audience: "women", paths: ["hesder", "midrasha"], hesder_balance: "balanced" });
+    expect(pruned.paths).toEqual(["midrasha"]);
+    expect(pruned.hesder_balance).toBeUndefined();
   });
 
   it("prunes answers to follow-ups that no longer apply", () => {

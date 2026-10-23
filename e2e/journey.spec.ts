@@ -2,8 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 /** Answers keyed by question heading → option labels to pick. Unlisted questions are skipped or get the first option. */
 const HESDER_PROFILE: Record<string, string[]> = {
+  "בשביל מי השאלון?": ["בן"],
   "איפה אתה נמצא היום?": ["כיתה י״ב"],
-  "לאילו מסגרות לחפש?": ["מסגרות לבנים"],
   "אילו כיוונים אתה שוקל כרגע?": ["ישיבת הסדר"],
   "בישיבת הסדר — איזה איזון בין לימוד לשירות מתאים לך?": ["יותר זמן לימוד"],
   "כמה חשוב לך לימוד תורה קבוע במסגרת הבאה?": ["חלק מרכזי בסדר היום שלי"],
@@ -54,7 +54,23 @@ test("homepage is Hebrew, RTL and leads into the questionnaire", async ({ page }
   }
   await page.getByRole("link", { name: "בוא נמצא את המסלול שלך" }).click();
   await expect(page).toHaveURL(/\/questionnaire/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("איפה אתה נמצא היום?");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("בשביל מי השאלון?");
+});
+
+test("choosing a girl leads to the girls' track, worded for her", async ({ page }) => {
+  await page.goto("/questionnaire");
+  await page.locator("label").filter({ hasText: /^בת/ }).click();
+  await page.getByRole("button", { name: "המשך" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("איפה את נמצאת היום?");
+  await page.locator("label").filter({ hasText: "כיתה י״ב" }).click();
+  await page.getByRole("button", { name: "המשך" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("אילו כיוונים את שוקלת כרגע?");
+  await expect(page.getByRole("checkbox", { name: /שירות לאומי/ })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: /מדרשה או סמינר/ })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: /ישיבת הסדר/ })).toHaveCount(0);
+  await page.locator("label").filter({ hasText: "מדרשה או סמינר" }).click();
+  await page.getByRole("button", { name: "המשך" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("במדרשה — איזו מסגרת מתאימה לך?");
 });
 
 test("full journey: conditional questions, summary, results, profile and compare", async ({ page }) => {
@@ -134,9 +150,11 @@ test("action plan without answers shows an empty state", async ({ page }) => {
 
 test("back navigation keeps answers, and progress survives a reload", async ({ page }) => {
   await page.goto("/questionnaire");
+  await page.locator("label").filter({ hasText: /^בן/ }).click();
+  await page.getByRole("button", { name: "המשך" }).click();
   await page.locator("label").filter({ hasText: "כיתה י״א" }).click();
   await page.getByRole("button", { name: "המשך" }).click();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("לאילו מסגרות לחפש?");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("אילו כיוונים אתה שוקל כרגע?");
   await page.getByRole("button", { name: "הקודם" }).click();
   await expect(page.getByRole("radio", { name: "כיתה י״א" })).toBeChecked();
   await page.getByRole("button", { name: "המשך" }).click();
@@ -144,21 +162,22 @@ test("back navigation keeps answers, and progress survives a reload", async ({ p
   await page.reload();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("ברוך שובך");
   await page.getByRole("button", { name: "להמשיך מאיפה שעצרתי" }).click();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("לאילו מסגרות לחפש?");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("אילו כיוונים אתה שוקל כרגע?");
 
   await page.reload();
   await page.getByRole("button", { name: "להתחיל מחדש" }).click();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("איפה אתה נמצא היום?");
-  await expect(page.getByRole("radio", { name: "כיתה י״א" })).not.toBeChecked();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("בשביל מי השאלון?");
+  await expect(page.getByRole("radio", { name: /^בן/ })).not.toBeChecked();
   expect(await page.evaluate(() => localStorage.getItem("nextstep.answers.v1"))).toBeNull();
 });
 
 test("required questions block continuing; multi-select respects its limit", async ({ page }) => {
   await page.goto("/questionnaire");
   await expect(page.getByRole("button", { name: "המשך" })).toBeDisabled();
+  await page.locator("label").filter({ hasText: /^בן/ }).click();
+  await page.getByRole("button", { name: "המשך" }).click();
   await page.locator("label").filter({ hasText: "כיתה י״ב" }).click();
   await page.getByRole("button", { name: "המשך" }).click();
-  await page.getByRole("button", { name: "דלג" }).click();
   // paths: choose idf, then "not sure" is exclusive
   await page.locator("label").filter({ hasText: "שירות צבאי" }).click();
   await page.locator("label").filter({ hasText: "עוד לא יודע" }).click();
@@ -171,11 +190,11 @@ test("required questions block continuing; multi-select respects its limit", asy
 
 test("keyboard-only use of a question", async ({ page }) => {
   await page.goto("/questionnaire");
-  await page.getByRole("radio", { name: "כיתה י״ב" }).focus();
+  await page.getByRole("radio", { name: /^בן/ }).focus();
   await page.keyboard.press("Space");
-  await expect(page.getByRole("radio", { name: "כיתה י״ב" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: /^בן/ })).toBeChecked();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("לאילו מסגרות לחפש?");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("איפה אתה נמצא היום?");
   await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
 });
 

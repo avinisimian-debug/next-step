@@ -1,5 +1,6 @@
 import type { Institution } from "@/lib/domain/types";
 import { directoryInstitutions } from "./directory";
+import { girlsInstitutions } from "./girls";
 
 /**
  * Seed catalog.
@@ -1125,4 +1126,4 @@ const researched: Institution[] = [
 ];
 
 /** Researched records first, then directory records (identity confirmed, details not yet verified). */
-export const institutions: Institution[] = [...researched, ...directoryInstitutions];
+export const institutions: Institution[] = [...researched, ...directoryInstitutions, ...girlsInstitutions];

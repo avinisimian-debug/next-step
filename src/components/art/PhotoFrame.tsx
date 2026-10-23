@@ -9,12 +9,21 @@ export function PhotoFrame({
   className = "",
   credit = true,
 }: {
-  photo: Photo;
+  /** No free photo yet for this pathway: a soft tint stands in, so nothing is presented as a real place. */
+  photo?: Photo;
   sizes: string;
   priority?: boolean;
   className?: string;
   credit?: boolean;
 }) {
+  if (!photo) {
+    return (
+      <div
+        aria-hidden="true"
+        className={`absolute inset-0 bg-gradient-to-br from-[#efe2ea] via-sand-100 to-[#e3e6f2] ${className}`}
+      />
+    );
+  }
   return (
     <>
       <Image
@@ -32,7 +41,8 @@ export function PhotoFrame({
 }
 
 /** The credit badge on its own, for photos inside a link (a link cannot contain another link). */
-export function PhotoCredit({ photo, className = "bottom-1.5 end-1.5" }: { photo: Photo; className?: string }) {
+export function PhotoCredit({ photo, className = "bottom-1.5 end-1.5" }: { photo?: Photo; className?: string }) {
+  if (!photo) return null;
   return (
     <a
       href={photo.source}
