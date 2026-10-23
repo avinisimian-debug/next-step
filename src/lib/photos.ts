@@ -20,7 +20,8 @@ export type Photo = {
   source: string;
 };
 
-export const PATHWAY_PHOTOS: Record<Pathway, Photo> = {
+/** National service and midrashot have no free photo yet; their pages show a tint instead. */
+export const PATHWAY_PHOTOS: Partial<Record<Pathway, Photo>> = {
   idf: {
     src: idf,
     alt: "טירונים של חטיבת גולני בטקס ההשבעה ברחבת הכותל",
@@ -55,4 +56,4 @@ export const PATHWAY_PHOTOS: Record<Pathway, Photo> = {
   },
 };
 
-export const ALL_PHOTOS: Photo[] = Object.values(PATHWAY_PHOTOS);
+export const ALL_PHOTOS: Photo[] = Object.values(PATHWAY_PHOTOS).filter((p): p is Photo => !!p);

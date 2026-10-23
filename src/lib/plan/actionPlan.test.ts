@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { institutions } from "@/data/institutions";
 import { match, rankPathways } from "@/lib/matching/engine";
 import { DEFAULT_CONFIG } from "@/lib/matching/config";
-import { PATHWAYS } from "@/lib/domain/types";
+import { PATHWAYS_FOR } from "@/lib/domain/pathways";
 import type { Answers } from "@/lib/questionnaire/questions";
 import { allStepIds, buildActionPlan } from "./actionPlan";
 
@@ -21,9 +21,9 @@ const sparse: Answers = { stage: "grade11", paths: ["not_sure"] };
 const plan = (a: Answers) => buildActionPlan(match(institutions, a), a);
 
 describe("pathway ranking", () => {
-  it("returns all four pathways, sorted by best score with empty pathways last", () => {
+  it("returns the boys' four pathways, sorted by best score with empty pathways last", () => {
     const { pathways } = match(institutions, hesder);
-    expect(pathways.map((p) => p.pathway).sort()).toEqual([...PATHWAYS].sort());
+    expect(pathways.map((p) => p.pathway).sort()).toEqual([...PATHWAYS_FOR.men].sort());
     const scores = pathways.map((p) => p.score ?? -1);
     expect(scores).toEqual([...scores].sort((a, b) => b - a));
   });

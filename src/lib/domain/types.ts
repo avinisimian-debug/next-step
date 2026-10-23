@@ -1,8 +1,15 @@
 import { z } from "zod";
 
-/** The four primary post-high-school pathways the platform covers. */
-export const PATHWAYS = ["idf", "mechina", "hesder", "yeshiva"] as const;
+/**
+ * The post-high-school pathways the platform covers. hesder and yeshiva are for boys, national_service
+ * and midrasha for girls, idf and mechina for both (see PATHWAYS_FOR in pathways.ts).
+ */
+export const PATHWAYS = ["idf", "mechina", "hesder", "yeshiva", "national_service", "midrasha"] as const;
 export type Pathway = (typeof PATHWAYS)[number];
+
+/** Who the questionnaire is filling in for: it decides which pathways are offered. */
+export const GENDERS = ["men", "women"] as const;
+export type Gender = (typeof GENDERS)[number];
 
 export const REGIONS = ["north", "center", "jerusalem", "south", "judea_samaria", "nationwide"] as const;
 export type Region = (typeof REGIONS)[number];
@@ -12,6 +19,7 @@ export const RELIGIOUS_ENVIRONMENTS = [
   "open_religious",
   "mixed_backgrounds",
   "general",
+  "haredi",
 ] as const;
 export type ReligiousEnvironment = (typeof RELIGIOUS_ENVIRONMENTS)[number];
 
@@ -62,6 +70,7 @@ export const MILITARY_MODELS = [
   "shiluv", // combined track with longer / full service
   "pre_military", // a preparatory year before enlistment
   "individual", // arranged individually per student
+  "national_service", // national (civilian) service instead of military service
   "unknown", // not stated in the sources we checked
 ] as const;
 export type MilitaryModel = (typeof MILITARY_MODELS)[number];
@@ -92,6 +101,10 @@ export const matchingAttributesSchema = z.object({
   communitySize: z.enum(["small", "medium", "large", "varies", "unknown"]),
   /** Who the framework is open to. "unknown" never excludes anyone. */
   audience: z.enum(["men", "women", "all", "unknown"]),
+  /** National service: the fields a framework places volunteers in (ids from the `ns_area` question). */
+  serviceAreas: z.array(z.enum(["education", "youth", "health", "welfare", "security", "abroad"])).optional(),
+  /** Midrashot: the kinds of programme a source says the place runs (ids from the `midrasha_mode` question). */
+  programModes: z.array(z.enum(["full_year", "shiluv", "before_army"])).optional(),
 });
 export type MatchingAttributes = z.infer<typeof matchingAttributesSchema>;
 

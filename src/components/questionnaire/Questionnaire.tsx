@@ -349,7 +349,7 @@ function Summary({
     if (v === undefined || (Array.isArray(v) && v.length === 0)) return null;
     if (q.kind === "text") return v as string;
     return asArray(v)
-      .map((id) => optionLabel(q.id, id))
+      .map((id) => optionLabel(q.id, id, answers))
       .join(" · ");
   };
 

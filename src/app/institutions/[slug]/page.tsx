@@ -44,6 +44,8 @@ const HEADER_TINT: Record<Pathway, string> = {
   mechina: "from-[#f3e2c9] via-sand-100",
   hesder: "from-[#dbe7e2] via-sand-100",
   yeshiva: "from-[#dfe6f0] via-sand-100",
+  national_service: "from-[#f0e0e4] via-sand-100",
+  midrasha: "from-[#e8e1f0] via-sand-100",
 };
 
 export default async function InstitutionPage({ params }: { params: Promise<{ slug: string }> }) {

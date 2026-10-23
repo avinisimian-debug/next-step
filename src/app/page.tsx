@@ -303,7 +303,7 @@ export default async function Home() {
           <div className="max-w-2xl">
             <Reveal>
               <p className="text-sm font-semibold tracking-wide text-teal-700">
-                ארבעה מסלולים
+                שישה מסלולים, לבנים ולבנות
               </p>
             </Reveal>
             <Reveal
@@ -443,7 +443,7 @@ export default async function Home() {
             </div>
           ))}
         </div>
-        <ul className="relative mx-auto mt-14 grid max-w-6xl grid-cols-2 gap-px overflow-hidden rounded-3xl border border-navy-800 bg-navy-800 md:grid-cols-4">
+        <ul className="relative mx-auto mt-14 grid max-w-6xl grid-cols-2 gap-px overflow-hidden rounded-3xl border border-navy-800 bg-navy-800 md:grid-cols-3">
           {PATHWAY_ORDER.map((p, i) => (
             <Reveal as="li" key={p} delay={i * 90} className="bg-night">
               <Link

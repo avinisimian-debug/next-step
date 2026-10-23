@@ -1,4 +1,4 @@
-import type { Pathway } from "./types";
+import type { Gender, Pathway } from "./types";
 
 export interface PathwayInfo {
   id: Pathway;
@@ -42,9 +42,41 @@ export const PATHWAY_INFO: Record<Pathway, PathwayInfo> = {
       "לימוד תורה במרכז, בבית מדרש, עם זמן להעמיק ולצמוח. האופן שבו משתלב שירות צבאי משתנה ממקום למקום וחשוב לברר אותו.",
     goodFor: ["מי שרוצה להעמיק בלימוד", "מי שמחפש צמיחה רוחנית וליווי של רבנים"],
   },
+  national_service: {
+    id: "national_service",
+    name: "שירות לאומי",
+    short: "שנה או שנתיים של נתינה",
+    description:
+      "שירות אזרחי של שנה או שנתיים במקום שירות צבאי: בחינוך, בבריאות, ברווחה, בקהילה ובתנועות נוער (כמו קומונריות). השיבוץ נעשה דרך עמותות מוכרות.",
+    goodFor: ["מי שרוצה לתת לחברה ולקהילה", "מי שמחפשת עצמאות ואחריות כבר אחרי י״ב"],
+  },
+  midrasha: {
+    id: "midrasha",
+    name: "מדרשה וסמינר",
+    short: "לימוד תורה לבנות",
+    description:
+      "שנה (או יותר) של לימוד תורה בבית מדרש לבנות: לפני השירות, אחריו, או בשילוב איתו. יש מדרשות לשנה מלאה, מדרשות שילוב ומכינות לבנות, וגם סמינרים.",
+    goodFor: ["מי שרוצה להעמיק בלימוד ובאמונה", "מי שמחפשת קבוצה וליווי לפני השירות"],
+  },
 };
 
-export const PATHWAY_ORDER: Pathway[] = ["idf", "mechina", "hesder", "yeshiva"];
+/** Every pathway, in display order: the boys' track first, then the girls' track. */
+export const PATHWAY_ORDER: Pathway[] = ["idf", "mechina", "hesder", "yeshiva", "national_service", "midrasha"];
+
+/** The pathways offered to each gender, in the order they are presented. */
+export const PATHWAYS_FOR: Record<Gender, Pathway[]> = {
+  men: ["idf", "mechina", "hesder", "yeshiva"],
+  women: ["national_service", "midrasha", "mechina", "idf"],
+};
+
+export const GENDER_TRACK_LABELS: Record<Gender, string> = {
+  men: "המסלול לבנים",
+  women: "המסלול לבנות",
+};
+
+/** Pathways for an answer to the gender question; anything else (old answers, skipped) gets all of them. */
+export const pathwaysFor = (gender: string | undefined): Pathway[] =>
+  gender === "men" || gender === "women" ? PATHWAYS_FOR[gender] : PATHWAY_ORDER;
 
 export const REGION_LABELS: Record<string, string> = {
   north: "צפון",
@@ -75,6 +107,7 @@ export const MILITARY_MODEL_LABELS: Record<string, string> = {
   shiluv: "שילוב — לימוד ושירות ארוך יותר",
   pre_military: "שנת הכנה לפני הגיוס",
   individual: "שירות שמתואם באופן אישי",
+  national_service: "שירות לאומי במקום שירות צבאי",
   unknown: "לא אומת",
 };
 
