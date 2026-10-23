@@ -36,7 +36,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 print:hidden border-b border-sand-200/80 bg-paper/90 backdrop-blur supports-[backdrop-filter]:bg-paper/75">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" aria-label="NEXT STEP — לדף הבית" className="shrink-0">
+        <Link href="/" aria-label="הצעד הבא, לדף הבית" className="shrink-0">
           <Logo />
         </Link>
 

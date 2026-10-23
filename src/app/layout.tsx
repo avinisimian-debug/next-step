@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { BottomNav } from "@/components/site/BottomNav";
 import { AccessibilityMenu } from "@/components/site/AccessibilityMenu";
+import Script from "next/script";
 import { A11Y_KEY } from "@/lib/a11y";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -14,13 +15,13 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "NEXT STEP — הצעד הבא שלך אחרי התיכון",
-    template: "%s · NEXT STEP",
+    default: "הצעד הבא: המסלול שלך אחרי התיכון",
+    template: "%s · הצעד הבא",
   },
   description:
     "צה״ל, מכינה, ישיבת הסדר או ישיבה גבוהה? עונים על כמה שאלות קצרות ומקבלים שלושה כיוונים מותאמים אישית, עם הסבר שקוף ומידע מאומת.",
   openGraph: {
-    title: "NEXT STEP — הצעד הבא שלך מתחיל כאן",
+    title: "הצעד הבא: המסלול שלך אחרי י״ב מתחיל כאן",
     description: "מוצאים את המסלול שמתאים לך אחרי י״ב: צה״ל, מכינה, ישיבת הסדר או ישיבה גבוהה.",
     locale: "he_IL",
     type: "website",
@@ -54,6 +55,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SiteFooter />
         <BottomNav />
         <AccessibilityMenu />
+        {/* Vercel Web Analytics: cookieless page-view counts. Served by Vercel once Analytics is enabled on the project. */}
+        {process.env.VERCEL && <Script src="/_vercel/insights/script.js" strategy="afterInteractive" />}
       </body>
     </html>
   );

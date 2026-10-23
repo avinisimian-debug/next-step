@@ -137,7 +137,7 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="grid gap-12 md:grid-cols-[0.9fr_1.1fr]">
             <div>
-              <p className="text-sm font-semibold tracking-wide text-teal-100">למה להשתמש ב־NEXT STEP</p>
+              <p className="text-sm font-semibold tracking-wide text-teal-100">למה דווקא ״הצעד הבא״</p>
               <h2 className="mt-2 font-display text-3xl font-bold sm:text-4xl">מידע שקוף, החלטה שלך</h2>
               <p className="mt-4 max-w-md leading-8 text-mist-300">
                 ההתאמה מבוססת על נתונים מובנים על כל מסגרת, ועל מקורות ציבוריים שמוצגים עם תאריך אימות. מה שלא אומת —

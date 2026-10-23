@@ -15,7 +15,7 @@ import { Location, VerificationBadge } from "@/components/institution/bits";
 
 export const metadata: Metadata = {
   title: "חיפוש מסגרות",
-  description: "חיפוש במסגרות ובמסלולים שבמאגר של NEXT STEP — צה״ל, מכינות קדם־צבאיות, ישיבות הסדר וישיבות גבוהות — עם מקורות ותאריך אימות.",
+  description: "חיפוש במסגרות ובמסלולים שבמאגר של ״הצעד הבא״ — צה״ל, מכינות קדם־צבאיות, ישיבות הסדר וישיבות גבוהות — עם מקורות ותאריך אימות.",
 };
 
 const field =

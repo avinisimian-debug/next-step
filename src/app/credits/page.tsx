@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function CreditsPage() {
   return (
-    <LegalPage title="קרדיטים ומקורות" lead="תודה לכל מי שהתוכן שלו עוזר לבנות את NEXT STEP.">
+    <LegalPage title="קרדיטים ומקורות" lead="תודה לכל מי שהתוכן שלו עוזר לבנות את ״הצעד הבא״.">
       <section>
         <h2>צילומים</h2>
         <p>

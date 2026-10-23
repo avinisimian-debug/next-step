@@ -10,4 +10,4 @@ export const SITE_OPERATOR = {
 export const ACCESSIBILITY_CONTACT = SITE_OPERATOR;
 
 /** Date the legal and accessibility pages were last reviewed (YYYY-MM-DD). Update when their content changes. */
-export const LEGAL_UPDATED = "2026-10-22";
+export const LEGAL_UPDATED = "2026-10-23";

@@ -4,7 +4,7 @@ import { COMPONENT_LABELS, DEFAULT_CONFIG } from "@/lib/matching/config";
 
 export const metadata: Metadata = {
   title: "אודות והשיטה",
-  description: "מה זה NEXT STEP, איך עובד מנגנון ההתאמה, ואיך אנחנו מאמתים את המידע על המסגרות.",
+  description: "מה זה ״הצעד הבא״, איך עובד מנגנון ההתאמה, ואיך אנחנו מאמתים את המידע על המסגרות.",
 };
 
 export default function AboutPage() {
@@ -12,10 +12,10 @@ export default function AboutPage() {
   const total = Object.values(w).reduce((a, b) => a + b, 0);
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-      <h1 className="font-display text-4xl font-bold text-navy-950 sm:text-5xl">אודות NEXT STEP</h1>
+      <h1 className="font-display text-4xl font-bold text-navy-950 sm:text-5xl">אודות ״הצעד הבא״</h1>
       <div className="mt-6 space-y-5 text-lg leading-8 text-navy-800">
         <p>
-          NEXT STEP נבנה כדי לעזור לתלמידי י״א–י״ב ולבוגרי תיכון להכיר את האפשרויות שאחרי התיכון — שירות בצה״ל, מכינה
+          ״הצעד הבא״ נבנה כדי לעזור לתלמידי י״א–י״ב ולבוגרי תיכון להכיר את האפשרויות שאחרי התיכון — שירות בצה״ל, מכינה
           קדם־צבאית, ישיבת הסדר וישיבה גבוהה — ולמצוא את הכיוונים שהכי מתאימים להם.
         </p>
         <p>

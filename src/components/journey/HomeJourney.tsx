@@ -49,7 +49,7 @@ export function HomeJourney() {
             <p className="mt-4 text-base leading-7 text-stone-600">
               {returning
                 ? `הצעד הבא: ${current ? current.title : "סיימת את כל השלבים"}. כל ההתקדמות שלך נמצאת במקום אחד.`
-                : "לא רק המלצה וזהו. NEXT STEP מלווה אותך לאורך כל הדרך: מהיכרות עם עצמך, דרך בדיקה והשוואה של מקומות, ועד שאתה יודע לאן אתה הולך."}
+                : "לא רק המלצה וזהו. ״הצעד הבא״ מלווה אותך לאורך כל הדרך: מהיכרות עם עצמך, דרך בדיקה והשוואה של מקומות, ועד שאתה יודע לאן אתה הולך."}
             </p>
           </div>
           {returning && <ProgressRing percent={percent} size={72} />}

@@ -6,7 +6,7 @@ import { LEGAL_UPDATED, SITE_OPERATOR } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "פרטיות",
-  description: "איזה מידע NEXT STEP שומר, איפה, ולמה — ואיך למחוק אותו.",
+  description: "איזה מידע ״הצעד הבא״ שומר, איפה, ולמה — ואיך למחוק אותו.",
 };
 
 export default function PrivacyPage() {
@@ -84,12 +84,16 @@ export default function PrivacyPage() {
             האתר לא משתמש בעוגיות פרסום או מעקב. אם נכנסת לחשבון, נשמרות עוגיות התחברות (שמתחילות ב־sb-) שנחוצות כדי שתישאר/י
             מחובר/ת. בחירות כמו התשובות לשאלון והגדרות תפריט הנגישות נשמרות באחסון המקומי של הדפדפן ולא נשלחות אלינו.
           </p>
+          <p className="mt-3">
+            כדי לדעת כמה אנשים נכנסים לאתר ולאילו עמודים, אנחנו משתמשים ב־Vercel Web Analytics. המדידה לא משתמשת בעוגיות ולא שומרת פרטים
+            מזהים: נספרים רק העמוד, מאיפה הגעת (אתר מפנה), המדינה וסוג המכשיר והדפדפן, והתשובות שלך לשאלון לא נשלחות.
+          </p>
         </section>
 
         <section>
           <h2 className="font-display text-2xl font-bold text-navy-950">ספקים שמעבדים מידע בשבילנו</h2>
           <ul className="mt-3 list-disc space-y-2 ps-6">
-            <li>Vercel — אחסון האתר והפעלתו.</li>
+            <li>Vercel — אחסון האתר והפעלתו, וספירת כניסות בלי עוגיות.</li>
             <li>Supabase — מסד הנתונים והתחברות לחשבון (רק למי שנכנס לחשבון).</li>
             <li>Anthropic — ניסוח תשובות העוזר והסיכומים, רק כשהשירות פעיל ובהיקף שמתואר למעלה.</li>
           </ul>
@@ -120,7 +124,7 @@ export default function PrivacyPage() {
 
         <section className="rounded-3xl border border-sand-200 bg-paper p-6">
           <h2 className="font-display text-2xl font-bold text-navy-950">מחיקת המידע</h2>
-          <p className="mt-2">הכפתור מוחק מהדפדפן הזה את כל מה ש־NEXT STEP שמר: תשובות, מועדפים, השוואות, סימונים בתוכנית הפעולה והסכמות. הוא לא מוחק את מה שנשמר בחשבון — את המסגרות השמורות והצעדים אפשר להסיר מהחשבון עצמו.</p>
+          <p className="mt-2">הכפתור מוחק מהדפדפן הזה את כל מה שהאתר שמר: תשובות, מועדפים, השוואות, סימונים בתוכנית הפעולה והסכמות. הוא לא מוחק את מה שנשמר בחשבון — את המסגרות השמורות והצעדים אפשר להסיר מהחשבון עצמו.</p>
           <div className="mt-4">
             <ClearDataButton />
           </div>
