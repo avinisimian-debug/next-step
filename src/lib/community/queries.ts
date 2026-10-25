@@ -11,7 +11,7 @@ export interface Author {
 
 export interface QuestionRow {
   id: string;
-  author_id: string;
+  author_id: string | null;
   title: string;
   body: string;
   institution_id: string | null;
@@ -26,7 +26,7 @@ export interface QuestionRow {
 export interface AnswerRow {
   id: string;
   question_id: string;
-  author_id: string;
+  author_id: string | null;
   body: string;
   kind: "experience" | "official";
   status: "published" | "hidden" | "removed";
