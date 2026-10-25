@@ -512,7 +512,7 @@ export default async function Home() {
                   </p>
                   <Link
                     href="/about"
-                    className="mt-7 inline-flex items-center gap-1.5 text-sm font-medium text-sky-300 underline underline-offset-4 hover:text-paper"
+                    className="mt-7 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-sky-300 underline underline-offset-4 hover:text-paper"
                   >
                     איך עובד מנגנון ההתאמה
                   </Link>

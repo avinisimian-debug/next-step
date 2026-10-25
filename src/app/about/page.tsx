@@ -5,6 +5,7 @@ import { COMPONENT_LABELS, DEFAULT_CONFIG } from "@/lib/matching/config";
 export const metadata: Metadata = {
   title: "אודות והשיטה",
   description: "מה זה ״הצעד הבא״, איך עובד מנגנון ההתאמה, ואיך אנחנו מאמתים את המידע על המסגרות.",
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {

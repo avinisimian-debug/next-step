@@ -10,6 +10,6 @@ export default defineConfig({
     },
   },
   // The app's tsconfig keeps JSX for Next to compile; tests that render components need the automatic runtime.
-  esbuild: { jsx: "automatic" },
+  oxc: { jsx: { runtime: "automatic" } },
   test: { include: ["src/**/*.test.ts", "src/**/*.test.tsx", "supabase/tests/**/*.test.ts"], environment: "node" },
 });

@@ -7,6 +7,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "השוואה",
   description: "השוואה צד לצד בין עד שלוש מסגרות: לימוד, שירות, מיקום, משך, עלויות ותנאי קבלה.",
+  alternates: { canonical: "/compare" },
 };
 
 export default async function ComparePage() {

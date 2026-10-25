@@ -7,6 +7,7 @@ import { ALL_PHOTOS } from "@/lib/photos";
 export const metadata: Metadata = {
   title: "קרדיטים ומקורות",
   description: "מאיפה התמונות, הגופנים והמידע באתר, ותחת איזה רישיון.",
+  alternates: { canonical: "/credits" },
 };
 
 export default function CreditsPage() {

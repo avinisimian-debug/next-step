@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Search, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Search, X } from "lucide-react";
 import { getRepository } from "@/lib/data/repository";
 import { AUDIENCE_LABELS, PATHWAY_INFO, PATHWAY_ORDER, REGION_LABELS } from "@/lib/domain/pathways";
 import { REGIONS } from "@/lib/domain/types";
@@ -19,6 +19,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/institutions" },
 };
 
+/** Cards per page. Rendering all ~200 cards at once made this the slowest page on phones. */
+const PAGE_SIZE = 30;
+
+/** The query's URL with a page number (page 1 has none, so it stays the canonical URL). */
+function pageHref(base: string, page: number) {
+  if (page <= 1) return base;
+  return `${base}${base.includes("?") ? "&" : "?"}page=${page}`;
+}
+
 const field =
   "w-full rounded-2xl border border-sand-300 bg-paper px-4 py-3 text-navy-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600";
 
@@ -27,10 +36,16 @@ export default async function InstitutionsIndex({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const query = parseInstitutionQuery(await searchParams);
+  const params = await searchParams;
+  const query = parseInstitutionQuery(params);
   const all = await getRepository().listPublic();
   const list = searchInstitutions(all, query);
   const filtered = isFiltered(query);
+  const pages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  const rawPage = Number(Array.isArray(params.page) ? params.page[0] : params.page);
+  const page = Number.isInteger(rawPage) ? Math.min(Math.max(rawPage, 1), pages) : 1;
+  const shown = list.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const base = institutionQueryHref(query);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
@@ -122,7 +137,7 @@ export default async function InstitutionsIndex({
               <Link
                 href={institutionQueryHref({ ...query, pathway: query.pathway === p ? null : p })}
                 aria-current={query.pathway === p ? "page" : undefined}
-                className={`inline-flex rounded-full px-4 py-2 text-sm font-medium transition ${query.pathway === p ? "bg-navy-900 text-paper" : "border border-sand-300 text-navy-900 hover:bg-sand-100"}`}
+                className={`inline-flex min-h-11 items-center rounded-full px-4 py-2 text-sm font-medium transition ${query.pathway === p ? "bg-navy-900 text-paper" : "border border-sand-300 text-navy-900 hover:bg-sand-100"}`}
               >
                 {PATHWAY_INFO[p].name} ({all.filter((i) => i.pathway === p).length})
               </Link>
@@ -136,6 +151,7 @@ export default async function InstitutionsIndex({
       <p role="status" className="mt-8 text-sm font-medium text-navy-900">
         {list.length === 0 ? "לא נמצאו מסגרות" : list.length === 1 ? "נמצאה מסגרת אחת" : `נמצאו ${list.length} מסגרות`}
         {filtered && list.length > 0 && ` מתוך ${all.length}`}
+        {pages > 1 && ` · עמוד ${page} מתוך ${pages}`}
       </p>
 
       {list.length === 0 ? (
@@ -144,13 +160,13 @@ export default async function InstitutionsIndex({
           <p className="mx-auto mt-2 max-w-xl leading-7 text-stone-600">
             ייתכן שהמסגרת קיימת אבל עדיין לא נוספה או לא אומתה. אפשר לנסות מילה אחרת, להסיר חלק מהסינון, או לשאול בקהילה.
           </p>
-          <Link href="/institutions" className="mt-4 inline-flex rounded-full border border-navy-900 px-5 py-2 text-sm font-medium text-navy-900 hover:bg-sand-100">
+          <Link href="/institutions" className="mt-4 inline-flex min-h-11 items-center rounded-full border border-navy-900 px-5 py-2 text-sm font-medium text-navy-900 hover:bg-sand-100">
             להצגת כל המסגרות
           </Link>
         </div>
       ) : (
         <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((i) => (
+          {shown.map((i) => (
             <li key={i.id}>
               <Link
                 href={`/institutions/${i.slug}`}
@@ -170,6 +186,43 @@ export default async function InstitutionsIndex({
             </li>
           ))}
         </ul>
+      )}
+
+      {pages > 1 && (
+        <nav aria-label="עמודי תוצאות" className="mt-8 flex flex-wrap items-center justify-center gap-2 text-sm font-medium">
+          {page > 1 && (
+            <Link
+              href={pageHref(base, page - 1)}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sand-300 px-4 text-navy-900 hover:bg-sand-100"
+            >
+              <ArrowRight className="size-4" aria-hidden="true" />
+              הקודמות
+            </Link>
+          )}
+          <ul className="flex flex-wrap gap-1">
+            {Array.from({ length: pages }, (_, n) => n + 1).map((n) => (
+              <li key={n}>
+                <Link
+                  href={pageHref(base, n)}
+                  aria-current={n === page ? "page" : undefined}
+                  aria-label={`עמוד ${n}`}
+                  className={`inline-flex size-11 items-center justify-center rounded-full ${n === page ? "bg-navy-900 text-paper" : "text-navy-900 hover:bg-sand-100"}`}
+                >
+                  {n}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {page < pages && (
+            <Link
+              href={pageHref(base, page + 1)}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sand-300 px-4 text-navy-900 hover:bg-sand-100"
+            >
+              הבאות
+              <ArrowLeft className="size-4" aria-hidden="true" />
+            </Link>
+          )}
+        </nav>
       )}
     </div>
   );

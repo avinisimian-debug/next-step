@@ -11,6 +11,7 @@ import {
 import { REGIONS, type Institution } from "@/lib/domain/types";
 import { institutionQueryHref } from "@/lib/search/institutions";
 import {
+  OG_IMAGE,
   PATHWAY_PAGES,
   SITE_URL,
   pathwayFromSlug,
@@ -35,7 +36,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const pathway = pathwayFromSlug((await params).slug);
-  if (!pathway) return { title: "לא נמצא" };
+  if (!pathway) return { title: "הדף לא נמצא" };
   const page = PATHWAY_PAGES[pathway];
   return {
     title: page.title,
@@ -45,7 +46,9 @@ export async function generateMetadata({
       title: page.title,
       description: page.description,
       url: pathwayHref(pathway),
+      images: [OG_IMAGE],
     },
+    twitter: { card: "summary_large_image", images: [OG_IMAGE.url] },
   };
 }
 
@@ -232,7 +235,7 @@ export default async function PathwayPage({
               <li key={p}>
                 <Link
                   href={pathwayHref(p)}
-                  className="inline-block rounded-full bg-sand-100 px-4 py-2 text-navy-800 hover:bg-sand-200"
+                  className="inline-flex min-h-11 items-center rounded-full bg-sand-100 px-4 py-2 text-navy-800 hover:bg-sand-200"
                 >
                   {PATHWAY_PAGES[p].h1.split(":")[0]}
                 </Link>

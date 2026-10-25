@@ -5,6 +5,7 @@ import { ACCESSIBILITY_CONTACT } from "@/lib/site";
 export const metadata: Metadata = {
   title: "הצהרת נגישות",
   description: "מה עשינו כדי שהאתר יהיה נגיש, מה עוד לא מושלם, ואיך פונים אלינו בנושא נגישות.",
+  alternates: { canonical: "/accessibility" },
 };
 
 export default function AccessibilityPage() {

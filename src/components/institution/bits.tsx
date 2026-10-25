@@ -82,7 +82,7 @@ export function ContactBlock({ inst, compact = false }: { inst: Institution; com
       {c.phone.map((p) => (
         <li key={p} className="flex items-center gap-2">
           <Phone className="size-4 shrink-0 text-mist-500" aria-hidden="true" />
-          <a href={`tel:${p.replace(/[^\d+]/g, "")}`} className="ltr hover:underline">
+          <a href={`tel:${p.replace(/[^\d+]/g, "")}`} className="ltr inline-flex min-h-11 items-center hover:underline">
             {p}
           </a>
         </li>
@@ -90,7 +90,7 @@ export function ContactBlock({ inst, compact = false }: { inst: Institution; com
       {c.email && (
         <li className="flex items-center gap-2">
           <Mail className="size-4 shrink-0 text-mist-500" aria-hidden="true" />
-          <a href={`mailto:${c.email}`} className="ltr break-all hover:underline">
+          <a href={`mailto:${c.email}`} className="ltr inline-flex min-h-11 items-center break-all hover:underline">
             {c.email}
           </a>
         </li>
@@ -121,8 +121,8 @@ export function OfficialLink({ inst, variant = "button" }: { inst: Institution; 
       rel="noopener noreferrer"
       className={
         variant === "button"
-          ? "inline-flex items-center gap-2 rounded-full border border-sand-300 px-4 py-2.5 text-sm font-medium text-navy-900 hover:bg-sand-100"
-          : "inline-flex items-center gap-1.5 text-sm font-medium text-teal-700 underline underline-offset-4"
+          ? "inline-flex items-center gap-2 min-h-11 rounded-full border border-sand-300 px-4 py-2.5 text-sm font-medium text-navy-900 hover:bg-sand-100"
+          : "inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-teal-700 underline underline-offset-4"
       }
     >
       לאתר הרשמי
@@ -179,7 +179,7 @@ export function FavoriteButton({ id, name }: { id: string; name: string }) {
         type="button"
         disabled={pending || state === null}
         onClick={toggle}
-        className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition disabled:opacity-60 ${on ? "bg-rose-50 text-rose-700" : "text-navy-800 hover:bg-sand-100"}`}
+        className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition disabled:opacity-60 ${on ? "bg-rose-50 text-rose-700" : "text-navy-800 hover:bg-sand-100"}`}
         aria-label={on ? `${savedLabel}, הסרה מהשמורים: ${name}` : `שמירה: ${name}`}
       >
         <Heart className={`size-4 ${on ? "fill-current" : ""}`} aria-hidden="true" />
@@ -218,7 +218,7 @@ export function CompareButton({ id, name }: { id: string; name: string }) {
           setAnnounced(true);
           setList((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id].slice(-MAX_COMPARE)));
         }}
-        className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition disabled:opacity-40 ${on ? "bg-teal-100 text-teal-700" : "text-navy-800 hover:bg-sand-100"}`}
+        className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition disabled:opacity-40 ${on ? "bg-teal-100 text-teal-700" : "text-navy-800 hover:bg-sand-100"}`}
         aria-label={on ? `בהשוואה, הסרה מההשוואה: ${name}` : `השוואה, הוספה להשוואה: ${name}`}
       >
         <Scale className="size-4" aria-hidden="true" />

@@ -654,7 +654,7 @@ const researched: Institution[] = [
       address: "ישיבת ההסדר עתניאל, עתניאל, הר חברון 90407",
     },
     sources: [
-      { label: "ישיבת עתניאל — צור קשר (אתר רשמי)", url: "https://otniel.org/en/?p=8102", kind: "official" },
+      { label: "ישיבת עתניאל — צור קשר (אתר רשמי)", url: "https://otniel.org/contact/", kind: "official" },
       { label: "Wikipedia — Yeshivat Otniel", url: "https://en.wikipedia.org/wiki/Yeshivat_Otniel", kind: "encyclopedia" },
       HESDER_GENERAL_SOURCE,
     ],

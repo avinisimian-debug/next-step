@@ -7,6 +7,7 @@ import { SITE_OPERATOR } from "@/lib/site";
 export const metadata: Metadata = {
   title: "מדיניות עוגיות",
   description: "אילו עוגיות ואיזה אחסון מקומי ״הצעד הבא״ משתמש בהם, למה, לכמה זמן ואיך מוחקים אותם.",
+  alternates: { canonical: "/cookies" },
 };
 
 const ROWS: { name: string; kind: string; purpose: string; duration: string }[] = [
