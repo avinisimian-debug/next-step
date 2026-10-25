@@ -45,6 +45,7 @@ function institutionText(i: Institution) {
     `סוג: ${i.typeLabel} (${PATHWAY_INFO[i.pathway].name})`,
     `מיקום: ${i.locationLabel}`,
     i.shortDescription,
+    i.selfDescription && `כך המקום מציג את עצמו: ${i.selfDescription.summary}`,
     p.overview,
     p.philosophy,
     p.programStructure,

@@ -1,6 +1,8 @@
 import type { Institution } from "@/lib/domain/types";
 import { directoryInstitutions } from "./directory";
 import { girlsInstitutions } from "./girls";
+import { selfDescriptions } from "./self-descriptions";
+import { withSelfDescription } from "@/lib/domain/emphases";
 
 /**
  * Seed catalog.
@@ -1126,4 +1128,6 @@ const researched: Institution[] = [
 ];
 
 /** Researched records first, then directory records (identity confirmed, details not yet verified). */
-export const institutions: Institution[] = [...researched, ...directoryInstitutions, ...girlsInstitutions];
+export const institutions: Institution[] = [...researched, ...directoryInstitutions, ...girlsInstitutions].map((i) =>
+  selfDescriptions[i.id] ? withSelfDescription({ ...i, selfDescription: selfDescriptions[i.id] }) : i,
+);

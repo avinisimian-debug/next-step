@@ -6,6 +6,7 @@ import { useEffect, useState, useTransition } from "react";
 import { KEYS, useStored } from "@/lib/client/store";
 import { getSaveState, setSaved, type SaveState } from "@/app/actions/saved";
 import { AUDIENCE_LABELS } from "@/lib/domain/pathways";
+import { emphasisLabels } from "@/lib/domain/emphases";
 
 export const formatDate = (iso: string) =>
   new Date(`${iso}T00:00:00`).toLocaleDateString("he-IL", { day: "numeric", month: "long", year: "numeric" });
@@ -227,5 +228,61 @@ export function CompareButton({ id, name }: { id: string; name: string }) {
         {announced && (on ? `${name} נוסף להשוואה (${list.length} מתוך ${MAX_COMPARE})` : `${name} הוסר מההשוואה`)}
       </span>
     </>
+  );
+}
+
+/** What the institution stresses in its own description of itself, as chips. */
+export function EmphasisChips({ inst, label, tone = "light" }: { inst: Institution; label: string; tone?: "light" | "dark" }) {
+  const labels = emphasisLabels(inst);
+  if (labels.length === 0) return null;
+  return (
+    <ul className="flex flex-wrap gap-2" aria-label={label}>
+      {labels.map((l) => (
+        <li
+          key={l}
+          className={
+            tone === "dark"
+              ? "rounded-full border border-sky-300/30 bg-sky-300/10 px-3.5 py-1.5 text-sm font-medium text-sky-300 shadow-[0_0_24px_-8px_rgb(63_208_255/0.5)]"
+              : "rounded-full bg-teal-100 px-3 py-1.5 text-sm text-teal-700"
+          }
+        >
+          {l}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** The institution's self-description with its source. Says plainly that this is the place's own view. */
+export function SelfDescriptionSection({ inst }: { inst: Institution }) {
+  const self = inst.selfDescription;
+  if (!self) return null;
+  const who = inst.pathway === "hesder" || inst.pathway === "yeshiva" ? "הישיבה" : "המקום";
+  return (
+    <section
+      aria-labelledby="h-self"
+      className="grain relative isolate overflow-hidden rounded-[28px] bg-night p-7 text-paper shadow-lift sm:p-10"
+    >
+      <div aria-hidden="true" className="absolute -start-24 -top-24 -z-10 size-72 rounded-full bg-sky-500/20 blur-[90px]" />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-6 end-5 -z-10 select-none font-display text-[10rem] leading-none text-sky-400/15"
+      >
+        ״
+      </span>
+      <h2 id="h-self" className="text-sm font-semibold tracking-wide text-sky-300">
+        כך {who} מציגה את עצמה
+      </h2>
+      <p className="mt-4 font-display text-xl leading-9 text-paper sm:text-2xl sm:leading-10">{self.summary}</p>
+      <p className="mt-6 border-t border-paper/10 pt-4 text-sm leading-6 text-mist-300">
+        סיכום שלנו מתוך{" "}
+        <a href={self.source.url} target="_blank" rel="noopener noreferrer" className="text-sky-300 underline underline-offset-4 hover:text-paper">
+          {self.source.label}
+          <span className="sr-only"> (נפתח בלשונית חדשה)</span>
+        </a>
+        , נבדק ב־<time dateTime={self.checkedOn}>{formatDate(self.checkedOn)}</time>. זה התיאור של {who} על עצמה, לא בדיקה שלנו,
+        ולכן כדאי לבקר בשבת או בשבוע ישיבה ולהרגיש בעצמך.
+      </p>
+    </section>
   );
 }

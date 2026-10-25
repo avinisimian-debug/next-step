@@ -249,7 +249,7 @@ body {
 }
 
 /* On dark sections the teal ring is too faint (under 3:1), so it turns white there. */
-:is(.bg-navy-950, .bg-navy-900) :focus-visible {
+:is(.bg-navy-950, .bg-navy-900, .bg-night) :focus-visible {
   outline-color: #fff;
 }
 

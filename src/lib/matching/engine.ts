@@ -103,6 +103,9 @@ export function hardConstraint(inst: Institution, a: Answers): string | null {
   return null;
 }
 
+/** Questionnaire `yeshiva_focus` options that cover more than one emphasis. The rest map to the emphasis of the same id. */
+const YESHIVA_FOCUS_EMPHASES: Record<string, string[]> = { emuna: ["emuna", "chassidut", "rav_kook"] };
+
 const isPathway = (p: string): p is Pathway => (PATHWAYS as readonly string[]).includes(p);
 
 // ───────────────────────── Components ─────────────────────────
@@ -230,6 +233,22 @@ function educationSignals(inst: Institution, a: Answers): Signal[] {
       score: s,
       weight: 1,
       reason: s >= 0.9 ? `חשוב לך ${optionLabel("yeshiva_style", ys)} — וזה מאפיין את המקום.` : undefined,
+    });
+  }
+
+  // What the yeshiva says about itself (selfDescription). A yeshiva with no self-description gets a
+  // neutral-low score: we can't say it matches, and it shouldn't outrank one whose own words do.
+  const yf = asArray(a.yeshiva_focus);
+  if (yf.length > 0 && (inst.pathway === "yeshiva" || inst.pathway === "hesder")) {
+    const own = inst.selfDescription?.emphases ?? [];
+    const hits = yf.filter((f) => (YESHIVA_FOCUS_EMPHASES[f] ?? [f]).some((e) => own.includes(e as never)));
+    out.push({
+      score: inst.selfDescription ? 0.2 + 0.8 * (hits.length / yf.length) : 0.4,
+      weight: 2,
+      reason:
+        hits.length > 0
+          ? `חיפשת ישיבה עם ${listHe(hits.map((h) => optionLabel("yeshiva_focus", h)))} — וכך הישיבה מתארת את עצמה.`
+          : undefined,
     });
   }
 

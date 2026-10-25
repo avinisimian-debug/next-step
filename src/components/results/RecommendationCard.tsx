@@ -9,6 +9,7 @@ import {
   AudienceChip,
   CompareButton,
   ContactBlock,
+  EmphasisChips,
   FavoriteButton,
   Location,
   OfficialLink,
@@ -81,6 +82,15 @@ export function RecommendationCard({ rec, rank, aiSummary }: { rec: Recommendati
               </li>
             ))}
           </ul>
+        )}
+
+        {inst.selfDescription && inst.selfDescription.emphases.length > 0 && (
+          <div>
+            <h3 className="text-sm font-semibold text-navy-950">מה הישיבה מדגישה, לפי התיאור שלה</h3>
+            <div className="mt-2">
+              <EmphasisChips inst={inst} label={`מה ${inst.name} מדגישה`} />
+            </div>
+          </div>
         )}
 
         {rec.concerns.length > 0 && (
