@@ -4,7 +4,7 @@ import { PATHWAY_ORDER } from "@/lib/domain/pathways";
 import { SITE_URL, pathwayHref } from "@/lib/seo";
 
 // Pages that are the same for everyone. Personal pages (saved, journey, account) are left out and blocked in robots.ts.
-const STATIC = ["/", "/questionnaire", "/institutions", "/community", "/compare", "/about", "/plan", "/accessibility", "/privacy", "/terms", "/credits"];
+const STATIC = ["/", "/questionnaire", "/institutions", "/community", "/compare", "/about", "/plan", "/accessibility", "/privacy", "/cookies", "/terms", "/credits"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const institutions = await getRepository().listPublic();

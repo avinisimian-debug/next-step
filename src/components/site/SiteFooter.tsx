@@ -44,6 +44,7 @@ export function SiteFooter() {
           <ul className="space-y-2 text-sm">
             <li><Link className="hover:text-paper" href="/about">אודות והשיטה</Link></li>
             <li><Link className="hover:text-paper" href="/privacy">מדיניות פרטיות</Link></li>
+            <li><Link className="hover:text-paper" href="/cookies">מדיניות עוגיות</Link></li>
             <li><Link className="hover:text-paper" href="/terms">תנאי שימוש</Link></li>
             <li><Link className="hover:text-paper" href="/accessibility">הצהרת נגישות</Link></li>
             <li><Link className="hover:text-paper" href="/credits">קרדיטים ומקורות</Link></li>

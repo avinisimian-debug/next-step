@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { BottomNav } from "@/components/site/BottomNav";
 import { AccessibilityMenu } from "@/components/site/AccessibilityMenu";
+import { CookieNotice } from "@/components/site/CookieNotice";
 import Script from "next/script";
 import { A11Y_KEY } from "@/lib/a11y";
 
@@ -60,6 +61,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SiteFooter />
         <BottomNav />
         <AccessibilityMenu />
+        <CookieNotice />
         {/* Vercel Web Analytics: cookieless page-view counts. Served by Vercel once Analytics is enabled on the project. */}
         {process.env.VERCEL && <Script src="/_vercel/insights/script.js" strategy="afterInteractive" />}
       </body>
