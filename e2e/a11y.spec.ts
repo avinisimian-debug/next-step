@@ -11,6 +11,7 @@ const PAGES = [
   "/compare",
   "/institutions",
   "/institutions/hakotel",
+  "/institutions/hesder-binot-raanana",
   "/maslul/mechinot",
   "/maslul/tzahal",
   "/maslul/sherut-leumi",

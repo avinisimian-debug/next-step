@@ -10,6 +10,7 @@ import {
   FavoriteButton,
   Location,
   OfficialLink,
+  SelfDescriptionSection,
   VerificationBadge,
 } from "@/components/institution/bits";
 import { PersonalFit } from "@/components/institution/PersonalFit";
@@ -114,7 +115,10 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
             <VerificationBadge inst={inst} />
             <AudienceChip inst={inst} />
           </div>
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-navy-800">{inst.shortDescription}</p>
+          {/* A directory record's short text is its self-description, shown in full in its own section below. */}
+          {inst.shortDescription !== inst.selfDescription?.summary && (
+            <p className="mt-5 max-w-3xl text-lg leading-8 text-navy-800">{inst.shortDescription}</p>
+          )}
           <div className="mt-6 flex flex-wrap items-center gap-2">
             <OfficialLink inst={inst} />
             <CompareButton id={inst.id} name={inst.name} />
@@ -125,6 +129,8 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
 
       <div className="mx-auto grid max-w-5xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_300px]">
         <div className="space-y-10">
+          <SelfDescriptionSection inst={inst} />
+
           <PersonalFit inst={inst} />
 
           {inst.highlights.length > 0 && (

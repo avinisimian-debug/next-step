@@ -1,4 +1,5 @@
 import { PATHWAYS, REGIONS, type Institution, type Pathway, type Region } from "@/lib/domain/types";
+import { emphasisLabels } from "@/lib/domain/emphases";
 
 export const AUDIENCE_FILTERS = ["men", "women"] as const;
 export type AudienceFilter = (typeof AUDIENCE_FILTERS)[number];
@@ -36,7 +37,9 @@ const PREFIX = /^[הבלומשכ]/;
 
 function haystack(i: Institution): string {
   return normalize(
-    [i.name, i.typeLabel, i.locationLabel, i.shortDescription, ...i.highlights, i.profile.overview].join(" "),
+    [i.name, i.typeLabel, i.locationLabel, i.shortDescription, ...i.highlights, ...emphasisLabels(i), i.profile.overview].join(
+      " ",
+    ),
   );
 }
 

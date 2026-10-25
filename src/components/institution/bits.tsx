@@ -6,6 +6,7 @@ import { useEffect, useState, useTransition } from "react";
 import { KEYS, useStored } from "@/lib/client/store";
 import { getSaveState, setSaved, type SaveState } from "@/app/actions/saved";
 import { AUDIENCE_LABELS } from "@/lib/domain/pathways";
+import { emphasisLabels } from "@/lib/domain/emphases";
 
 export const formatDate = (iso: string) =>
   new Date(`${iso}T00:00:00`).toLocaleDateString("he-IL", { day: "numeric", month: "long", year: "numeric" });
@@ -227,5 +228,47 @@ export function CompareButton({ id, name }: { id: string; name: string }) {
         {announced && (on ? `${name} נוסף להשוואה (${list.length} מתוך ${MAX_COMPARE})` : `${name} הוסר מההשוואה`)}
       </span>
     </>
+  );
+}
+
+/** What the institution stresses in its own description of itself, as chips. */
+export function EmphasisChips({ inst, label }: { inst: Institution; label: string }) {
+  const labels = emphasisLabels(inst);
+  if (labels.length === 0) return null;
+  return (
+    <ul className="flex flex-wrap gap-2" aria-label={label}>
+      {labels.map((l) => (
+        <li key={l} className="rounded-full bg-teal-100 px-3 py-1.5 text-sm text-teal-700">
+          {l}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** The institution's self-description with its source. Says plainly that this is the place's own view. */
+export function SelfDescriptionSection({ inst }: { inst: Institution }) {
+  const self = inst.selfDescription;
+  if (!self) return null;
+  const who = inst.pathway === "hesder" || inst.pathway === "yeshiva" ? "הישיבה" : "המקום";
+  return (
+    <section aria-labelledby="h-self" className="rounded-3xl border border-teal-100 bg-teal-100/30 p-6">
+      <h2 id="h-self" className="font-display text-2xl font-bold text-navy-950">
+        כך {who} מציגה את עצמה
+      </h2>
+      <p className="mt-3 leading-8 text-navy-800">{self.summary}</p>
+      <div className="mt-4">
+        <EmphasisChips inst={inst} label={`מה ${who} מדגישה`} />
+      </div>
+      <p className="mt-4 text-sm leading-6 text-stone-600">
+        סיכום שלנו מתוך{" "}
+        <a href={self.source.url} target="_blank" rel="noopener noreferrer" className="text-teal-700 underline underline-offset-4">
+          {self.source.label}
+          <span className="sr-only"> (נפתח בלשונית חדשה)</span>
+        </a>
+        , נבדק ב־<time dateTime={self.checkedOn}>{formatDate(self.checkedOn)}</time>. זה התיאור של {who} על עצמה, לא בדיקה שלנו,
+        ולכן כדאי לבקר בשבת או בשבוע ישיבה ולהרגיש בעצמך.
+      </p>
+    </section>
   );
 }

@@ -75,6 +75,29 @@ export const MILITARY_MODELS = [
 ] as const;
 export type MilitaryModel = (typeof MILITARY_MODELS)[number];
 
+/** What a yeshiva can say it stresses (see selfDescription). Labels and matching effects live in emphases.ts. */
+export const EMPHASIS_IDS = [
+  "iyun",
+  "bekiut",
+  "halacha",
+  "emuna",
+  "chassidut",
+  "rav_kook",
+  "tanach",
+  "personal",
+  "family",
+  "community",
+  "academic",
+  "shiluvim",
+  "army_prep",
+  "sephardi",
+  "personality",
+  "openness",
+  "prayer",
+  "leadership",
+] as const;
+export type Emphasis = (typeof EMPHASIS_IDS)[number];
+
 export const VERIFICATION_STATUSES = ["verified", "partial", "unverified"] as const;
 export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number];
 
@@ -134,6 +157,19 @@ export const profileSchema = z.object({
   faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
 });
 
+/**
+ * What a framework says about itself on a page it wrote (its own site, or its page on an association site),
+ * summarized in our words. It is the institution's self-image, not something we checked.
+ */
+export const selfDescriptionSchema = z.object({
+  summary: z.string().min(10),
+  /** Ids from EMPHASES (src/lib/domain/emphases.ts): only what the page itself stresses. */
+  emphases: z.array(z.enum(EMPHASIS_IDS)),
+  source: sourceSchema,
+  checkedOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+export type SelfDescription = z.infer<typeof selfDescriptionSchema>;
+
 export const institutionSchema = z.object({
   id: z.string().min(1),
   slug: z.string().regex(/^[a-z0-9-]+$/),
@@ -150,6 +186,7 @@ export const institutionSchema = z.object({
   limitations: z.array(z.string()).default([]),
   attributes: matchingAttributesSchema,
   profile: profileSchema,
+  selfDescription: selfDescriptionSchema.optional(),
   website: z.string().url().optional(),
   contact: contactSchema.optional(),
   sources: z.array(sourceSchema).min(1),
