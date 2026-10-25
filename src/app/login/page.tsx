@@ -30,8 +30,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         )}
       </div>
       <p className="mt-8 text-xs leading-5 text-stone-600">
-        אנחנו שומרים רק את כתובת המייל, את השם שתבחרו להציג ואת מה שתשמרו או תפרסמו. פרטים נוספים ב
-        <a href="/privacy" className="underline">מדיניות הפרטיות</a>.
+        אנחנו שומרים רק את כתובת המייל, את השם שתבחרו להציג ואת מה שתשמרו או תפרסמו. בכניסה לחשבון אתם מאשרים את{" "}
+        <a href="/terms" className="underline">תנאי השימוש</a> ואת <a href="/privacy" className="underline">מדיניות הפרטיות</a>.
       </p>
     </div>
   );

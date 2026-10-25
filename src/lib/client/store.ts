@@ -15,6 +15,7 @@ export const KEYS = {
   aiConsent: "nextstep.aiConsent.v1",
   plan: "nextstep.plan.v1",
   journey: "nextstep.journey.v1",
+  cookieNotice: "nextstep.cookieNotice.v1",
 } as const;
 
 const listeners = new Set<() => void>();

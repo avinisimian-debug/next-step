@@ -40,6 +40,13 @@ export default function AccessibilityPage() {
       </section>
 
       <section>
+        <h2>דפדפנים וטכנולוגיות מסייעות</h2>
+        <p>
+          האתר מותאם לגרסאות העדכניות של Chrome,‏ Safari,‏ Edge ו־Firefox, במחשב ובטלפון, ולשימוש עם קורא מסך (NVDA,‏ JAWS,‏
+          VoiceOver ו־TalkBack), הגדלת מסך וניווט במקלדת בלבד.
+        </p>
+      </section>
+      <section>
         <h2>איך בדקנו</h2>
         <p>
           כל העמודים הראשיים נבדקים באופן אוטומטי (axe-core) מול הכללים של WCAG 2.0 ו־2.1 ברמות A ו־AA, בגרסת מחשב ובגרסת
@@ -68,6 +75,9 @@ export default function AccessibilityPage() {
           מה ניסית לעשות, ובאיזה דפדפן או טכנולוגיה מסייעת השתמשת.
         </p>
         <ContactLines {...ACCESSIBILITY_CONTACT} />
+        <p>
+          אם חלק מהשירות לא נגיש לך, אפשר גם לפנות אלינו בטלפון או בדוא״ל, ונמסור לך את המידע שחיפשת בדרך שנוחה לך.
+        </p>
       </section>
 
       <section>

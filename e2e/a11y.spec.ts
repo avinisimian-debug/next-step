@@ -27,6 +27,7 @@ const PAGES = [
   "/login",
   "/about",
   "/privacy",
+  "/cookies",
   "/accessibility",
   "/terms",
   "/credits",
