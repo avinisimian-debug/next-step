@@ -23,6 +23,8 @@ export async function POST(req: Request) {
     await getRepository().upsert(parsed.data);
     return NextResponse.json({ message: "נשמר במאגר." });
   } catch (err) {
-    return NextResponse.json({ message: err instanceof Error ? err.message : "השמירה נכשלה." }, { status: 500 });
+    // The details go to the server log; the page gets a plain message.
+    console.error("admin upsert failed", err);
+    return NextResponse.json({ message: "השמירה נכשלה. הפרטים נרשמו ביומן השרת." }, { status: 500 });
   }
 }

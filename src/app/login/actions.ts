@@ -16,7 +16,10 @@ const schema = z.object({
   next: z.string().optional(),
 });
 
+// The configured site URL wins, so a forged Host header can't change where the login link points.
+// Previews have no NEXT_PUBLIC_SITE_URL and fall back to their own host (Supabase's redirect allow-list still applies).
 async function siteOrigin() {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host");
   const proto = h.get("x-forwarded-proto") ?? (host?.startsWith("localhost") ? "http" : "https");
