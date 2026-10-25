@@ -3,6 +3,12 @@ import type { Pathway } from "@/lib/domain/types";
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 export const SITE_NAME = "הצעד הבא";
 
+/**
+ * The share image from src/app/opengraph-image.jpg. A page that sets its own openGraph loses the
+ * inherited image, so those pages pass this one explicitly.
+ */
+export const OG_IMAGE = { url: "/opengraph-image.jpg", width: 1200, height: 630, alt: "הצעד הבא: גלה מה מתאים לך אחרי י״ב" };
+
 /** One landing page per pathway, written for the words people search for ("מכינות קדם צבאיות", "ישיבות הסדר"). */
 export const PATHWAY_PAGES: Record<Pathway, { slug: string; title: string; h1: string; description: string; noun: string }> = {
   idf: {

@@ -29,6 +29,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Put title and description in <head> for every visitor, not only known crawlers. With streaming
+  // metadata, pages that read search params (like /institutions) sent their description in <body>.
+  htmlLimitedBots: /.*/,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

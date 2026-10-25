@@ -15,6 +15,7 @@ import { AuthorLine, ContentLabel } from "@/components/community/bits";
 export const metadata: Metadata = {
   title: "קהילה",
   description: "שאלות ותשובות על המסלולים והמסגרות — מניסיון אישי של אנשים, ותשובות רשמיות מנציגים מאומתים.",
+  alternates: { canonical: "/community" },
 };
 export const dynamic = "force-dynamic";
 

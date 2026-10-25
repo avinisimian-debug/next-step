@@ -62,7 +62,7 @@ export function Questionnaire() {
   }, [index, progress.phase, resume]);
 
   if (!hydrated || resume === "pending") {
-    return <Loading label="טוען את השאלון…" />;
+    return <Loading title="השאלון" label="טוען את השאלון…" />;
   }
 
   const setAnswer = (id: string, value: string | string[] | undefined) => {
@@ -215,7 +215,7 @@ export function Questionnaire() {
 
       <p className="mt-6 flex items-center gap-2 text-xs text-mist-500">
         <Save className="size-3.5" aria-hidden="true" />
-        התשובות נשמרות רק בדפדפן שלך. <Link href="/privacy" className="underline">מה נשמר ולמה</Link>
+        התשובות נשמרות רק בדפדפן שלך. <Link href="/privacy" className="inline-flex min-h-6 items-center underline">מה נשמר ולמה</Link>
       </p>
     </Shell>
   );

@@ -6,6 +6,7 @@ import { SITE_OPERATOR } from "@/lib/site";
 export const metadata: Metadata = {
   title: "תנאי שימוש",
   description: "התנאים לשימוש באתר ״הצעד הבא״, כולל מעמד המידע באתר, כללי הקהילה וזכויות יוצרים.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {

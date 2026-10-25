@@ -73,8 +73,9 @@ export function SiteHeader() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" aria-label="הצעד הבא, לדף הבית" className="shrink-0">
+        <Link href="/" className="shrink-0">
           <Logo tone={dark ? "light" : "dark"} />
+          <span className="sr-only">, לדף הבית</span>
         </Link>
 
         {!inFlow && (
@@ -123,7 +124,7 @@ export function SiteHeader() {
             <button
               ref={toggle}
               type="button"
-              className={`inline-flex size-10 items-center justify-center rounded-lg lg:hidden ${
+              className={`inline-flex size-11 items-center justify-center rounded-lg lg:hidden ${
                 dark
                   ? "text-paper hover:bg-paper/10"
                   : "text-navy-900 hover:bg-sand-100"

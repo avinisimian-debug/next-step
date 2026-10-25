@@ -7,6 +7,7 @@ import { LEGAL_UPDATED, SITE_OPERATOR } from "@/lib/site";
 export const metadata: Metadata = {
   title: "פרטיות",
   description: "איזה מידע ״הצעד הבא״ שומר, איפה, ולמה — ואיך למחוק אותו.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

@@ -18,22 +18,20 @@ export function CookieNotice() {
   return (
     <section
       aria-label="הודעה על עוגיות"
-      className={`fixed ${bottom} start-3 end-[4.5rem] z-40 mx-auto max-w-md rounded-3xl border border-sand-200 bg-paper p-4 text-sm leading-6 text-navy-900 shadow-lift print:hidden lg:bottom-6 lg:end-24`}
+      className={`fixed ${bottom} start-3 end-[4.5rem] z-40 mx-auto max-w-md rounded-2xl border border-sand-200 bg-paper px-3 py-2 text-[13px] leading-5 text-navy-900 shadow-lift print:hidden sm:rounded-3xl sm:p-4 sm:text-sm sm:leading-6 lg:bottom-6 lg:end-24`}
     >
-      <div className="flex items-start gap-3">
-        <Cookie className="mt-0.5 size-5 shrink-0 text-teal-700" aria-hidden="true" />
-        <p>
-          באתר יש רק עוגיות שנחוצות כדי להתחבר לחשבון, ומדידת כניסות בלי עוגיות. אין עוגיות פרסום או מעקב.{" "}
+      <div className="flex items-center gap-3">
+        <Cookie className="hidden size-5 shrink-0 text-teal-700 sm:block" aria-hidden="true" />
+        <p className="min-w-0 flex-1">
+          רק עוגיות חיוניות להתחברות. אין עוגיות פרסום או מעקב.{" "}
           <Link href="/cookies" className="font-medium text-teal-700 underline underline-offset-4">
             מדיניות העוגיות
           </Link>
         </p>
-      </div>
-      <div className="mt-3 flex justify-end">
         <button
           type="button"
           onClick={() => setSeen(true)}
-          className="rounded-full bg-navy-900 px-5 py-2 text-sm font-semibold text-paper hover:bg-navy-800"
+          className="min-h-11 shrink-0 rounded-full bg-navy-900 px-4 text-sm font-semibold text-paper hover:bg-navy-800"
         >
           הבנתי
         </button>

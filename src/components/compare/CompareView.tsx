@@ -69,7 +69,7 @@ export function CompareView({ catalog }: { catalog: Institution[] }) {
     setFocusTarget(null);
   }, [focusTarget, selected]);
 
-  if (!hydrated) return <Loading label="טוען את ההשוואה…" />;
+  if (!hydrated) return <Loading title="השוואה בין מסגרות" label="טוען את ההשוואה…" />;
 
   const remove = (inst: Institution) => {
     const i = selected.findIndex((x) => x.id === inst.id);

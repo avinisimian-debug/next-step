@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+// Zod probes for eval support with new Function(), which the site's CSP blocks and the browser reports as an
+// issue. Turning off its compiled fast path skips the probe; parsing works the same.
+z.config({ jitless: true });
+
 /**
  * The post-high-school pathways the platform covers. hesder and yeshiva are for boys, national_service
  * and midrasha for girls, idf and mechina for both (see PATHWAYS_FOR in pathways.ts).

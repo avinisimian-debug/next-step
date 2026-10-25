@@ -17,7 +17,7 @@ import {
 import { PersonalFit } from "@/components/institution/PersonalFit";
 import { DURATION_LABELS, INTENSITY_LABELS, MILITARY_MODEL_LABELS, PATHWAY_INFO } from "@/lib/domain/pathways";
 import type { Pathway } from "@/lib/domain/types";
-import { SITE_URL, pathwayHref } from "@/lib/seo";
+import { OG_IMAGE, SITE_URL, pathwayHref } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Dust } from "@/components/motion/Dust";
 
@@ -31,13 +31,14 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const inst = await getRepository().getPublicBySlug((await params).slug);
-  if (!inst) return { title: "לא נמצא" };
+  if (!inst) return { title: "הדף לא נמצא" };
   const path = `/institutions/${inst.slug}`;
   return {
     title: `${inst.name}: ${inst.typeLabel}`,
     description: inst.shortDescription,
     alternates: { canonical: path },
-    openGraph: { title: inst.name, description: inst.shortDescription, url: path },
+    openGraph: { title: inst.name, description: inst.shortDescription, url: path, images: [OG_IMAGE] },
+    twitter: { card: "summary_large_image", images: [OG_IMAGE.url] },
   };
 }
 
@@ -108,7 +109,7 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
         />
         <Dust count={36} className="-z-10" />
         <div className="relative mx-auto max-w-5xl px-4 pb-24 pt-8 sm:px-6 sm:pb-28 sm:pt-12">
-          <Link href="/results" className="inline-flex items-center gap-1.5 text-sm font-medium text-mist-100 hover:text-paper hover:underline">
+          <Link href="/results" className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-mist-100 hover:text-paper hover:underline">
             <ArrowRight className="size-4" aria-hidden="true" />
             חזרה להמלצות
           </Link>
@@ -197,7 +198,7 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
               </ul>
               <Link
                 href={`/community/ask?institution=${encodeURIComponent(inst.id)}`}
-                className="mt-4 inline-flex text-sm font-medium text-teal-700 underline underline-offset-4"
+                className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-teal-700 underline underline-offset-4"
               >
                 לשאול בקהילה על {inst.name}
               </Link>
@@ -264,10 +265,10 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
               תשובות בקהילה הן ניסיון אישי של משתמשים, אלא אם מסומנות כתשובה רשמית של נציג מאומת.
             </p>
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium">
-              <Link href={`/community?institution=${encodeURIComponent(inst.id)}`} className="text-teal-700 underline-offset-4 hover:underline">
+              <Link href={`/community?institution=${encodeURIComponent(inst.id)}`} className="inline-flex min-h-11 items-center text-teal-700 underline-offset-4 hover:underline">
                 שאלות על {inst.name}
               </Link>
-              <Link href={`/community/ask?institution=${encodeURIComponent(inst.id)}`} className="text-teal-700 underline-offset-4 hover:underline">
+              <Link href={`/community/ask?institution=${encodeURIComponent(inst.id)}`} className="inline-flex min-h-11 items-center text-teal-700 underline-offset-4 hover:underline">
                 לשאול שאלה
               </Link>
             </div>
@@ -279,7 +280,7 @@ export default async function InstitutionPage({ params }: { params: Promise<{ sl
             <ul className="mt-3 space-y-2 text-sm">
               {inst.sources.map((s) => (
                 <li key={s.url}>
-                  <a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1.5 text-teal-700 hover:underline">
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1.5 py-1.5 text-teal-700 hover:underline">
                     <ExternalLink className="mt-1 size-3.5 shrink-0" aria-hidden="true" />
                     {s.label}
                   </a>

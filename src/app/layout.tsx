@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     siteName: "הצעד הבא",
     type: "website",
   },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

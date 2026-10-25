@@ -56,7 +56,7 @@ export function PlanView({ catalog }: { catalog: Institution[] }) {
             <Printer className="size-4" aria-hidden="true" />
             הדפסה
           </button>
-          <Link href="/results" className="text-sm font-medium text-teal-700 underline underline-offset-4">
+          <Link href="/results" className="inline-flex min-h-11 items-center text-sm font-medium text-teal-700 underline underline-offset-4">
             חזרה להמלצות
           </Link>
         </div>
