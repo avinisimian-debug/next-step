@@ -49,7 +49,7 @@ export function withSelfDescription(inst: Institution): Institution {
     attributes,
     shortDescription: inst.highlights.length > 0 ? inst.shortDescription : self.summary,
     // The directory overview says nothing is known about the educational approach; the self-description now covers it.
-    profile: { ...inst.profile, overview: inst.profile.overview.replace("על הגישה החינוכית, ", "") },
+    profile: { ...inst.profile, overview: inst.profile.overview.replace("על הגישה החינוכית, ", "על ") },
     sources: inst.sources.some((s) => s.url === self.source.url) ? inst.sources : [...inst.sources, self.source],
   };
 }
