@@ -24,6 +24,7 @@ const PAGES = [
   "/plan",
   "/my-path",
   "/account",
+  "/manage",
   "/login",
   "/about",
   "/privacy",

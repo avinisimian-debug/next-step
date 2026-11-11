@@ -42,3 +42,5 @@ export const getViewer = cache(async (): Promise<Viewer> => {
 
 export const isModerator = (v: Viewer) =>
   v.state === "signed_in" && (v.profile.role === "moderator" || v.profile.role === "admin");
+
+export const isAdmin = (v: Viewer) => v.state === "signed_in" && v.profile.role === "admin";

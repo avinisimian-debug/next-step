@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Bell, Bookmark, LogOut, Map, MessagesSquare, ShieldCheck } from "lucide-react";
-import { getViewer, isModerator } from "@/lib/auth/viewer";
+import { Bell, Bookmark, LogOut, Map, MessagesSquare, ShieldCheck, Users } from "lucide-react";
+import { getViewer, isAdmin, isModerator } from "@/lib/auth/viewer";
 import { loginHref } from "@/lib/auth/redirect";
 import { ROLE_LABELS } from "@/lib/community/labels";
 import { getRepository } from "@/lib/data/repository";
@@ -44,6 +44,7 @@ export default async function AccountPage() {
     { href: "/my-path", label: "מפת הדרך שלי", Icon: Map },
     { href: "/community?mine=1", label: "השאלות שלי בקהילה", Icon: MessagesSquare },
     ...(isModerator(viewer) ? [{ href: "/moderation", label: "תור הדיווחים", Icon: ShieldCheck }] : []),
+    ...(isAdmin(viewer) ? [{ href: "/manage", label: "ניהול: נרשמים", Icon: Users }] : []),
   ];
 
   return (
